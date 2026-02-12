@@ -1,0 +1,238 @@
+ALGORITHM: Hybrid Energy System Optimization using NSGA-II
+
+================================================================================
+OPTIMIZATION LAYER
+================================================================================
+
+DECISION VARIABLES:
+    - N_PV (number/capacity of PV panels)
+    - N_WT (number/capacity of Wind turbines)
+    - Cap_H2 (Hydrogen storage capacity, Hmax)
+    - Cap_FC (Fuel cell capacity)
+    - Cap_EL (Electrolyzer capacity)
+    - Cap_DG (Diesel generator capacity)
+
+OBJECTIVES:
+    - f1: Minimize Total_Cost
+    - f2: Minimize Total_Emissions
+
+CONSTRAINT:
+    - LPSP <= LPSPmax
+
+NSGA_II_MAIN():
+    Initialize_Population(decision_variables)
+    
+    FOR generation = 1 TO max_generations:
+        
+        FOR each individual IN population:
+            (Total_Cost, Total_Emissions, LPSP) = SIMULATE_YEAR(individual)
+            
+            IF (LPSP > LPSPmax) THEN
+                Apply_penalty(individual)
+            ENDIF
+        ENDFOR
+        
+        Non_dominated_sorting(population)
+        Crowding_distance_assignment(population)
+        Selection_and_Crossover()
+        Mutation()
+        Create_new_population()
+        
+    ENDFOR
+    
+    OUTPUT: Pareto_front WHERE (LPSP <= LPSPmax)
+
+================================================================================
+SIMULATION LAYER (8760 HOURLY TIMESTEPS)
+================================================================================
+
+SIMULATE_YEAR(system_config):
+
+    INPUTS: 
+        - Hourly_irradiation[8760]
+        - Hourly_wind_speed[8760]
+        - Hourly_Ecl[8760] (community load)
+        - system_config (PV, WT, H2, FC, EL, DG capacities)
+
+    INITIALIZE:
+        T = 1
+        HS = 0 (initial hydrogen storage level)
+        Total_Cost = 0
+        Total_Emissions = 0
+        Total_Unmet_Energy = 0
+        Total_Grid_Sales = 0
+        Total_Annual_Load = SUM(Ecl[1:8760])
+        
+    WHILE (T <= 8760):
+        
+        // ================================================================
+        // ENERGY PRODUCTION
+        // ================================================================
+        Epv = Calculate_PV_output(irradiation[T], N_PV)
+        Ewt = Calculate_WT_output(wind_speed[T], N_WT)
+        E = Epv + Ewt
+        Enet = E - Ecl[T]
+        
+        // ================================================================
+        // DECISION TREE
+        // ================================================================
+        
+        IF (Enet > 0) THEN
+            // ============================================================
+            // SURPLUS ENERGY SCENARIO
+            // ============================================================
+            
+            IF (Enet = 0) THEN
+                // Exactly balanced
+                Ed_Served = TRUE
+                LOG(T, E, Ecl[T], HS, 0, 0, 0, 0)
+                T = T + 1
+                CONTINUE
+            
+            ELSE  // Enet > 0
+                Eexcess = Enet
+                
+                IF (Hmax > HS) THEN
+                    // Hydrogen storage not full, run electrolyzer
+                    E_to_electrolyzer = MIN(Eexcess, Cap_EL, (Hmax - HS)/eta_EL)
+                    Run_Electrolyzer(E_to_electrolyzer)
+                    HS = HS + (E_to_electrolyzer * eta_EL)
+                    E_to_grid = Eexcess - E_to_electrolyzer
+                    
+                    Total_Cost += Cost_electrolyzer_operation(E_to_electrolyzer)
+                    Total_Emissions += Emissions_electrolyzer(E_to_electrolyzer)
+                    
+                    GRID(E_to_grid)
+                    Total_Grid_Sales += E_to_grid
+                    Total_Cost -= Revenue_grid_sales(E_to_grid)
+                    
+                    LOG(T, E, Ecl[T], HS, E_to_electrolyzer, 0, 0, E_to_grid)
+                    T = T + 1
+                    CONTINUE
+                
+                ELSE  // Hmax <= HS (storage full)
+                    // Send all excess to grid
+                    GRID(Eexcess)
+                    Total_Grid_Sales += Eexcess
+                    Total_Cost -= Revenue_grid_sales(Eexcess)
+                    
+                    LOG(T, E, Ecl[T], HS, 0, 0, 0, Eexcess)
+                    T = T + 1
+                    CONTINUE
+                
+                ENDIF
+            ENDIF
+        
+        ELSE  // Enet <= 0
+            // ============================================================
+            // SHORTAGE SCENARIO
+            // ============================================================
+            Shortage = Ecl[T] - E
+            EFC_available = MIN(HS * eta_FC, Cap_FC)
+            
+            IF (E + EFC_available >= Ecl[T]) THEN
+                // FC can cover the shortage
+                
+                IF (HSmin < HS) THEN
+                    // Sufficient hydrogen available
+                    EFC_needed = Shortage
+                    H2_consumed = EFC_needed / eta_FC
+                    
+                    Served_by_HS_FC(EFC_needed)
+                    HS = HS - H2_consumed
+                    Ed_Served = TRUE
+                    
+                    Total_Cost += Cost_FC_operation(EFC_needed)
+                    Total_Emissions += Emissions_FC(EFC_needed)
+                    
+                    LOG(T, E, Ecl[T], HS, 0, EFC_needed, 0, 0)
+                    T = T + 1
+                    CONTINUE
+                
+                ELSE  // HSmin >= HS
+                    // Hydrogen depleted, cannot use FC
+                    Ed_Served = FALSE
+                    Total_Unmet_Energy += Shortage
+                    
+                    LOG(T, E, Ecl[T], HS, 0, 0, 0, 0)
+                    T = T + 1
+                    CONTINUE
+                
+                ENDIF
+            
+            ELSE  // E + EFC_available < Ecl[T]
+                // FC cannot fully cover shortage
+                Remaining_shortage = Ecl[T] - (E + EFC_available)
+                
+                IF (DGmin <= Remaining_shortage) THEN
+                    // DG can operate within limits
+                    EDG = MIN(Remaining_shortage, Cap_DG)
+                    RUN_DG(EDG)
+                    
+                    // Use FC if available
+                    IF (EFC_available > 0 AND HS > HSmin) THEN
+                        H2_consumed = EFC_available / eta_FC
+                        HS = HS - H2_consumed
+                        Total_Cost += Cost_FC_operation(EFC_available)
+                        Total_Emissions += Emissions_FC(EFC_available)
+                    ENDIF
+                    
+                    Total_Cost += Cost_DG_operation(EDG)
+                    Total_Emissions += Emissions_DG(EDG)
+                    
+                    Total_energy_supplied = E + EFC_available + EDG
+                    
+                    IF (Total_energy_supplied > Ecl[T]) THEN
+                        // Excess after using DG, sell to grid
+                        E_to_grid = Total_energy_supplied - Ecl[T]
+                        GRID(E_to_grid)
+                        Total_Grid_Sales += E_to_grid
+                        Total_Cost -= Revenue_grid_sales(E_to_grid)
+                    ELSE
+                        // Still unmet load
+                        Unmet = Ecl[T] - Total_energy_supplied
+                        Total_Unmet_Energy += Unmet
+                    ENDIF
+                    
+                    LOG(T, E, Ecl[T], HS, 0, EFC_available, EDG, E_to_grid)
+                    T = T + 1
+                    CONTINUE
+                
+                ELSE  // DGmin > Remaining_shortage
+                    // DG cannot operate (below minimum)
+                    
+                    // Use FC if available
+                    IF (EFC_available > 0 AND HS > HSmin) THEN
+                        H2_consumed = EFC_available / eta_FC
+                        HS = HS - H2_consumed
+                        Total_Cost += Cost_FC_operation(EFC_available)
+                        Total_Emissions += Emissions_FC(EFC_available)
+                    ENDIF
+                    
+                    UNMET_LOAD(Remaining_shortage)
+                    Total_Unmet_Energy += Remaining_shortage
+                    
+                    LOG(T, E, Ecl[T], HS, 0, EFC_available, 0, 0)
+                    T = T + 1
+                    CONTINUE
+                
+                ENDIF
+            ENDIF
+        ENDIF
+        
+    ENDWHILE  // End of 8760 hours
+    
+    // ================================================================
+    // CALCULATE ANNUAL METRICS
+    // ================================================================
+    LPSP = Total_Unmet_Energy / Total_Annual_Load
+    
+    Total_Cost += Capital_Cost(system_config) + 
+                  Maintenance_Cost(system_config) + 
+                  Replacement_Cost(system_config)
+    
+    RETURN (Total_Cost, Total_Emissions, LPSP)
+
+END SIMULATE_YEAR
+
+END ALGORITHM
