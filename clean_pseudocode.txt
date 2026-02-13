@@ -1,0 +1,273 @@
+ALGORITHM: Hybrid Energy System Optimization using NSGA-II
+
+================================================================================
+OPTIMIZATION LAYER
+================================================================================
+
+DECISION VARIABLES:
+    N_PV, N_WT, Cap_H2, Cap_FC, Cap_EL, Cap_DG
+
+OBJECTIVES:
+    Minimize C_total
+    Minimize E_total
+
+CONSTRAINT:
+    LPSP <= LPSP_max
+
+--------------------------------------------------------------------------------
+
+NSGA_II_MAIN():
+    
+    g = 1
+    P = Initialize_Population(pop_size)
+    
+    WHILE g <= g_max:
+        
+        FOR i = 1 TO pop_size:
+            
+            [C_total, E_total, LPSP] = SIMULATE_YEAR(P[i])
+            
+            IF LPSP > LPSP_max THEN
+                penalty = M * (LPSP - LPSP_max)^2
+                C_total = C_total + penalty
+            ENDIF
+            
+            P[i].cost = C_total
+            P[i].emissions = E_total
+            P[i].lpsp = LPSP
+            
+        ENDFOR
+        
+        IF g < g_max THEN
+            F = Non_Dominated_Sort(P)
+            CD = Crowding_Distance(P, F)
+            P = Selection_Crossover_Mutation(P, F, CD)
+            g = g + 1
+        ELSE
+            OUTPUT: F[1] WHERE LPSP <= LPSP_max
+            EXIT
+        ENDIF
+        
+    ENDWHILE
+
+END NSGA_II_MAIN
+
+================================================================================
+SIMULATION LAYER
+================================================================================
+
+SIMULATE_YEAR(system):
+    
+    C_op = 0
+    E_CO2 = 0
+    E_unmet = 0
+    E_grid = 0
+    L_year = SUM(L[1:8760])
+    
+    H[1] = 0
+    
+    FOR t = 1 TO 8760:
+        
+        E_PV = eta_PV * A_PV * I[t] * N_PV
+        E_WT = P_WT(v[t]) * N_WT
+        E_RE = E_PV + E_WT
+        
+        E_net = E_RE - L[t]
+        
+        IF E_net < 0 THEN
+            
+            E_deficit = ABS(E_net)
+            
+            IF H[t] > H_min THEN
+                
+                P_FC_limit = MIN(H[t] * eta_FC, Cap_FC)
+                
+                IF E_deficit <= P_FC_limit THEN
+                    
+                    E_FC = E_deficit
+                    H_consumed = E_FC / eta_FC
+                    H[t+1] = H[t] - H_consumed
+                    
+                    C_op = C_op + c_FC * E_FC
+                    E_CO2 = E_CO2 + e_FC * E_FC
+                    
+                ELSE
+                    
+                    E_FC = P_FC_limit
+                    H_consumed = E_FC / eta_FC
+                    E_remaining = E_deficit - E_FC
+                    
+                    IF E_remaining >= P_DG_min AND E_remaining <= Cap_DG THEN
+                        
+                        E_DG = E_remaining
+                        H[t+1] = H[t] - H_consumed
+                        
+                        C_op = C_op + c_FC * E_FC + c_DG * E_DG
+                        E_CO2 = E_CO2 + e_FC * E_FC + e_DG * E_DG
+                        
+                        E_total = E_RE + E_FC + E_DG
+                        E_excess = E_total - L[t]
+                        
+                        IF E_excess > 0 THEN
+                            E_grid = E_grid + E_excess
+                            C_op = C_op - p_grid * E_excess
+                        ELSE
+                            E_unmet = E_unmet + ABS(E_excess)
+                        ENDIF
+                        
+                    ELSE
+                        
+                        H[t+1] = H[t] - H_consumed
+                        E_unmet = E_unmet + E_remaining
+                        
+                        C_op = C_op + c_FC * E_FC
+                        E_CO2 = E_CO2 + e_FC * E_FC
+                        
+                    ENDIF
+                    
+                ENDIF
+                
+            ELSE
+                H[t+1] = H[t]
+                
+                IF E_deficit >= P_DG_min AND E_deficit <= Cap_DG THEN
+                    E_DG = E_deficit
+                    C_op = C_op + c_DG * E_DG
+                    E_CO2 = E_CO2 + e_DG * E_DG
+                    
+                    E_total = E_RE + E_DG
+                    E_excess = E_total - L[t]
+                    
+                    IF E_excess > 0 THEN
+                        E_grid = E_grid + E_excess
+                        C_op = C_op - p_grid * E_excess
+                    ELSE
+                        E_unmet = E_unmet + ABS(E_excess)
+                    ENDIF
+                ELSE
+                    E_unmet = E_unmet + E_deficit
+                ENDIF
+                
+            ENDIF
+            
+        ELSE
+            
+            E_surplus = E_net
+            
+            IF E_surplus == 0 THEN
+                
+                H[t+1] = H[t]
+                
+            ELSE
+                
+                IF H[t] < H_max THEN
+                    
+                    H_space = H_max - H[t]
+                    E_EL_limit = MIN(E_surplus, Cap_EL, H_space / eta_EL)
+                    
+                    E_EL = E_EL_limit
+                    H_produced = E_EL * eta_EL
+                    H[t+1] = H[t] + H_produced
+                    
+                    C_op = C_op + c_EL * E_EL
+                    E_CO2 = E_CO2 + e_EL * E_EL
+                    
+                    E_leftover = E_surplus - E_EL
+                    
+                    IF E_leftover > 0 THEN
+                        E_grid = E_grid + E_leftover
+                        C_op = C_op - p_grid * E_leftover
+                    ENDIF
+                    
+                ELSE
+                    
+                    H[t+1] = H[t]
+                    E_grid = E_grid + E_surplus
+                    C_op = C_op - p_grid * E_surplus
+                    
+                ENDIF
+                
+            ENDIF
+            
+        ENDIF
+        
+    ENDFOR
+    
+    LPSP = E_unmet / L_year
+    
+    C_cap = c_PV * N_PV + c_WT * N_WT + c_H2 * Cap_H2 + 
+            c_FC_cap * Cap_FC + c_EL_cap * Cap_EL + c_DG_cap * Cap_DG
+    
+    C_om = (om_PV * N_PV + om_WT * N_WT + om_H2 * Cap_H2 + 
+            om_FC * Cap_FC + om_EL * Cap_EL + om_DG * Cap_DG) * T_life
+    
+    C_rep = Calculate_Replacement_Cost(system, T_life, r)
+    
+    CRF = (r * (1 + r)^T_life) / ((1 + r)^T_life - 1)
+    
+    C_total = (C_cap + C_rep) * CRF + C_om + C_op
+    E_total = E_CO2
+    
+    RETURN [C_total, E_total, LPSP]
+
+END SIMULATE_YEAR
+
+================================================================================
+VARIABLES
+================================================================================
+
+INPUTS:
+    I[t]        Solar irradiation at hour t (kW/m²)
+    v[t]        Wind speed at hour t (m/s)
+    L[t]        Load demand at hour t (kW)
+
+CALCULATED AT EACH HOUR t:
+    E_PV        PV power output (kW)
+    E_WT        Wind turbine power output (kW)
+    E_RE        Total renewable power (kW)
+    E_net       Net power = E_RE - L[t] (kW)
+    E_deficit   Power shortage = ABS(E_net) when E_net < 0 (kW)
+    E_surplus   Power surplus = E_net when E_net > 0 (kW)
+    E_FC        Fuel cell output (kW)
+    E_DG        Diesel generator output (kW)
+    E_EL        Electrolyzer input (kW)
+    E_remaining Energy deficit after FC (kW)
+    E_excess    Excess after DG (kW)
+    E_leftover  Surplus after electrolyzer (kW)
+    E_total     Total generation from all sources (kW)
+    H[t]        Hydrogen storage at hour t (kg or kWh)
+    H_consumed  Hydrogen consumed by FC (kg or kWh)
+    H_produced  Hydrogen produced by EL (kg or kWh)
+    H_space     Available storage space (kg or kWh)
+    P_FC_limit  Maximum FC power limited by H and capacity (kW)
+    E_EL_limit  Maximum EL power limited by surplus and capacity (kW)
+
+CUMULATIVE OVER YEAR:
+    C_op        Operating cost ($)
+    E_CO2       CO2 emissions (kg)
+    E_unmet     Unmet energy (kWh)
+    E_grid      Energy sold to grid (kWh)
+    L_year      Total annual load (kWh)
+
+FINAL OUTPUTS:
+    C_total     Total annualized cost ($)
+    E_total     Total annual emissions (kg)
+    LPSP        Loss of power supply probability
+
+PARAMETERS:
+    N_PV, N_WT, Cap_H2, Cap_FC, Cap_EL, Cap_DG     System capacities
+    H_max, H_min                                    Storage limits
+    P_DG_min                                        Diesel minimum load
+    eta_PV, eta_FC, eta_EL                          Efficiencies
+    A_PV                                            PV area per unit
+    c_FC, c_DG, c_EL                                Operating costs ($/kWh)
+    e_FC, e_DG, e_EL                                Emission factors (kg/kWh)
+    p_grid                                          Grid price ($/kWh)
+    c_PV, c_WT, c_H2, c_FC_cap, c_EL_cap, c_DG_cap Capital costs ($/unit)
+    om_*                                            O&M costs ($/unit/year)
+    T_life                                          Project lifetime (years)
+    r                                               Discount rate
+    M                                               Penalty multiplier
+    LPSP_max                                        Maximum acceptable LPSP
+
+END ALGORITHM

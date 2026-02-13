@@ -1,0 +1,43 @@
+
+
+# SUMMARY OF PROCESSES
+
+## Energy Flow Decision Tree
+```
+START HOUR t
+    │
+    ├─ Calculate: E_RE (solar + wind)
+    ├─ Calculate: E_net = E_RE - Load
+    │
+    └─ Three Cases:
+       │
+       ├─ CASE 1: DEFICIT (E_net < 0)
+       │   │
+       │   ├─ Have Hydrogen? (H[t] > H_min)
+       │   │   ├─ YES:
+       │   │   │   ├─ Can FC cover it all?
+       │   │   │   │   ├─ YES: Use FC only → DONE ✓
+       │   │   │   │   └─ NO: FC at max + try Diesel
+       │   │   │   │       ├─ Diesel can help?
+       │   │   │   │       │   ├─ YES: FC + Diesel → Check for overproduction
+       │   │   │   │       │   │   ├─ Excess? → Sell to grid
+       │   │   │   │       │   │   └─ Still short? → Unmet demand
+       │   │   │   │       │   └─ NO: FC only → Unmet demand
+       │   │   └─ NO:
+       │   │       ├─ Can Diesel cover it all?
+       │   │       │   ├─ YES: Diesel only → Check for overproduction
+       │   │       │   │   ├─ Excess? → Sell to grid
+       │   │       │   │   └─ Still short? → Unmet demand
+       │   │       │   └─ NO: Unmet demand (blackout)
+       │
+       ├─ CASE 2: SURPLUS (E_net > 0)
+       │   │
+       │   ├─ Storage full? (H[t] == H_max)
+       │   │   ├─ NO:
+       │   │   │   ├─ Run Electrolyzer → Make H2
+       │   │   │   └─ Still have excess? → Sell to grid
+       │   │   └─ YES:
+       │   │       └─ Sell ALL to grid
+       │
+       └─ CASE 3: BALANCED (E_net == 0)
+           └─ Do nothing, perfect match!
