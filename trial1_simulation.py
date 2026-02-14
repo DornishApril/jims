@@ -160,6 +160,7 @@ class HybridEnergySystem:
     
     
     def simulate_year(self, system: Dict, data: pd.DataFrame) -> Tuple[float, float, float]:
+        print("Hi samir")
         """
         Simulate one year of system operation
         
@@ -233,6 +234,7 @@ class HybridEnergySystem:
         
         # Hourly simulation loop
         for t in range(len(data)):
+            print(f"Day {t}")
             # Get hourly inputs
             I_t = data.iloc[t][irrad_col] / 1000.0  # Convert W/m² to kW/m²
             v_t = data.iloc[t][wind_col]
@@ -249,13 +251,14 @@ class HybridEnergySystem:
             # CASE 1: DEFICIT (E_net < 0)
             if E_net < 0:
                 E_deficit = abs(E_net)
-                
+
                 # Try to use fuel cell
                 if H[t] > H_min:
                     # Maximum FC power limited by hydrogen availability and capacity
                     P_FC_limit = min(H[t] * self.eta_FC, Cap_FC)
                     
                     if E_deficit <= P_FC_limit:
+                        print(f"Enet<0, FC covered everything")
                         # FC can cover entire deficit
                         E_FC = E_deficit
                         H_consumed = E_FC / self.eta_FC
@@ -266,6 +269,7 @@ class HybridEnergySystem:
                     
                     else:
                         # FC runs at maximum, need additional source
+                        print("FC runs at maximum, need additional source")
                         E_FC = P_FC_limit
                         H_consumed = E_FC / self.eta_FC
                         E_remaining = E_deficit - E_FC
@@ -273,6 +277,7 @@ class HybridEnergySystem:
                         # Try diesel generator
                         P_DG_min_abs = self.P_DG_min * Cap_DG
                         if E_remaining >= P_DG_min_abs and E_remaining <= Cap_DG:
+                            print(f"FC Depleted, trying DIESEL")
                             # DG can operate within limits
                             E_DG = E_remaining
                             H[t+1] = H[t] - H_consumed
@@ -283,16 +288,20 @@ class HybridEnergySystem:
                             # Check if DG produces excess
                             E_total_gen = E_RE + E_FC + E_DG
                             E_excess = E_total_gen - L_t
-                            
+                            print(f"FC Depleted, trying DIESEL")
                             if E_excess > 0:
                                 # Sell excess to grid
+                                print(f"FC ran at full capacity, then we ran DG and still got some excess = {E_excess}")
                                 E_grid += E_excess
                                 C_op -= self.p_grid * E_excess
                             else:
                                 # Still have unmet load (shouldn't happen in this logic)
+                                print(f"FC ran at full capacity, then we ran DG and still unmet = {E_excess}")
+
                                 E_unmet += abs(E_excess)
                         
                         else:
+                            print("DG cudnt operate")
                             # DG cannot operate or doesn't meet demand
                             H[t+1] = H[t] - H_consumed
                             E_unmet += E_remaining
@@ -303,7 +312,7 @@ class HybridEnergySystem:
                 else:
                     # No hydrogen available, try diesel generator
                     H[t+1] = H[t]
-                    
+                    print("No hydrogen available, try diesel generator")
                     # Check if diesel generator can operate within limits
                     P_DG_min_abs = self.P_DG_min * Cap_DG
                     if E_deficit >= P_DG_min_abs and E_deficit <= Cap_DG:
@@ -361,6 +370,7 @@ class HybridEnergySystem:
             
             # CASE 3: BALANCED (E_net == 0)
             else:
+                print("Balanced")
                 H[t+1] = H[t]
         
         # Calculate LPSP
@@ -381,7 +391,7 @@ class HybridEnergySystem:
                  self.om_H2 * Cap_H2 + 
                  self.om_FC * Cap_FC + 
                  self.om_EL * Cap_EL + 
-                 self.om_DG * Cap_DG) * self.T_life)
+                 self.om_DG * Cap_DG) )
         
         # Replacement cost
         C_rep = self.calculate_replacement_cost(system, self.T_life, self.r)

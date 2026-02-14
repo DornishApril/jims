@@ -99,12 +99,12 @@ def run_single_simulation():
     
     # Example system configuration
     config = {
-        'N_PV': 150,      # kW PV capacity
-        'N_WT': 100,      # kW WT rated capacity
-        'Cap_H2': 200,    # kg H2 storage
-        'Cap_FC': 80,     # kW fuel cell
-        'Cap_EL': 80,     # kW electrolyzer
-        'Cap_DG': 50,     # kW diesel generator
+        'N_PV': 1500,      # kW PV capacity
+        'N_WT': 1000,      # kW WT rated capacity
+        'Cap_H2': 2000,    # kg H2 storage
+        'Cap_FC': 800,     # kW fuel cell
+        'Cap_EL': 800,     # kW electrolyzer
+        'Cap_DG': 500,     # kW diesel generator
     }
     
     print("\nSystem Configuration:")
