@@ -1,0 +1,5 @@
+modified power calculation
+import calculated power from sheets itself
+no RO load
+inverter
+
