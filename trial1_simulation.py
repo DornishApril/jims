@@ -176,8 +176,8 @@ class HybridEnergySystem:
         float
             Power output (kW)
         """
-        v_cut_in = 3.0   # Cut-in wind speed (m/s)
-        v_rated = 12.0   # Rated wind speed (m/s)
+        v_cut_in = 2.75   # Cut-in wind speed (m/s)
+        v_rated = 10.0   # Rated wind speed (m/s)
         v_cut_out = 25.0 # Cut-out wind speed (m/s)
         
         if v < v_cut_in or v > v_cut_out:
@@ -316,6 +316,13 @@ class HybridEnergySystem:
         else:
             raise ValueError("Solar irradiance column not found in data")
         
+
+        if 'Avg Solar Irradiance' in data.columns:
+            avg_solar_col = 'Avg Solar Irradiance'
+
+        else:
+            raise ValueError("Solar irradiance column not found in data")
+        
         if 'Wind Speed (m/s)' in data.columns:
             wind_col = 'Wind Speed (m/s)'
         elif 'Avg Wind Speed' in data.columns:
@@ -328,7 +335,7 @@ class HybridEnergySystem:
         # =================================================================
         L = data['Community Load'].values.copy()
         if 'RO Load (kWh)' in data.columns:
-            L = L + data['RO Load (kWh)'].values
+            L = L + 0*data['RO Load (kWh)'].values
         
         L_year = np.sum(L)  # Total annual load (kWh)
         
@@ -339,13 +346,14 @@ class HybridEnergySystem:
             # Get hourly inputs
             I_t = data.iloc[t][irrad_col] / 1000.0  # Convert W/m² to kW/m²
             v_t = data.iloc[t][wind_col]            # Wind speed (m/s)
+            PV_t = data.iloc[t][avg_solar_col]
             L_t = L[t]                               # Load (kWh for this hour)
             
             # ---------------------------------------------------------
             # RENEWABLE ENERGY GENERATION
             # ---------------------------------------------------------
             # PV generation: Power = efficiency × area × irradiance × capacity
-            E_PV = self.eta_PV * self.A_PV * I_t * N_PV  # kWh
+            E_PV = PV_t * N_PV  # kWh
             
             # Wind generation: Power = power_curve(wind_speed) × capacity
             E_WT = self.wind_power_curve(v_t, rated_power=1.0) * N_WT  # kWh

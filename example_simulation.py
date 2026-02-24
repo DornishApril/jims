@@ -85,7 +85,7 @@ def run_single_simulation():
         # ---------------------------------------------------------------------
         'A_PV': 6.67,             # PV area: m²/kW (for 15% efficiency)
                                   # Calculation: 1000 W/m² / (0.15 × 1000 W/kW) = 6.67
-        'P_DG_min': 0.3,          # Diesel must run at ≥30% capacity
+        'P_DG_min': 0.1,          # Diesel must run at ≥30% capacity
         
         # ---------------------------------------------------------------------
         # COMPONENT LIFETIMES (years)
@@ -107,12 +107,12 @@ def run_single_simulation():
     # DEFINE SYSTEM CONFIGURATION
     # =========================================================================
     config = {
-        'N_PV': 700,      # kW PV capacity
-        'N_WT': 2000,      # kW wind turbine rated capacity
+        'N_PV': 5,      # Number of PV
+        'N_WT': 1120,      # kW wind turbine rated capacity
         'Cap_H2': 2000,    # kg hydrogen storage capacity
         'Cap_FC': 800,     # kW fuel cell capacity
         'Cap_EL': 800,     # kW electrolyzer capacity
-        'Cap_DG': 500,     # kW diesel generator capacity
+        'Cap_DG': 450,     # kW diesel generator capacity
     }
     
     print("\n" + "="*80)
@@ -245,7 +245,7 @@ def plot_results(details, config):
     # Hydrogen storage trajectory
     hours = np.arange(len(details['H_trajectory']))
     axes[0].plot(hours / 24, details['H_trajectory'], linewidth=0.8)
-    axes[0].axhline(y=config['Cap_H2'], color='r', linestyle='--', label='Max Capacity')
+    # axes[0].axhline(y=config['Cap_H2'], color='r', linestyle='--', label='Max Capacity')
     axes[0].axhline(y=0.1*config['Cap_H2'], color='orange', linestyle='--', label='Min Level (10%)')
     axes[0].set_xlabel('Day')
     axes[0].set_ylabel('Hydrogen Storage (kg)')
@@ -277,7 +277,7 @@ def plot_results(details, config):
         axes[1].text(0.5, 0.5, 'No Energy Generated', ha='center', va='center')
     
     plt.tight_layout()
-    plt.savefig('/home/claude/simulation_results.png', dpi=150, bbox_inches='tight')
+    plt.savefig('simulation_results_cutin2.75.png', dpi=150, bbox_inches='tight')
     print("\nPlot saved to: simulation_results.png")
     plt.close()
 
@@ -354,7 +354,7 @@ if __name__ == "__main__":
         C_total, E_total, LPSP, system, config, data, details = result
         
         # Create plots
-        # plot_results(details, config)
+        plot_results(details, config)
         
         # Uncomment to run sensitivity analysis
         # sensitivity_results = sensitivity_analysis()
