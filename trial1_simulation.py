@@ -439,39 +439,46 @@ class HybridEnergySystem:
                 # ---------------------------------------------------------
                 # STEP 1: TRY FUEL CELL FIRST
                 # ---------------------------------------------------------
-                if H[t] > H_min and self.Cap_FC > 0:
+                if H[t] > H_min and Capacity_FC > 0:
                     # -------------------------------------------------
                     # FUEL CELL OPERATION
+                    # DC chain: H2 -> [FC, eta_FC] -> DC -> [Inverter, eta_INVT] -> AC load
                     # -------------------------------------------------
                     # Maximum H2 available for use (kg)
                     H2_available = H[t] - H_min
                     
-                    # Maximum energy from available H2 (kWh)
+                    # Maximum energy from available H2 (kWh) - in DC terms (pre-inverter)
                     # Energy = H2_mass × LHV × efficiency
                     E_FC_max_from_H2 = H2_available * self.H2_LHV * self.eta_FC
                     
-                    # Maximum energy from FC capacity (kWh in 1 hour)
-                    E_FC_max_from_cap = self.Cap_FC * 1.0  # kW × 1 hour
+                    # Maximum energy from FC capacity (kWh in 1 hour) - in DC terms
+                    E_FC_max_from_cap = Capacity_FC * 1.0  # kW × 1 hour
                     
-                    # Actual FC limit is minimum of both constraints
+                    # Actual FC DC limit is minimum of both constraints
                     E_FC_max = min(E_FC_max_from_H2, E_FC_max_from_cap)
                     
-                    # FC produces what it can (up to deficit)
-                    E_FC = self.eta_INVT*(min(E_deficit, E_FC_max))
+                    # Convert AC deficit to DC equivalent to compare against DC limits
+                    E_deficit_DC = E_deficit / self.eta_INVT
+
+                    # FC DC output: limited by DC capacity and DC deficit requirement
+                    E_FC_DC = min(E_deficit_DC, E_FC_max)
+
+                    # Convert DC output to AC output delivered to load (through inverter)
+                    E_FC = E_FC_DC * self.eta_INVT
                     
-                    # H2 consumed (kg)
-                    # H2_consumed = Energy / (LHV × efficiency)
-                    H2_consumed = E_FC / (self.H2_LHV * self.eta_FC)
+                    # H2 consumed (kg) - based on DC energy into inverter
+                    # H2_consumed = DC_Energy / (LHV × eta_FC)
+                    H2_consumed = E_FC_DC / (self.H2_LHV * self.eta_FC)
                     
                     # Update hydrogen storage
                     H[t+1] = max(0, H[t] - H2_consumed)
                     
-                    # Add costs and emissions
+                    # Add costs and emissions (tracked in AC terms, consistent with load)
                     C_op += self.c_FC * E_FC
                     E_CO2 += self.e_FC * E_FC
                     E_FC_total += E_FC
                     
-                    # Update remaining deficit
+                    # Update remaining deficit (in AC terms)
                     E_deficit = E_deficit - E_FC
                 else:
                     # No fuel cell available, keep current H2 level
@@ -480,7 +487,7 @@ class HybridEnergySystem:
                 # ---------------------------------------------------------
                 # STEP 2: IF STILL DEFICIT, TRY DIESEL GENERATOR
                 # ---------------------------------------------------------
-                if E_deficit > 0.001 and self.Cap_DG > 0:  # Small tolerance
+                if E_deficit > 0.001 and Capacity_DG > 0:  # Small tolerance
                     # -------------------------------------------------
                     # DIESEL GENERATOR OPERATION
                     # -------------------------------------------------
@@ -520,12 +527,13 @@ class HybridEnergySystem:
             # CASE 2: SURPLUS (E_net > 0)
             # =============================================================
             elif E_net > 0:
-                E_surplus = E_net  # kWh available
+                E_surplus = E_net  # kWh available (AC)
                 
                 # Check if storage has space and electrolyzer exists
                 if H[t] < H_max and Capacity_EL > 0:
                     # -------------------------------------------------
                     # ELECTROLYZER OPERATION
+                    # AC chain: AC surplus -> [Rectifier, eta_INVT] -> DC -> [Electrolyzer, eta_EL] -> H2
                     # -------------------------------------------------
                     # Available storage space (kg)
                     H2_space = H_max - H[t]
@@ -533,32 +541,35 @@ class HybridEnergySystem:
                     # Maximum energy that can be converted to H2 based on storage space
                     # Energy = H2_mass / (efficiency / LHV)
                     # H2_produced = Energy × efficiency / LHV
-                    # So: Energy_max = H2_space × LHV / efficiency
+                    # So: Energy_max = H2_space × LHV / efficiency  (in DC terms)
                     E_EL_max_from_storage = H2_space * self.H2_LHV / self.eta_EL
                     
-                    # Maximum energy from EL capacity (kWh in 1 hour)
+                    # Maximum energy from EL capacity (kWh in 1 hour) - in DC terms
                     E_EL_max_from_cap = Capacity_EL * 1.0  # kW × 1 hour
+
+                    # Maximum DC available from AC surplus through rectifier
+                    E_surplus_DC = E_surplus * self.eta_INVT
+
+                    # Actual EL DC input is minimum of all constraints
+                    E_EL_DC = min(E_surplus_DC, E_EL_max_from_storage, E_EL_max_from_cap)
+
+                    # AC consumed from the bus to supply the rectifier
+                    E_EL_AC = E_EL_DC / self.eta_INVT
                     
-                    # Actual EL limit is minimum of all constraints
-                    E_EL_max = min(self.eta_INVT*E_surplus, E_EL_max_from_storage, E_EL_max_from_cap)
-                    
-                    # EL consumes what it can
-                    E_EL = E_EL_max
-                    
-                    # H2 produced (kg)
-                    # H2_produced = Energy × efficiency / LHV
-                    H2_produced = E_EL * self.eta_EL / self.H2_LHV
+                    # H2 produced (kg) - based on DC energy into electrolyzer
+                    # H2_produced = DC_Energy × efficiency / LHV
+                    H2_produced = E_EL_DC * self.eta_EL / self.H2_LHV
                     
                     # Update hydrogen storage
                     H[t+1] = min(H_max, H[t] + H2_produced)
                     
-                    # Add costs and emissions
-                    C_op += self.c_EL * E_EL
-                    E_CO2 += self.e_EL * E_EL
-                    E_EL_total += E_EL
+                    # Add costs and emissions (tracked in AC terms, consistent with load)
+                    C_op += self.c_EL * E_EL_AC
+                    E_CO2 += self.e_EL * E_EL_AC
+                    E_EL_total += E_EL_AC
                     
-                    # Remaining surplus after electrolysis
-                    E_leftover = E_surplus - E_EL / self.eta_INVT  # subtract the AC consumed, not DC
+                    # Remaining surplus after electrolysis (both in AC terms)
+                    E_leftover = E_surplus - E_EL_AC  # subtract the AC consumed, not DC
                     
                     if E_leftover > 0.001:  # Small tolerance
                         # Sell leftover to grid
@@ -575,7 +586,6 @@ class HybridEnergySystem:
             # =============================================================
             else:
                 H[t+1] = H[t]
-        
         # =================================================================
         # CALCULATE PERFORMANCE METRICS
         # =================================================================
