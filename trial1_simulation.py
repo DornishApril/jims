@@ -112,10 +112,9 @@ class HybridEnergySystem:
         self.v_rated =  parameters.get('v_rated', 9.0)  # Rated wind speed (m/s)
         self.rated_power = parameters.get('rated_power', 20.0) #wind turbine rated power
         self.Cap_H2 = parameters.get('Cap_H2')
-        self.Cap_FC = parameters.get('CAP_FC')
+        self.Cap_FC = parameters.get('Cap_FC')
         self.Cap_EL = parameters.get('Cap_EL')
         self.Cap_DG = parameters.get('Cap_DG')
-
 
         # =================================================================
         # Diesel Constants
@@ -133,7 +132,7 @@ class HybridEnergySystem:
         self.eta_PV = parameters.get('eta_PV', 0.15)  # PV efficiency (fraction)
         self.eta_FC = parameters.get('eta_FC', 0.50)  # Fuel cell efficiency (fraction)
         self.eta_EL = parameters.get('eta_EL', 0.70)  # Electrolyzer efficiency (fraction)
-        self.eta_INVT = parameters.get('eta_INVT', 0.90)  # Electrolyzer efficiency (fraction)
+        self.eta_INVT = parameters.get('eta_INVT', 0.90)  # Inverter efficiency (fraction)
         
         # Hydrogen energy content (thermodynamic constant)
         self.H2_LHV = parameters.get('H2_LHV', 33.3)  # kWh/kg (Lower Heating Value)
@@ -310,10 +309,10 @@ class HybridEnergySystem:
             System configuration containing:
             - N_PV: number of PV 
             - N_WT: number of Wind turbines 
-            - Cap_H2: Hydrogen storage capacity (kg)
-            - Cap_FC: Fuel cell capacity (kW)
-            - Cap_EL: Electrolyzer capacity (kW)
-            - Cap_DG: Diesel generator capacity (kW)
+            - N_H2: Hydrogen storage capacity (kg)
+            - N_FC: Fuel cell capacity (kW)
+            - N_EL: Electrolyzer capacity (kW)
+            - N_DG: Diesel generator capacity (kW)
         
         data : pd.DataFrame
             Hourly data with columns:
@@ -334,20 +333,20 @@ class HybridEnergySystem:
         # =================================================================
         N_PV = system.get('N_PV', 0)
         N_WT = system.get('N_WT', 0)
-        Cap_H2 = system.get('Cap_H2', 0)
-        Cap_FC = system.get('Cap_FC', 0)
-        Cap_EL = system.get('Cap_EL', 0)
-        Cap_DG = system.get('Cap_DG', 0)
+        Capacity_H2 = system.get('N_H2', 0)*self.Cap_H2
+        Capacity_FC = system.get('N_FC', 0)*self.Cap_FC
+        Capacity_EL = system.get('N_EL', 0)*self.Cap_EL
+        Capacity_DG = system.get('N_DG', 0)*self.Cap_DG
         
         # Validate inputs
-        if Cap_H2 < 0 or Cap_FC < 0 or Cap_EL < 0:
+        if Capacity_H2 < 0 or Capacity_FC < 0 or Capacity_EL < 0:
             raise ValueError("Capacities cannot be negative")
         
         # =================================================================
         # HYDROGEN STORAGE LIMITS
         # =================================================================
-        H_max = Cap_H2  # Maximum hydrogen storage (kg)
-        H_min = 0.1 * Cap_H2  # Minimum hydrogen level (10% of capacity)
+        H_max = Capacity_H2  # Maximum hydrogen storage (kg)
+        H_min = 0.1 * Capacity_H2  # Minimum hydrogen level (10% of capacity)
         
         # =================================================================
         # INITIALIZE TRACKING VARIABLES
@@ -365,7 +364,7 @@ class HybridEnergySystem:
         
         # Initialize hydrogen storage trajectory
         H = np.zeros(len(data) + 1)
-        H[0] = 0.5 * Cap_H2  # Start at 50% capacity
+        H[0] = 0.5 * Capacity_H2  # Start at 50% capacity
         
         # =================================================================
         # DETECT COLUMN NAMES
@@ -414,7 +413,7 @@ class HybridEnergySystem:
             # RENEWABLE ENERGY GENERATION
             # ---------------------------------------------------------
             # PV generation: Power = efficiency × area × irradiance × capacity
-            E_PV = PV_t * N_PV*self.eta_INVT  # kWh DC
+            E_PV = PV_t * N_PV*self.eta_INVT  # kWh AC
             
             # Wind generation: Power = power_curve(wind_speed) × capacity
             E_WT = self.wind_power_curve(v_t) * N_WT  # kWh AC
@@ -440,7 +439,7 @@ class HybridEnergySystem:
                 # ---------------------------------------------------------
                 # STEP 1: TRY FUEL CELL FIRST
                 # ---------------------------------------------------------
-                if H[t] > H_min and Cap_FC > 0:
+                if H[t] > H_min and self.Cap_FC > 0:
                     # -------------------------------------------------
                     # FUEL CELL OPERATION
                     # -------------------------------------------------
@@ -452,7 +451,7 @@ class HybridEnergySystem:
                     E_FC_max_from_H2 = H2_available * self.H2_LHV * self.eta_FC
                     
                     # Maximum energy from FC capacity (kWh in 1 hour)
-                    E_FC_max_from_cap = Cap_FC * 1.0  # kW × 1 hour
+                    E_FC_max_from_cap = self.Cap_FC * 1.0  # kW × 1 hour
                     
                     # Actual FC limit is minimum of both constraints
                     E_FC_max = min(E_FC_max_from_H2, E_FC_max_from_cap)
@@ -481,17 +480,17 @@ class HybridEnergySystem:
                 # ---------------------------------------------------------
                 # STEP 2: IF STILL DEFICIT, TRY DIESEL GENERATOR
                 # ---------------------------------------------------------
-                if E_deficit > 0.001 and Cap_DG > 0:  # Small tolerance
+                if E_deficit > 0.001 and self.Cap_DG > 0:  # Small tolerance
                     # -------------------------------------------------
                     # DIESEL GENERATOR OPERATION
                     # -------------------------------------------------
                     # Diesel generator must run above minimum load
-                    P_DG_min_abs = self.P_DG_min * Cap_DG  # Minimum power (kW)
+                    P_DG_min_abs = self.P_DG_min * Capacity_DG  # Minimum power (kW)
                     
                     # Check if deficit is within operable range
                     if E_deficit >= P_DG_min_abs:
                         # DG can operate
-                        E_DG = min(E_deficit, Cap_DG)  # Limited by capacity
+                        E_DG = min(E_deficit, Capacity_DG)  # Limited by capacity
                         #We can choose to run the DG several times to minimize deficit
                         #As long as we are being above the minimum so if deficit is 5c and capacity is c
                         #we run DG 5 times. If deficit is 5c+k, then unmet load is k
@@ -500,7 +499,7 @@ class HybridEnergySystem:
                         f_1 = 0.246 #litre/kWh
                         
 
-                        DG_Litre = self.f_0 * Cap_DG + self.f_1 * E_DG
+                        DG_Litre = self.f_0 * Capacity_DG + self.f_1 * E_DG
 
                         # Add costs and emissions
                         C_op += self.c_DG_FUEL * DG_Litre
@@ -524,7 +523,7 @@ class HybridEnergySystem:
                 E_surplus = E_net  # kWh available
                 
                 # Check if storage has space and electrolyzer exists
-                if H[t] < H_max and Cap_EL > 0:
+                if H[t] < H_max and Capacity_EL > 0:
                     # -------------------------------------------------
                     # ELECTROLYZER OPERATION
                     # -------------------------------------------------
@@ -538,7 +537,7 @@ class HybridEnergySystem:
                     E_EL_max_from_storage = H2_space * self.H2_LHV / self.eta_EL
                     
                     # Maximum energy from EL capacity (kWh in 1 hour)
-                    E_EL_max_from_cap = Cap_EL * 1.0  # kW × 1 hour
+                    E_EL_max_from_cap = Capacity_EL * 1.0  # kW × 1 hour
                     
                     # Actual EL limit is minimum of all constraints
                     E_EL_max = min(self.eta_INVT*E_surplus, E_EL_max_from_storage, E_EL_max_from_cap)
@@ -589,18 +588,18 @@ class HybridEnergySystem:
         # Capital cost (present value)
         C_cap = (self.c_PV * N_PV + 
                  self.c_WT * N_WT + 
-                 self.c_H2 * Cap_H2 + 
-                 self.c_FC_cap * Cap_FC + 
-                 self.c_EL_cap * Cap_EL + 
-                 self.c_DG_cap * Cap_DG)
+                 self.c_H2 * Capacity_H2 + 
+                 self.c_FC_cap * Capacity_FC + 
+                 self.c_EL_cap * Capacity_EL + 
+                 self.c_DG_cap * Capacity_DG)
         
         # Annual O&M cost
         C_om_annual = (self.om_PV * N_PV + 
                        self.om_WT * N_WT + 
-                       self.om_H2 * Cap_H2 + 
-                       self.om_FC * Cap_FC + 
-                       self.om_EL * Cap_EL + 
-                       self.om_DG * Cap_DG)
+                       self.om_H2 * Capacity_H2 + 
+                       self.om_FC * Capacity_FC + 
+                       self.om_EL * Capacity_EL + 
+                       self.om_DG * Capacity_DG)
         
         # Replacement cost (present value)
         C_rep = self.calculate_replacement_cost(system, self.T_life, self.r)
@@ -724,10 +723,10 @@ def example_usage():
     config = {
         'N_PV': 100,      # number of PV
         'N_WT': 2,       # number of wind
-        'Cap_H2': 100,    # kg
-        'Cap_FC': 50,     # kW
-        'Cap_EL': 50,     # kW
-        'Cap_DG': 30,     # kW
+        'N_H2': 100,    # number of H2 container
+        'N_FC': 50,     # number of FC
+        'N_EL': 50,     # number of EL
+        'N_DG': 30,     # number of DG
     }
     
     print("\nCORRECTED UNIT CONVERSIONS:")
