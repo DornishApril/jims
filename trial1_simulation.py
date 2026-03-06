@@ -44,6 +44,8 @@ class HybridEnergySystem:
                      Default: 0.50 (50% of H2 energy to electricity)
             - eta_EL: Electrolyzer efficiency (dimensionless, 0-1)
                      Default: 0.70 (70% of electrical energy to H2)
+            - eta_INVT: Inverter Efficiency
+                    Default: 0.90 (90% blah blah blah)
             
             CAPITAL COSTS (one-time investment):
             - c_PV: PV capital cost ($/kW)
@@ -53,10 +55,13 @@ class HybridEnergySystem:
             - c_EL_cap: Electrolyzer capital cost ($/kW)
             - c_DG_cap: Diesel generator capital cost ($/kW)
             
+            - c_INVT : Inverter cost  ($)
+
             OPERATING COSTS (per kWh of energy produced/consumed):
             - c_FC: Fuel cell operating cost ($/kWh produced)
             - c_DG: Diesel fuel cost ($/kWh produced)
             - c_EL: Electrolyzer operating cost ($/kWh consumed)
+            - c_DG_FUEL: Diesel cost $/litre
             
             OPERATION & MAINTENANCE COSTS (annual, per unit capacity):
             - om_PV: PV O&M cost ($/kW/year)
@@ -65,12 +70,22 @@ class HybridEnergySystem:
             - om_FC: Fuel cell O&M cost ($/kW/year)
             - om_EL: Electrolyzer O&M cost ($/kW/year)
             - om_DG: Diesel generator O&M cost ($/kW/year)
+            - om_INVT: 0
+
+            REPLACEMENT COSTS (annual, per unit capacity):
+            - rc_PV: PV O&M cost ($/kW/year)
+            - rc_WT: Wind turbine O&M cost ($/kW/year)
+            - rc_H2: Hydrogen storage O&M cost ($/kg/year)
+            - rc_FC: Fuel cell O&M cost ($/kW/year)
+            - rc_EL: Electrolyzer O&M cost ($/kW/year)
+            - rc_DG: Diesel generator O&M cost ($/kW/year)
+            - rc_INVT: 0
             
             EMISSION FACTORS (kg CO2 per kWh):
             - e_FC: Fuel cell emissions (kg CO2/kWh)
                    Default: 0.0 (assuming green H2)
-            - e_DG: Diesel generator emissions (kg CO2/kWh)
-                   Default: 0.8
+            - e_DG: Diesel generator emissions (kg CO2/litre)
+                   Default: 2.63
             - e_EL: Electrolyzer emissions (kg CO2/kWh)
                    Default: 0.0 (direct emissions)
             
@@ -91,11 +106,34 @@ class HybridEnergySystem:
             - life_PV, life_WT, life_H2, life_FC, life_EL, life_DG
         """
         # =================================================================
+        # Generator configs
+        # =================================================================
+        self.v_cut_in = parameters.get('v_cut_in', 2.75)   # Cut-in wind speed (m/s)
+        self.v_rated =  parameters.get('v_rated', 9.0)  # Rated wind speed (m/s)
+        self.rated_power = parameters.get('rated_power', 20.0) #wind turbine rated power
+        self.Cap_H2 = parameters.get('Cap_H2')
+        self.Cap_FC = parameters.get('CAP_FC')
+        self.Cap_EL = parameters.get('Cap_EL')
+        self.Cap_DG = parameters.get('Cap_DG')
+
+
+        # =================================================================
+        # Diesel Constants
+        # =================================================================
+        self.f_0 = parameters.get('f_0', 0.08145)#litre/kW/h
+        self.f_1 = parameters.get('f_1', 0.246)#litre/kWh
+
+
+
+
+
+        # =================================================================
         # EFFICIENCY PARAMETERS
         # =================================================================
         self.eta_PV = parameters.get('eta_PV', 0.15)  # PV efficiency (fraction)
         self.eta_FC = parameters.get('eta_FC', 0.50)  # Fuel cell efficiency (fraction)
         self.eta_EL = parameters.get('eta_EL', 0.70)  # Electrolyzer efficiency (fraction)
+        self.eta_INVT = parameters.get('eta_INVT', 0.90)  # Electrolyzer efficiency (fraction)
         
         # Hydrogen energy content (thermodynamic constant)
         self.H2_LHV = parameters.get('H2_LHV', 33.3)  # kWh/kg (Lower Heating Value)
@@ -109,13 +147,16 @@ class HybridEnergySystem:
         self.c_FC_cap = parameters.get('c_FC_cap', 2000)  # $/kW
         self.c_EL_cap = parameters.get('c_EL_cap', 1500)  # $/kW
         self.c_DG_cap = parameters.get('c_DG_cap', 400)   # $/kW
+        self.c_INVT = parameters.get('c_INVT',300)
         
         # =================================================================
         # OPERATING COSTS ($/kWh)
         # =================================================================
-        self.c_FC = parameters.get('c_FC', 0.01)  # $/kWh produced
-        self.c_DG = parameters.get('c_DG', 0.30)  # $/kWh produced (diesel fuel)
-        self.c_EL = parameters.get('c_EL', 0.01)  # $/kWh consumed
+        self.c_FC = parameters.get('c_FC', 0)  # $/kWh produced
+        self.c_DG = parameters.get('c_DG', 0)  # $/kWh produced (diesel fuel)
+        self.c_EL = parameters.get('c_EL', 0)  # $/kWh consumed
+        self.c_DG_FUEL = parameters.get('c_DG_FUEL',0.82)  #$/litre diesel consumed
+
         
         # =================================================================
         # O&M COSTS ($/unit/year)
@@ -126,12 +167,26 @@ class HybridEnergySystem:
         self.om_FC = parameters.get('om_FC', 30)  # $/kW/year
         self.om_EL = parameters.get('om_EL', 25)  # $/kW/year
         self.om_DG = parameters.get('om_DG', 15)  # $/kW/year
+        self.om_INVT = parameters.get('om_INVT',0) 
+
+
+        # Replacement COSTS(rc) ($/unit/year)
+        # =================================================================
+        self.rc_PV = parameters.get('rc_PV', 20)  # $/kW/year
+        self.rc_WT = parameters.get('rc_WT', 50)  # $/kW/year
+        self.rc_H2 = parameters.get('rc_H2', 10)  # $/kg/year
+        self.rc_FC = parameters.get('rc_FC', 30)  # $/kW/year
+        self.rc_EL = parameters.get('rc_EL', 25)  # $/kW/year
+        self.rc_DG = parameters.get('rc_DG', 15)  # $/kW/year
+        self.rc_INVT = parameters.get('rc_INVT',0) # $/kW/year
+
+
         
         # =================================================================
         # EMISSION FACTORS (kg CO2/kWh)
         # =================================================================
         self.e_FC = parameters.get('e_FC', 0.0)   # Assuming H2 from renewables
-        self.e_DG = parameters.get('e_DG', 0.8)   # Diesel emissions
+        self.e_DG = parameters.get('e_DG', 2.6391)   # 2.6391 kg/Litre Diesel emissions
         self.e_EL = parameters.get('e_EL', 0.0)   # Electrolyzer direct emissions
         
         # =================================================================
@@ -146,6 +201,8 @@ class HybridEnergySystem:
         # =================================================================
         self.A_PV = parameters.get('A_PV', 6.67)      # PV area per kW (m²/kW)
         self.P_DG_min = parameters.get('P_DG_min', 0.3)  # Minimum DG load ratio
+        # self.DG_CAPACITY = parameters.get('DG_CAPACITY') #DG capacity
+        # self.DG_RATED = parameters.get('DG_RATED',50) #DG Rated Capacity
         
         # =================================================================
         # COMPONENT LIFETIMES (years)
@@ -156,9 +213,10 @@ class HybridEnergySystem:
         self.life_FC = parameters.get('life_FC', 10)
         self.life_EL = parameters.get('life_EL', 15)
         self.life_DG = parameters.get('life_DG', 15)
+        self.life_INVT = parameters.get('life_INVT', 15)
     
     
-    def wind_power_curve(self, v: float, rated_power: float = 1.0) -> float:
+    def wind_power_curve(self, v: float) -> float:
         """
         Calculate wind turbine power output based on wind speed
         Using a simplified power curve model
@@ -176,17 +234,18 @@ class HybridEnergySystem:
         float
             Power output (kW)
         """
-        v_cut_in = 2.75   # Cut-in wind speed (m/s)
-        v_rated = 10.0   # Rated wind speed (m/s)
-        v_cut_out = 25.0 # Cut-out wind speed (m/s)
+        # v_cut_in = 2.75   # Cut-in wind speed (m/s)
+        # v_rated = 9.0   # Rated wind speed (m/s)
+        # # v_cut_out = 25.0 # Cut-out wind speed (m/s)
+        # rated_power = 20
         
-        if v < v_cut_in or v > v_cut_out:
+        if v < self.v_cut_in :
             return 0.0
-        elif v >= v_cut_in and v < v_rated:
+        elif v >= self.v_cut_in and v < self.v_rated:
             # Cubic relationship between cut-in and rated
-            return rated_power * ((v - v_cut_in) / (v_rated - v_cut_in)) ** 3
+            return self.rated_power * ((v**3 - self.v_cut_in**3) / (self.v_rated**3 - self.v_cut_in**3))
         else:  # v_rated <= v <= v_cut_out
-            return rated_power
+            return self.rated_power
     
     
     def calculate_replacement_cost(self, system: Dict, T_life: int, r: float) -> float:
@@ -211,12 +270,14 @@ class HybridEnergySystem:
         C_rep = 0.0
         
         components = [
-            ('N_PV', self.c_PV, self.life_PV),
-            ('N_WT', self.c_WT, self.life_WT),
-            ('Cap_H2', self.c_H2, self.life_H2),
-            ('Cap_FC', self.c_FC_cap, self.life_FC),
-            ('Cap_EL', self.c_EL_cap, self.life_EL),
-            ('Cap_DG', self.c_DG_cap, self.life_DG),
+            ('N_PV', self.rc_PV, self.life_PV),
+            ('N_WT', self.rc_WT, self.life_WT),
+            ('rc_H2', self.rc_H2, self.life_H2),
+            ('rc_FC', self.rc_FC, self.life_FC),
+            ('rc_EL', self.rc_EL, self.life_EL),
+            ('rc_DG', self.rc_DG, self.life_DG),
+            ('rc_INVT', self.rc_INVT, self.life_INVT),
+            
         ]
         
         for comp_name, unit_cost, life in components:
@@ -247,8 +308,8 @@ class HybridEnergySystem:
         ----------
         system : dict
             System configuration containing:
-            - N_PV: PV capacity (kW)
-            - N_WT: Wind turbine rated capacity (kW)
+            - N_PV: number of PV 
+            - N_WT: number of Wind turbines 
             - Cap_H2: Hydrogen storage capacity (kg)
             - Cap_FC: Fuel cell capacity (kW)
             - Cap_EL: Electrolyzer capacity (kW)
@@ -256,7 +317,7 @@ class HybridEnergySystem:
         
         data : pd.DataFrame
             Hourly data with columns:
-            - 'Solar Irradiance (W/sq.m)' or 'Avg Solar Irradiance'
+            - 'Solar Power','Solar Irradiance (W/sq.m)' or 'Avg Solar Irradiance'
             - 'Wind Speed (m/s)' or 'Avg Wind Speed'
             - 'Community Load' and/or 'RO Load (kWh)'
             
@@ -309,19 +370,19 @@ class HybridEnergySystem:
         # =================================================================
         # DETECT COLUMN NAMES
         # =================================================================
-        if 'Solar Irradiance (W/sq.m)' in data.columns:
-            irrad_col = 'Solar Irradiance (W/sq.m)'
-        elif 'Avg Solar Irradiance' in data.columns:
-            irrad_col = 'Avg Solar Irradiance'
-        else:
-            raise ValueError("Solar irradiance column not found in data")
+        # if 'Solar Irradiance (W/sq.m)' in data.columns:
+        #     irrad_col = 'Solar Irradiance (W/sq.m)'
+        # elif 'Avg Solar Irradiance' in data.columns:
+        #     irrad_col = 'Avg Solar Irradiance'
+        # else:
+        #     raise ValueError("Solar irradiance column not found in data")
         
 
-        if 'Avg Solar Irradiance' in data.columns:
-            avg_solar_col = 'Avg Solar Irradiance'
+        if 'Solar Power' in data.columns:
+            avg_solar_col = 'Solar Power'
 
         else:
-            raise ValueError("Solar irradiance column not found in data")
+            raise ValueError("Solar Power column not found in data")
         
         if 'Wind Speed (m/s)' in data.columns:
             wind_col = 'Wind Speed (m/s)'
@@ -344,7 +405,7 @@ class HybridEnergySystem:
         # =================================================================
         for t in range(len(data)):
             # Get hourly inputs
-            I_t = data.iloc[t][irrad_col] / 1000.0  # Convert W/m² to kW/m²
+            # I_t = data.iloc[t][irrad_col] / 1000.0  # Convert W/m² to kW/m²
             v_t = data.iloc[t][wind_col]            # Wind speed (m/s)
             PV_t = data.iloc[t][avg_solar_col]
             L_t = L[t]                               # Load (kWh for this hour)
@@ -353,10 +414,10 @@ class HybridEnergySystem:
             # RENEWABLE ENERGY GENERATION
             # ---------------------------------------------------------
             # PV generation: Power = efficiency × area × irradiance × capacity
-            E_PV = PV_t * N_PV  # kWh
+            E_PV = PV_t * N_PV*self.eta_INVT  # kWh DC
             
             # Wind generation: Power = power_curve(wind_speed) × capacity
-            E_WT = self.wind_power_curve(v_t, rated_power=1.0) * N_WT  # kWh
+            E_WT = self.wind_power_curve(v_t) * N_WT  # kWh AC
             
             E_RE = E_PV + E_WT  # Total renewable energy (kWh)
             
@@ -397,7 +458,7 @@ class HybridEnergySystem:
                     E_FC_max = min(E_FC_max_from_H2, E_FC_max_from_cap)
                     
                     # FC produces what it can (up to deficit)
-                    E_FC = min(E_deficit, E_FC_max)
+                    E_FC = self.eta_INVT*(min(E_deficit, E_FC_max))
                     
                     # H2 consumed (kg)
                     # H2_consumed = Energy / (LHV × efficiency)
@@ -434,10 +495,16 @@ class HybridEnergySystem:
                         #We can choose to run the DG several times to minimize deficit
                         #As long as we are being above the minimum so if deficit is 5c and capacity is c
                         #we run DG 5 times. If deficit is 5c+k, then unmet load is k
+
+                        f_0 = 0.08145 #litre/kWh
+                        f_1 = 0.246 #litre/kWh
                         
+
+                        DG_Litre = self.f_0 * Cap_DG + self.f_1 * E_DG
+
                         # Add costs and emissions
-                        C_op += self.c_DG * E_DG
-                        E_CO2 += self.e_DG * E_DG
+                        C_op += self.c_DG_FUEL * DG_Litre
+                        E_CO2 += self.e_DG * DG_Litre
                         E_DG_total += E_DG
                         
                         # Update remaining deficit
@@ -474,7 +541,7 @@ class HybridEnergySystem:
                     E_EL_max_from_cap = Cap_EL * 1.0  # kW × 1 hour
                     
                     # Actual EL limit is minimum of all constraints
-                    E_EL_max = min(E_surplus, E_EL_max_from_storage, E_EL_max_from_cap)
+                    E_EL_max = min(self.eta_INVT*E_surplus, E_EL_max_from_storage, E_EL_max_from_cap)
                     
                     # EL consumes what it can
                     E_EL = E_EL_max
@@ -492,7 +559,7 @@ class HybridEnergySystem:
                     E_EL_total += E_EL
                     
                     # Remaining surplus after electrolysis
-                    E_leftover = E_surplus - E_EL
+                    E_leftover = E_surplus - E_EL / self.eta_INVT  # subtract the AC consumed, not DC
                     
                     if E_leftover > 0.001:  # Small tolerance
                         # Sell leftover to grid
@@ -589,6 +656,7 @@ def example_usage():
         'eta_PV': 0.15,    # 15% solar panel efficiency
         'eta_FC': 0.50,    # 50% fuel cell efficiency
         'eta_EL': 0.70,    # 70% electrolyzer efficiency
+        'eta_INVT':0.95,   # 90% inverter efficiency
         
         # Hydrogen properties
         'H2_LHV': 33.3,    # kWh/kg (thermodynamic constant)
@@ -600,11 +668,13 @@ def example_usage():
         'c_FC_cap': 2000,  # $/kW
         'c_EL_cap': 1500,  # $/kW
         'c_DG_cap': 400,   # $/kW
+        'c_INVT' : 300,
         
         # Operating costs
-        'c_FC': 0.01,      # $/kWh
-        'c_DG': 0.30,      # $/kWh
-        'c_EL': 0.01,      # $/kWh
+        'c_FC':0,      # $/kWh
+        'c_DG': 0,      # $/kWh
+        'c_EL': 0,      # $/kWh
+        'c_DG_FUEL':0.82 ,  #$/LITRE
         
         # O&M costs
         'om_PV': 20,       # $/kW/year
@@ -613,10 +683,18 @@ def example_usage():
         'om_FC': 30,       # $/kW/year
         'om_EL': 25,       # $/kW/year
         'om_DG': 15,       # $/kW/year
+
+        # Replacement costs
+        'rc_PV': 20,       # $/kW/year
+        'rc_WT': 50,       # $/kW/year
+        'rc_H2': 10,       # $/kg/year
+        'rc_FC': 30,       # $/kW/year
+        'rc_EL': 25,       # $/kW/year
+        'rc_DG': 15,       # $/kW/year
         
         # Emissions
         'e_FC': 0.0,       # kg CO2/kWh
-        'e_DG': 0.8,       # kg CO2/kWh
+        'e_DG': 2.639,      # kg CO2/kWh
         'e_EL': 0.0,       # kg CO2/kWh
         
         # Economic
@@ -644,8 +722,8 @@ def example_usage():
     
     # Example system configuration
     config = {
-        'N_PV': 100,      # kW
-        'N_WT': 50,       # kW rated
+        'N_PV': 100,      # number of PV
+        'N_WT': 2,       # number of wind
         'Cap_H2': 100,    # kg
         'Cap_FC': 50,     # kW
         'Cap_EL': 50,     # kW

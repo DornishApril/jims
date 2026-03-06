@@ -1,0 +1,74 @@
+Parameters
+        ----------
+        parameters : dict
+            Dictionary containing all system parameters:
+            
+            EFFICIENCY PARAMETERS:
+            - eta_PV: PV panel efficiency (dimensionless, 0-1)
+                     Default: 0.15 (15% conversion of solar to electrical)
+            - eta_FC: Fuel cell electrical efficiency (dimensionless, 0-1)
+                     Default: 0.50 (50% of H2 energy to electricity)
+            - eta_EL: Electrolyzer efficiency (dimensionless, 0-1)
+                     Default: 0.70 (70% of electrical energy to H2)
+            - eta_INVT: Inverter Efficiency
+                    Default: 0.90 (90% blah blah blah)
+            
+            CAPITAL COSTS (one-time investment):
+            - c_PV: PV capital cost ($/kW)
+            - c_WT: Wind turbine capital cost ($/kW)
+            - c_H2: Hydrogen storage capital cost ($/kg capacity)
+            - c_FC_cap: Fuel cell capital cost ($/kW)
+            - c_EL_cap: Electrolyzer capital cost ($/kW)
+            - c_DG_cap: Diesel generator capital cost ($/kW)
+            
+            - c_INVT : Inverter cost  ($)
+
+            OPERATING COSTS (per kWh of energy produced/consumed):
+            - c_FC: Fuel cell operating cost ($/kWh produced)
+            - c_DG: Diesel fuel cost ($/kWh produced)
+            - c_EL: Electrolyzer operating cost ($/kWh consumed)
+            - c_DG_FUEL: Diesel cost $/litre
+            
+            OPERATION & MAINTENANCE COSTS (annual, per unit capacity):
+            - om_PV: PV O&M cost ($/kW/year)
+            - om_WT: Wind turbine O&M cost ($/kW/year)
+            - om_H2: Hydrogen storage O&M cost ($/kg/year)
+            - om_FC: Fuel cell O&M cost ($/kW/year)
+            - om_EL: Electrolyzer O&M cost ($/kW/year)
+            - om_DG: Diesel generator O&M cost ($/kW/year)
+            - om_INVT: 0
+
+            REPLACEMENT COSTS (annual, per unit capacity):
+            - rc_PV: PV O&M cost ($/kW/year)
+            - rc_WT: Wind turbine O&M cost ($/kW/year)
+            - rc_H2: Hydrogen storage O&M cost ($/kg/year)
+            - rc_FC: Fuel cell O&M cost ($/kW/year)
+            - rc_EL: Electrolyzer O&M cost ($/kW/year)
+            - rc_DG: Diesel generator O&M cost ($/kW/year)
+            - rc_INVT: 0
+            
+            EMISSION FACTORS (kg CO2 per kWh):
+            - e_FC: Fuel cell emissions (kg CO2/kWh)
+                   Default: 0.0 (assuming green H2)
+            - e_DG: Diesel generator emissions (kg CO2/litre)
+                   Default: 2.63
+            - e_EL: Electrolyzer emissions (kg CO2/kWh)
+                   Default: 0.0 (direct emissions)
+            
+            ECONOMIC PARAMETERS:
+            - T_life: Project lifetime (years)
+            - r: Discount rate (dimensionless, e.g., 0.05 = 5%)
+            - p_grid: Grid selling price ($/kWh)
+            
+            TECHNICAL PARAMETERS:
+            - A_PV: PV area per kW capacity (m²/kW)
+                   For eta_PV = 0.15: A_PV = 1000W/m² / (0.15 * 1000W/kW) = 6.67 m²/kW
+            - P_DG_min: Minimum diesel generator load ratio (0-1)
+                       Default: 0.3 (must run at ≥30% of rated capacity)
+            - H2_LHV: Lower heating value of hydrogen (kWh/kg)
+                     Default: 33.3 kWh/kg (thermodynamic constant)
+            
+            COMPONENT LIFETIMES (years):
+            - life_PV, life_WT, life_H2, life_FC, life_EL, life_DG
+        """
+        

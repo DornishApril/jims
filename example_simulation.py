@@ -21,83 +21,70 @@ def run_single_simulation():
     # =========================================================================
     # DEFINE CORRECTED SYSTEM PARAMETERS
     # =========================================================================
+    # Define system parameters
     parameters = {
-        # ---------------------------------------------------------------------
-        # EFFICIENCIES (dimensionless, 0-1)
-        # ---------------------------------------------------------------------
-        'eta_PV': 0.15,           # 15% PV panel efficiency
-        'eta_FC': 0.50,           # 50% fuel cell efficiency
-        'eta_EL': 0.70,           # 70% electrolyzer efficiency
+        # Efficiencies (all dimensionless, 0-1)
+        'eta_PV': 0.15,    # 15% solar panel efficiency
+        'eta_FC': 0.50,    # 50% fuel cell efficiency
+        'eta_EL': 0.70,    # 70% electrolyzer efficiency
+        'eta_INVT':0.95,   # 90% inverter efficiency
         
-        # ---------------------------------------------------------------------
-        # HYDROGEN PROPERTIES
-        # ---------------------------------------------------------------------
-        'H2_LHV': 33.3,           # Lower Heating Value: 33.3 kWh/kg (constant)
+        # Hydrogen properties
+        'H2_LHV': 33.3,    # kWh/kg (thermodynamic constant)
         
-        # With these values:
-        # - Fuel cell produces: 0.50 × 33.3 = 16.65 kWh per kg H2 consumed
-        # - Electrolyzer needs: 33.3 / 0.70 = 47.6 kWh to produce 1 kg H2
-        # - Round-trip efficiency: 0.50 × 0.70 = 35%
+        # Capital costs
+        'c_PV': 1500,      # $/kW
+        'c_WT': 3000,      # $/kW
+        'c_H2': 500,       # $/kg
+        'c_FC_cap': 2000,  # $/kW
+        'c_EL_cap': 1500,  # $/kW
+        'c_DG_cap': 400,   # $/kW
         
-        # ---------------------------------------------------------------------
-        # CAPITAL COSTS ($/unit)
-        # ---------------------------------------------------------------------
-        'c_PV': 1500,             # $/kW installed
-        'c_WT': 3000,             # $/kW installed
-        'c_H2': 500,              # $/kg storage capacity
-        'c_FC_cap': 2000,         # $/kW fuel cell capacity
-        'c_EL_cap': 1500,         # $/kW electrolyzer capacity
-        'c_DG_cap': 400,          # $/kW diesel generator capacity
+        # Operating costs
+        'c_FC':0,      # $/kWh
+        'c_DG': 0,      # $/kWh
+        'c_EL': 0,      # $/kWh
+        'c_DG_FUEL':0.82 ,  #$/LITRE
         
-        # ---------------------------------------------------------------------
-        # OPERATING COSTS ($/kWh)
-        # ---------------------------------------------------------------------
-        'c_FC': 0.01,             # Fuel cell O&M per kWh produced
-        'c_DG': 0.30,             # Diesel fuel cost per kWh produced
-        'c_EL': 0.01,             # Electrolyzer O&M per kWh consumed
+        # O&M costs
+        'om_PV': 20,       # $/kW/year
+        'om_WT': 50,       # $/kW/year
+        'om_H2': 10,       # $/kg/year
+        'om_FC': 30,       # $/kW/year
+        'om_EL': 25,       # $/kW/year
+        'om_DG': 15,       # $/kW/year
+
+        # Replacement costs
+        'rc_PV': 20,       # $/kW/year
+        'rc_WT': 50,       # $/kW/year
+        'rc_H2': 10,       # $/kg/year
+        'rc_FC': 30,       # $/kW/year
+        'rc_EL': 25,       # $/kW/year
+        'rc_DG': 15,       # $/kW/year
         
-        # ---------------------------------------------------------------------
-        # ANNUAL O&M COSTS ($/unit/year)
-        # ---------------------------------------------------------------------
-        'om_PV': 20,              # $/kW/year
-        'om_WT': 50,              # $/kW/year
-        'om_H2': 10,              # $/kg/year
-        'om_FC': 30,              # $/kW/year
-        'om_EL': 25,              # $/kW/year
-        'om_DG': 15,              # $/kW/year
+        # Emissions
+        'e_FC': 0.0,       # kg CO2/kWh
+        'e_DG': 2.639,      # kg CO2/kWh
+        'e_EL': 0.0,       # kg CO2/kWh
         
-        # ---------------------------------------------------------------------
-        # EMISSION FACTORS (kg CO2/kWh)
-        # ---------------------------------------------------------------------
-        'e_FC': 0.0,              # Fuel cell (assuming green H2)
-        'e_DG': 0.8,              # Diesel generator
-        'e_EL': 0.0,              # Electrolyzer (direct emissions)
+        # Economic
+        'T_life': 20,      # years
+        'r': 0.05,         # 5% discount rate
+        'p_grid': 0.08,    # $/kWh
         
-        # ---------------------------------------------------------------------
-        # ECONOMIC PARAMETERS
-        # ---------------------------------------------------------------------
-        'T_life': 20,             # Project lifetime (years)
-        'r': 0.05,                # Discount rate (5% annual)
-        'p_grid': 0.08,           # Grid selling price ($/kWh)
+        # Technical
+        'A_PV': 6.67,      # m²/kW
+        'P_DG_min': 0.3,   # 30% minimum load
         
-        # ---------------------------------------------------------------------
-        # TECHNICAL PARAMETERS
-        # ---------------------------------------------------------------------
-        'A_PV': 6.67,             # PV area: m²/kW (for 15% efficiency)
-                                  # Calculation: 1000 W/m² / (0.15 × 1000 W/kW) = 6.67
-        'P_DG_min': 0.1,          # Diesel must run at ≥30% capacity
-        
-        # ---------------------------------------------------------------------
-        # COMPONENT LIFETIMES (years)
-        # ---------------------------------------------------------------------
-        'life_PV': 25,            # Solar panels
-        'life_WT': 20,            # Wind turbines
-        'life_H2': 20,            # Hydrogen storage tanks
-        'life_FC': 10,            # Fuel cells (need replacement)
-        'life_EL': 15,            # Electrolyzers
-        'life_DG': 15,            # Diesel generators
+        # Lifetimes
+        'life_PV': 25,
+        'life_WT': 20,
+        'life_H2': 20,
+        'life_FC': 10,
+        'life_EL': 15,
+        'life_DG': 15,
     }
-    
+
     # =========================================================================
     # CREATE SYSTEM INSTANCE
     # =========================================================================
@@ -107,18 +94,18 @@ def run_single_simulation():
     # DEFINE SYSTEM CONFIGURATION
     # =========================================================================
     config = {
-        'N_PV': 5,      # Number of PV
-        'N_WT': 1120,      # kW wind turbine rated capacity
-        'Cap_H2': 2000,    # kg hydrogen storage capacity
-        'Cap_FC': 800,     # kW fuel cell capacity
-        'Cap_EL': 800,     # kW electrolyzer capacity
-        'Cap_DG': 450,     # kW diesel generator capacity
+        'N_PV': 2000,      # number of PV
+        'N_WT': 180,       # number of wind
+        'Cap_H2': 2000,    # kg
+        'Cap_FC': 600,     # kW
+        'Cap_EL': 600,     # kW
+        'Cap_DG': 300,     # kW
     }
     
     print("\n" + "="*80)
     print("SYSTEM CONFIGURATION")
     print("="*80)
-    print(f"  PV Capacity:              {config['N_PV']:>8} kW")
+    print(f"  PV Capacity:              {config['N_PV']*0.327} kW")
     print(f"  Wind Turbine Capacity:    {config['N_WT']:>8} kW")
     print(f"  H2 Storage Capacity:      {config['Cap_H2']:>8} kg")
     print(f"  Fuel Cell Capacity:       {config['Cap_FC']:>8} kW")
