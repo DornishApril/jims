@@ -108,19 +108,22 @@ class HybridEnergySystem:
         # =================================================================
         # Generator configs
         # =================================================================
+        self.rated_PV = parameters.get('rated_PV',0.327)
         self.v_cut_in = parameters.get('v_cut_in', 2.75)   # Cut-in wind speed (m/s)
         self.v_rated =  parameters.get('v_rated', 9.0)  # Rated wind speed (m/s)
-        self.rated_power = parameters.get('rated_power', 20.0) #wind turbine rated power
-        self.Cap_H2 = parameters.get('Cap_H2')
-        self.Cap_FC = parameters.get('Cap_FC')
-        self.Cap_EL = parameters.get('Cap_EL')
-        self.Cap_DG = parameters.get('Cap_DG')
+        self.rated_power = parameters.get('rated_power', 25.0) #wind turbine rated power
+        self.Cap_H2 = parameters.get('Cap_H2',6) #kg Capacity of 1 H2 storage
+        self.Cap_FC = parameters.get('Cap_FC',2) #kW Capacity/Rated power of FC
+        self.Cap_EL = parameters.get('Cap_EL',2) #kW Capacity/Rated power of Electrolyzer
+        self.Cap_DG = parameters.get('Cap_DG',50) #kW Capacity/Rated power of Diesel
+        self.H_min_percentage = parameters.get('H_min_percentage',0) 
+        self.H_max_percentage = parameters.get('H_max_percentage',0)
 
         # =================================================================
         # Diesel Constants
         # =================================================================
-        self.f_0 = parameters.get('f_0', 0.08145)#litre/kW/h
-        self.f_1 = parameters.get('f_1', 0.246)#litre/kWh
+        self.f_0 = parameters.get('f_0', 0.246)#litre/kW/h
+        self.f_1 = parameters.get('f_1', 0.08145)#litre/kWh
 
 
 
@@ -140,12 +143,12 @@ class HybridEnergySystem:
         # =================================================================
         # CAPITAL COSTS ($/unit)
         # =================================================================
-        self.c_PV = parameters.get('c_PV', 1500)      # $/kW
-        self.c_WT = parameters.get('c_WT', 3000)      # $/kW
+        self.c_PV = parameters.get('c_PV', 1300)      # $/kW
+        self.c_WT = parameters.get('c_WT', 2300)      # $/kW
         self.c_H2 = parameters.get('c_H2', 500)       # $/kg capacity
         self.c_FC_cap = parameters.get('c_FC_cap', 2000)  # $/kW
         self.c_EL_cap = parameters.get('c_EL_cap', 1500)  # $/kW
-        self.c_DG_cap = parameters.get('c_DG_cap', 400)   # $/kW
+        self.c_DG_cap = parameters.get('c_DG_cap', 500)   # $/kW
         self.c_INVT = parameters.get('c_INVT',300)
         
         # =================================================================
@@ -160,24 +163,24 @@ class HybridEnergySystem:
         # =================================================================
         # O&M COSTS ($/unit/year)
         # =================================================================
-        self.om_PV = parameters.get('om_PV', 20)  # $/kW/year
-        self.om_WT = parameters.get('om_WT', 50)  # $/kW/year
+        self.om_PV = parameters.get('om_PV', 10)  # $/kW/year
+        self.om_WT = parameters.get('om_WT', 69)  # $/kW/year
         self.om_H2 = parameters.get('om_H2', 10)  # $/kg/year
         self.om_FC = parameters.get('om_FC', 30)  # $/kW/year
         self.om_EL = parameters.get('om_EL', 25)  # $/kW/year
-        self.om_DG = parameters.get('om_DG', 15)  # $/kW/year
+        self.om_DG = parameters.get('om_DG', 0.03)  # $/h
         self.om_INVT = parameters.get('om_INVT',0) 
 
 
         # Replacement COSTS(rc) ($/unit/year)
         # =================================================================
-        self.rc_PV = parameters.get('rc_PV', 20)  # $/kW/year
-        self.rc_WT = parameters.get('rc_WT', 50)  # $/kW/year
-        self.rc_H2 = parameters.get('rc_H2', 10)  # $/kg/year
-        self.rc_FC = parameters.get('rc_FC', 30)  # $/kW/year
-        self.rc_EL = parameters.get('rc_EL', 25)  # $/kW/year
-        self.rc_DG = parameters.get('rc_DG', 15)  # $/kW/year
-        self.rc_INVT = parameters.get('rc_INVT',0) # $/kW/year
+        self.rc_PV = parameters.get('rc_PV', 0)  # $/kW
+        self.rc_WT = parameters.get('rc_WT', 1750)  # $/kW
+        self.rc_H2 = parameters.get('rc_H2', 10)  # $/kg
+        self.rc_FC = parameters.get('rc_FC', 30)  # $/kW
+        self.rc_EL = parameters.get('rc_EL', 25)  # $/kW
+        self.rc_DG = parameters.get('rc_DG', 500)  # $/kW
+        self.rc_INVT = parameters.get('rc_INVT',300) # per piece
 
 
         
@@ -249,56 +252,72 @@ class HybridEnergySystem:
     
     def calculate_replacement_cost(self, system: Dict, T_life: int, r: float) -> float:
         """
-        Calculate replacement costs for components with lifetime < project lifetime
-        Returns the NET PRESENT VALUE of all future replacement costs
-        
+        Calculate the total present value of all component replacement costs
+        over the project lifetime.
+
+        A replacement occurs at years: life, 2*life, 3*life, ...
+        Any replacement that falls exactly on or after T_life is excluded
+        (the project is over; you wouldn't replace something on the last day).
+
         Parameters
         ----------
         system : dict
-            System configuration with capacities
+            System configuration (N_PV, N_WT, N_H2, N_FC, N_EL, N_DG)
         T_life : int
             Project lifetime (years)
         r : float
-            Discount rate
-            
+            Annual discount rate (e.g. 0.05 = 5%)
+
         Returns
         -------
         float
-            Total replacement cost in present value ($)
+            Present value of all replacement costs ($)
         """
         C_rep = 0.0
-        
+
+        # ------------------------------------------------------------------
+        # Per-unit components
+        # Each tuple: (system_key, capacity_per_unit, replacement_cost_per_unit_capacity, lifetime)
+        # Uses rc_* parameters (replacement costs), NOT c_* (capital costs)
+        # ------------------------------------------------------------------
         components = [
-            ('N_PV', self.rc_PV, self.life_PV),
-            ('N_WT', self.rc_WT, self.life_WT),
-            ('rc_H2', self.rc_H2, self.life_H2),
-            ('rc_FC', self.rc_FC, self.life_FC),
-            ('rc_EL', self.rc_EL, self.life_EL),
-            ('rc_DG', self.rc_DG, self.life_DG),
-            ('rc_INVT', self.rc_INVT, self.life_INVT),
-            
+            ('N_PV', self.rated_PV,    self.rc_PV,  self.life_PV),
+            ('N_WT', self.rated_power, self.rc_WT,  self.life_WT),
+            ('N_H2', self.Cap_H2,      self.rc_H2,  self.life_H2),
+            ('N_FC', self.Cap_FC,      self.rc_FC,  self.life_FC),
+            ('N_EL', self.Cap_EL,      self.rc_EL,  self.life_EL),
+            ('N_DG', self.Cap_DG,      self.rc_DG,  self.life_DG),
         ]
-        
-        for comp_name, unit_cost, life in components:
-            capacity = system.get(comp_name, 0)
-            
-            if capacity == 0 or life >= T_life:
+
+        for comp_key, capacity_per_unit, rc_per_unit_capacity, life in components:
+            n_units = system.get(comp_key, 0)
+
+            # Skip if component not present or outlasts the project
+            if n_units == 0 or life <= 0 or life >= T_life:
                 continue
-            
-            # Calculate number of replacements needed
-            n_replacements = int(T_life / life)
-            
-            # Add discounted replacement costs
-            for n in range(1, n_replacements + 1):
-                replacement_year = n * life
-                if replacement_year < T_life:
-                    # Present value of replacement cost
-                    pv_cost = (capacity * unit_cost) / ((1 + r) ** replacement_year)
-                    C_rep += pv_cost
-        
-        return C_rep
-    
-    
+
+            # Total replacement cost for this component (one replacement event)
+            total_rc = n_units * capacity_per_unit * rc_per_unit_capacity
+
+            # Replacement years: life, 2*life, ... up to but NOT including T_life
+            replacement_year = life
+            while replacement_year < T_life:
+                C_rep += total_rc / ((1 + r) ** replacement_year)
+                replacement_year += life
+
+        # ------------------------------------------------------------------
+        # Inverter: single flat cost (c_INVT is a total $ amount, not per-kW)
+        # Uses rc_INVT; falls back to c_INVT if rc_INVT is 0
+        # ------------------------------------------------------------------
+        invt_rc = self.rc_INVT if self.rc_INVT > 0 else self.c_INVT
+
+        if invt_rc > 0 and self.life_INVT > 0 and self.life_INVT < T_life:
+            replacement_year = self.life_INVT
+            while replacement_year < T_life:
+                C_rep += invt_rc / ((1 + r) ** replacement_year)
+                replacement_year += self.life_INVT
+
+        return C_rep    
     def simulate_year(self, system: Dict, data: pd.DataFrame) -> Tuple[float, float, float, Dict]:
         """
         Simulate one year of system operation
@@ -331,13 +350,16 @@ class HybridEnergySystem:
         # =================================================================
         # EXTRACT SYSTEM CONFIGURATION
         # =================================================================
+        print(len(data))          # Should be 8760 for hourly annual data
+        print(data['Community Load'].sum())  # Should match ~1,096,946
+        print(data['Community Load'].describe())
         N_PV = system.get('N_PV', 0)
         N_WT = system.get('N_WT', 0)
         Capacity_H2 = system.get('N_H2', 0)*self.Cap_H2
         Capacity_FC = system.get('N_FC', 0)*self.Cap_FC
         Capacity_EL = system.get('N_EL', 0)*self.Cap_EL
         Capacity_DG = system.get('N_DG', 0)*self.Cap_DG
-        
+ 
         # Validate inputs
         if Capacity_H2 < 0 or Capacity_FC < 0 or Capacity_EL < 0:
             raise ValueError("Capacities cannot be negative")
@@ -346,7 +368,7 @@ class HybridEnergySystem:
         # HYDROGEN STORAGE LIMITS
         # =================================================================
         H_max = Capacity_H2  # Maximum hydrogen storage (kg)
-        H_min = 0.1 * Capacity_H2  # Minimum hydrogen level (10% of capacity)
+        H_min = self.H_min_percentage * Capacity_H2  # Minimum hydrogen level (10% of capacity)
         
         # =================================================================
         # INITIALIZE TRACKING VARIABLES
@@ -364,7 +386,7 @@ class HybridEnergySystem:
         
         # Initialize hydrogen storage trajectory
         H = np.zeros(len(data) + 1)
-        H[0] = 0.5 * Capacity_H2  # Start at 50% capacity
+        H[0] = 1 * Capacity_H2  # Start at 100% capacity
         
         # =================================================================
         # DETECT COLUMN NAMES
@@ -383,8 +405,8 @@ class HybridEnergySystem:
         else:
             raise ValueError("Solar Power column not found in data")
         
-        if 'Wind Speed (m/s)' in data.columns:
-            wind_col = 'Wind Speed (m/s)'
+        if 'Avg Wind Speed NASA (36m)' in data.columns:
+            wind_col = 'Avg Wind Speed NASA (36m)'
         elif 'Avg Wind Speed' in data.columns:
             wind_col = 'Avg Wind Speed'
         else:
@@ -394,8 +416,8 @@ class HybridEnergySystem:
         # CALCULATE TOTAL LOAD
         # =================================================================
         L = data['Community Load'].values.copy()
-        if 'RO Load (kWh)' in data.columns:
-            L = L + 0*data['RO Load (kWh)'].values
+        # if 'RO Load (kWh)' in data.columns:
+        #     L = L + 0*data['RO Load (kWh)'].values
         
         L_year = np.sum(L)  # Total annual load (kWh)
         
@@ -418,7 +440,7 @@ class HybridEnergySystem:
             # Wind generation: Power = power_curve(wind_speed) × capacity
             E_WT = self.wind_power_curve(v_t) * N_WT  # kWh AC
             
-            E_RE = E_PV + E_WT  # Total renewable energy (kWh)
+            E_RE = E_PV + E_WT  # Total renewable energy AC (kWh)
             
             E_PV_total += E_PV
             E_WT_total += E_WT
@@ -432,6 +454,7 @@ class HybridEnergySystem:
             # CASE 1: DEFICIT (E_net < 0)
             # =============================================================
             if E_net < 0:
+
                 E_deficit = abs(E_net)  # kWh needed
                 E_FC = 0.0
                 E_DG = 0.0
@@ -470,7 +493,7 @@ class HybridEnergySystem:
                     # H2_consumed = DC_Energy / (LHV × eta_FC)
                     H2_consumed = E_FC_DC / (self.H2_LHV * self.eta_FC)
                     
-                    # Update hydrogen storage
+                    # Update hydrogen storage---------------------------
                     H[t+1] = max(0, H[t] - H2_consumed)
                     
                     # Add costs and emissions (tracked in AC terms, consistent with load)
@@ -492,8 +515,7 @@ class HybridEnergySystem:
                     # DIESEL GENERATOR OPERATION
                     # -------------------------------------------------
                     # Diesel generator must run above minimum load
-                    P_DG_min_abs = self.P_DG_min * Capacity_DG  # Minimum power (kW)
-                    
+                    P_DG_min_abs = self.P_DG_min * self.Cap_DG  # Minimum power (kW)
                     # Check if deficit is within operable range
                     if E_deficit >= P_DG_min_abs:
                         # DG can operate
@@ -502,11 +524,9 @@ class HybridEnergySystem:
                         #As long as we are being above the minimum so if deficit is 5c and capacity is c
                         #we run DG 5 times. If deficit is 5c+k, then unmet load is k
 
-                        f_0 = 0.08145 #litre/kWh
-                        f_1 = 0.246 #litre/kWh
                         
 
-                        DG_Litre = self.f_0 * Capacity_DG + self.f_1 * E_DG
+                        DG_Litre = self.f_1 * Capacity_DG + self.f_0 * E_DG
 
                         # Add costs and emissions
                         C_op += self.c_DG_FUEL * DG_Litre
@@ -596,20 +616,22 @@ class HybridEnergySystem:
         # CALCULATE COSTS
         # =================================================================
         # Capital cost (present value)
-        C_cap = (self.c_PV * N_PV + 
-                 self.c_WT * N_WT + 
+        C_cap = (self.c_PV * N_PV*self.rated_PV + 
+                 self.c_WT * N_WT*self.rated_power + #wind 
                  self.c_H2 * Capacity_H2 + 
                  self.c_FC_cap * Capacity_FC + 
                  self.c_EL_cap * Capacity_EL + 
-                 self.c_DG_cap * Capacity_DG)
+                 self.c_DG_cap * Capacity_DG +
+                 self.c_INVT)
         
         # Annual O&M cost
-        C_om_annual = (self.om_PV * N_PV + 
-                       self.om_WT * N_WT + 
+        print(f"CapacityDG = {Capacity_DG}")
+        C_om_annual = (self.om_PV * N_PV*self.rated_PV + 
+                       self.om_WT * N_WT*self.rated_power + 
                        self.om_H2 * Capacity_H2 + 
                        self.om_FC * Capacity_FC + 
                        self.om_EL * Capacity_EL + 
-                       self.om_DG * Capacity_DG)
+                       self.om_DG * (E_DG_total/Capacity_DG))
         
         # Replacement cost (present value)
         C_rep = self.calculate_replacement_cost(system, self.T_life, self.r)

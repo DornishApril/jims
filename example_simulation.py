@@ -27,7 +27,7 @@ def run_single_simulation():
         'eta_PV': 0.15,    # 15% solar panel efficiency
         'eta_FC': 0.50,    # 50% fuel cell efficiency
         'eta_EL': 0.70,    # 70% electrolyzer efficiency
-        'eta_INVT':0.95,   # 90% inverter efficiency
+        'eta_INVT':0.90,   # 90% inverter efficiency
         
         # Hydrogen properties
         'H2_LHV': 33.3,    # kWh/kg (thermodynamic constant)
@@ -94,23 +94,23 @@ def run_single_simulation():
     # DEFINE SYSTEM CONFIGURATION
     # =========================================================================
     config = {
-        'N_PV': 2000,      # number of PV
-        'N_WT': 180,       # number of wind
-        'Cap_H2': 2000,    # kg
-        'Cap_FC': 600,     # kW
-        'Cap_EL': 600,     # kW
-        'Cap_DG': 300,     # kW
+        'N_PV': 200,      # number of PV
+        'N_WT': 50,       # number of wind
+        'N_H2': 100,    # number of H2 container
+        'N_FC': 50,     # number of FC
+        'N_EL': 50,     # number of EL
+        'N_DG': 30,    # kW
     }
     
     print("\n" + "="*80)
     print("SYSTEM CONFIGURATION")
     print("="*80)
-    print(f"  PV Capacity:              {config['N_PV']*0.327} kW")
+    print(f"  PV Capacity:           {config['N_PV']}   {config['N_PV']*0.327} kW")
     print(f"  Wind Turbine Capacity:    {config['N_WT']:>8} kW")
-    print(f"  H2 Storage Capacity:      {config['Cap_H2']:>8} kg")
-    print(f"  Fuel Cell Capacity:       {config['Cap_FC']:>8} kW")
-    print(f"  Electrolyzer Capacity:    {config['Cap_EL']:>8} kW")
-    print(f"  Diesel Generator:         {config['Cap_DG']:>8} kW")
+    print(f"  H2 Storage Capacity:      {config['N_H2']*system.Cap_H2} kg")
+    print(f"  Fuel Cell Capacity:       {config['N_FC']*system.Cap_FC} kW")
+    print(f"  Electrolyzer Capacity:    {config['N_EL']*system.Cap_EL} kW")
+    print(f"  Diesel Generator:         {config['N_DG']*system.Cap_DG} kW")
     
     print("\n" + "="*80)
     print("EFFICIENCY DETAILS")
@@ -128,11 +128,11 @@ def run_single_simulation():
     # LOAD DATA
     # =========================================================================
     try:
-        data = pd.read_excel('data/Load.xlsx')
+        data = pd.read_excel('data/semi_final_load.xlsx')
         print("\n" + "="*80)
         print("DATA LOADED")
         print("="*80)
-        print(f"  Source: data/Load.xlsx")
+        print(f"  Source: data/semi_final_load.xlsx")
     except:
         try:
             data = pd.read_excel('data/combined.xlsx')
@@ -145,7 +145,7 @@ def run_single_simulation():
             print("ERROR: Could not load data file!")
             print("="*80)
             print("Please ensure one of the following exists:")
-            print("  - data/Load.xlsx")
+            print("  - data/semi_final_load.xlsx")
             print("  - data/combined.xlsx")
             return None
     
@@ -205,10 +205,10 @@ def run_single_simulation():
     # Capital cost breakdown
     c_pv_cost = parameters['c_PV'] * config['N_PV']
     c_wt_cost = parameters['c_WT'] * config['N_WT']
-    c_h2_cost = parameters['c_H2'] * config['Cap_H2']
-    c_fc_cost = parameters['c_FC_cap'] * config['Cap_FC']
-    c_el_cost = parameters['c_EL_cap'] * config['Cap_EL']
-    c_dg_cost = parameters['c_DG_cap'] * config['Cap_DG']
+    c_h2_cost = parameters['c_H2'] * system.Cap_H2
+    c_fc_cost = parameters['c_FC_cap'] * system.Cap_H2
+    c_el_cost = parameters['c_EL_cap'] * system.Cap_H2
+    c_dg_cost = parameters['c_DG_cap'] * system.Cap_H2
     
     print("\n--- CAPITAL COST BREAKDOWN ---")
     print(f"  PV System:                ${c_pv_cost:>12,.2f} ({c_pv_cost/details['C_cap']*100:>5.1f}%)")
@@ -232,8 +232,8 @@ def plot_results(details, config):
     # Hydrogen storage trajectory
     hours = np.arange(len(details['H_trajectory']))
     axes[0].plot(hours / 24, details['H_trajectory'], linewidth=0.8)
-    # axes[0].axhline(y=config['Cap_H2'], color='r', linestyle='--', label='Max Capacity')
-    axes[0].axhline(y=0.1*config['Cap_H2'], color='orange', linestyle='--', label='Min Level (10%)')
+    # axes[0].axhline(y=system.Cap_H2, color='r', linestyle='--', label='Max Capacity')
+    axes[0].axhline(y=0.1*system.Cap_H2, color='orange', linestyle='--', label='Min Level (10%)')
     axes[0].set_xlabel('Day')
     axes[0].set_ylabel('Hydrogen Storage (kg)')
     axes[0].set_title('Hydrogen Storage Level Over Time')
@@ -296,17 +296,17 @@ def sensitivity_analysis():
     
     # Base configuration
     base_config = {
-        'N_PV': 1500,
-        'N_WT': 1000,
-        'Cap_H2': 2000,  # Will vary this
-        'Cap_FC': 800,
-        'Cap_EL': 800,
-        'Cap_DG': 500,
+        'N_PV': 100,      # number of PV
+        'N_WT': 2,       # number of wind
+        'N_H2': 100,    # number of H2 container
+        'N_FC': 50,     # number of FC
+        'N_EL': 50,     # number of EL
+        'N_DG': 30,
     }
     
     # Load data
     try:
-        data = pd.read_excel('data/Load.xlsx')
+        data = pd.read_excel('data/semi_final_load.xlsx')
     except:
         try:
             data = pd.read_excel('data/combined.xlsx')
@@ -323,7 +323,7 @@ def sensitivity_analysis():
     results = []
     for h2_cap in h2_capacities:
         config = base_config.copy()
-        config['Cap_H2'] = h2_cap
+        system.Cap_H2 = h2_cap
         
         C_total, E_total, LPSP, details = system.simulate_year(config, data)
         results.append((h2_cap, C_total, E_total, LPSP))
