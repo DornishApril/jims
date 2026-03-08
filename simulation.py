@@ -642,20 +642,20 @@ class HybridEnergySystem:
             else:
                 E_grid_hour = 0.0
                 H[t+1] = H[t]
-
-            hourly_log.append({
-                'Hour': t,
-                'Community Load': L_t,
-                'Solar Power': PV_t,
-                'Wind Power': self.wind_power_curve(v_t),
-                'PV Generation': E_PV,
-                'WT Generation': E_WT,
-                'FC Generation': E_FC,
-                'DG Generation': E_DG,
-                'Unmet Energy': E_deficit if (E_net < 0 and E_deficit > 0.001) else 0.0,
-                'Surplus Energy': E_grid_hour,
-                'H2 Capacity': H[t+1],
-                })
+            if self.output_simulation:
+                hourly_log.append({
+                    'Hour': t,
+                    'Community Load': L_t,
+                    'Solar Power': PV_t,
+                    'Wind Power': self.wind_power_curve(v_t),
+                    'PV Generation': E_PV,
+                    'WT Generation': E_WT,
+                    'FC Generation': E_FC,
+                    'DG Generation': E_DG,
+                    'Unmet Energy': E_deficit if (E_net < 0 and E_deficit > 0.001) else 0.0,
+                    'Surplus Energy': E_grid_hour,
+                    'H2 Capacity': H[t+1],
+                    })
         
         # Export hourly log to CSV
         if self.output_simulation:
@@ -690,7 +690,7 @@ class HybridEnergySystem:
                        self.om_H2 * Capacity_H2 + 
                        self.om_FC * Capacity_FC + 
                        self.om_EL * Capacity_EL + 
-                       self.om_DG * (E_DG_total/Capacity_DG))
+                       self.om_DG * (E_DG_total/Capacity_DG if Capacity_DG>0 else 0))
         
         # Replacement cost (present value)
         C_rep = self.calculate_replacement_cost(system, self.T_life, self.r)
@@ -727,7 +727,7 @@ class HybridEnergySystem:
             'E_unmet': E_unmet,
             'L_year': L_year,
             'H_trajectory': H,
-            'hourly_df' : hourly_df,
+            'hourly_df' : hourly_df if self.output_simulation else None,
         }
         
         return C_total, E_total, LPSP, details

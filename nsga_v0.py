@@ -72,7 +72,7 @@ CONSTRAINTS = [
 # ------------------------------------------------------------
 # SECTION 4: GA PARAMETERS
 # ------------------------------------------------------------
-POP_SIZE       = 200     # population size (keep even)
+POP_SIZE       = 20     # population size (keep even)
 N_GENERATIONS  = 500    # number of generations
 CROSSOVER_PROB = 0.9    # probability of crossover per pair
 MUTATION_PROB  = 0.1    # probability of mutating each gene
@@ -165,7 +165,11 @@ def evaluate(ind: Individual, sim: 'HybridEnergySystem', data: pd.DataFrame):
     cfg = ind.to_config()
     try:
         C_total, E_total, LPSP, details = sim.simulate_year(cfg, data)
-    except Exception:
+    except Exception as e:
+        print(f"EVAL FAILED: {cfg}")   # <-- add this
+        print(f"ERROR: {e}")           # <-- and this
+        import traceback
+        traceback.print_exc()          # <-- full stack trace
         ind.objectives  = np.full(N_OBJ, 1e12)
         ind.constraints = np.full(max(N_CON, 1), 1e12)
         ind.feasible    = False
