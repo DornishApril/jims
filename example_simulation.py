@@ -7,7 +7,7 @@ This script demonstrates the corrected version with proper unit conversions
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from trial1_simulation import HybridEnergySystem
+from simulation import HybridEnergySystem
 
 
 def run_single_simulation(data,parameters,config):
@@ -400,6 +400,8 @@ if __name__ == "__main__":
     'life_EL': 15,              # years - electrolyzer lifetime
     'life_DG': 15,              # years - diesel generator lifetime
     'life_INVT': 15,            # years - inverter lifetime
+
+    'output_simulation' : True
 }
         
     

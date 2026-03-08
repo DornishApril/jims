@@ -115,6 +115,9 @@ class HybridEnergySystem:
             - life_EL           : int    - Electrolyzer lifetime. Default: 15
             - life_DG           : int    - Diesel generator lifetime. Default: 15
             - life_INVT         : int    - Inverter lifetime. Default: 15
+
+            FUNCTIONALITY:
+            - output_simulation : Bool     - Set True to output .csv file of the simulation
         """
         # =================================================================
         # Generator configs
@@ -227,6 +230,13 @@ class HybridEnergySystem:
         self.life_EL = parameters.get('life_EL', 15)
         self.life_DG = parameters.get('life_DG', 15)
         self.life_INVT = parameters.get('life_INVT', 15)
+
+        # =================================================================
+        # FUNCTIONALITY
+        # =================================================================
+        
+        self.output_simulation = parameters.get('output_simulation',False)
+
     
     
     def wind_power_curve(self, v: float) -> float:
@@ -362,9 +372,11 @@ class HybridEnergySystem:
         # =================================================================
         # EXTRACT SYSTEM CONFIGURATION
         # =================================================================
-        print(len(data))          # Should be 8760 for hourly annual data
-        print(data['Community Load'].sum())  # Should match ~1,096,946
-        print(data['Community Load'].describe())
+        if self.output_simulation:
+
+            print(len(data))          # Should be 8760 for hourly annual data
+            print(data['Community Load'].sum())  # Should match ~1,096,946
+            print(data['Community Load'].describe())
         N_PV = system.get('N_PV', 0)
         N_WT = system.get('N_WT', 0)
         Capacity_H2 = system.get('N_H2', 0)*self.Cap_H2
@@ -630,6 +642,7 @@ class HybridEnergySystem:
             else:
                 E_grid_hour = 0.0
                 H[t+1] = H[t]
+
             hourly_log.append({
                 'Hour': t,
                 'Community Load': L_t,
@@ -645,9 +658,11 @@ class HybridEnergySystem:
                 })
         
         # Export hourly log to CSV
-        hourly_df = pd.DataFrame(hourly_log)
-        hourly_df.to_csv('simulation_hourly_log.csv', index=False)
-        print("Hourly log saved to simulation_hourly_log.csv")
+        if self.output_simulation:
+
+            hourly_df = pd.DataFrame(hourly_log)
+            hourly_df.to_csv('simulation_hourly_log.csv', index=False)
+            print("Hourly log saved to simulation_hourly_log.csv")
 
         # =================================================================
         # CALCULATE PERFORMANCE METRICS
@@ -669,7 +684,7 @@ class HybridEnergySystem:
                  self.c_INVT)
         
         # Annual O&M cost
-        print(f"CapacityDG = {Capacity_DG}")
+        # print(f"CapacityDG = {Capacity_DG}")
         C_om_annual = (self.om_PV * N_PV*self.rated_PV + 
                        self.om_WT * N_WT*self.rated_power + 
                        self.om_H2 * Capacity_H2 + 
@@ -828,6 +843,8 @@ def example_usage():
     'life_EL': 15,              # years - electrolyzer lifetime
     'life_DG': 15,              # years - diesel generator lifetime
     'life_INVT': 15,            # years - inverter lifetime
+
+    'output_simulation':True
 }
 
     
