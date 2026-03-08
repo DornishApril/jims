@@ -103,7 +103,7 @@ def run_single_simulation(data):
         'N_H2': 50,      # number of H2 storage units
         'N_FC': 50,       # number of fuel cell units
         'N_EL': 50,       # number of electrolyzer units
-        'N_DG': 10,       # number of diesel generator units
+        'N_DG': 5,       # number of diesel generator units
     }
 
     # Derived capacities for display

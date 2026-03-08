@@ -434,13 +434,19 @@ class HybridEnergySystem:
             v_t = data.iloc[t][wind_col]            # Wind speed (m/s)
             PV_t = data.iloc[t][avg_solar_col]
             L_t = L[t]                               # Load (kWh for this hour)
-            
+
+            E_FC = 0.0
+            E_DG = 0.0
+            E_deficit_logged = 0.0
+            E_surplus_logged = 0.0
+            E_EL_AC = 0.0
+                        
             # ---------------------------------------------------------
             # RENEWABLE ENERGY GENERATION
             # ---------------------------------------------------------
             # PV generation: Power = efficiency × area × irradiance × capacity
-            E_PV = PV_t * N_PV*self.eta_INVT  # kWh AC
             
+            E_PV = PV_t * N_PV*self.eta_INVT  # kWh AC
             # Wind generation: Power = power_curve(wind_speed) × capacity
             E_WT = self.wind_power_curve(v_t) * N_WT  # kWh AC
             
@@ -458,7 +464,7 @@ class HybridEnergySystem:
             # CASE 1: DEFICIT (E_net < 0)
             # =============================================================
             if E_net < 0:
-
+                E_grid_hour = 0.0
                 E_deficit = abs(E_net)  # kWh needed
                 E_FC = 0.0
                 E_DG = 0.0
@@ -598,22 +604,45 @@ class HybridEnergySystem:
                     if E_leftover > 0.001:  # Small tolerance
                         # Sell leftover to grid
                         E_grid += E_leftover
+                        E_grid_hour = E_leftover
                         C_op -= self.p_grid * E_leftover  # Revenue (negative cost)
                 else:
                     # Storage is full or no electrolyzer, sell all surplus to grid
                     H[t+1] = H[t]
                     E_grid += E_surplus
+                    E_grid_hour = E_surplus
                     C_op -= self.p_grid * E_surplus  # Revenue (negative cost)
             
             # =============================================================
             # CASE 3: BALANCED (E_net == 0)
             # =============================================================
             else:
+                E_grid_hour = 0.0
                 H[t+1] = H[t]
+            hourly_log.append({
+                'Hour': t,
+                'Community Load': L_t,
+                'Solar Power': PV_t,
+                'Wind Power': self.wind_power_curve(v_t),
+                'PV Generation': E_PV,
+                'WT Generation': E_WT,
+                'FC Generation': E_FC,
+                'DG Generation': E_DG,
+                'Unmet Energy': E_deficit if (E_net < 0 and E_deficit > 0.001) else 0.0,
+                'Surplus Energy': E_grid_hour,
+                'H2 Capacity': H[t+1],
+                })
+        
+        # Export hourly log to CSV
+        hourly_df = pd.DataFrame(hourly_log)
+        hourly_df.to_csv('simulation_hourly_log.csv', index=False)
+        print("Hourly log saved to simulation_hourly_log.csv")
+
         # =================================================================
         # CALCULATE PERFORMANCE METRICS
         # =================================================================
         # Loss of Power Supply Probability
+        
         LPSP = E_unmet / L_year if L_year > 0 else 0.0
         
         # =================================================================
@@ -672,6 +701,7 @@ class HybridEnergySystem:
             'E_unmet': E_unmet,
             'L_year': L_year,
             'H_trajectory': H,
+            'hourly_df' : hourly_df,
         }
         
         return C_total, E_total, LPSP, details
