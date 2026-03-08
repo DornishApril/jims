@@ -30,80 +30,91 @@ class HybridEnergySystem:
     
     def __init__(self, parameters: Dict):
         """
-        Initialize system parameters
-        
+        Initialize system parameters.
+
         Parameters
         ----------
         parameters : dict
-            Dictionary containing all system parameters:
-            
+            Dictionary containing all system parameters, grouped as follows:
+
+            GENERATOR CONFIGS:
+            - rated_PV          : float  - Rated power per PV panel (kW). Default: 0.327
+            - v_cut_in          : float  - Wind turbine cut-in speed (m/s). Default: 2.75
+            - v_rated           : float  - Wind turbine rated speed (m/s). Default: 9.0
+            - rated_power       : float  - Rated power per wind turbine (kW). Default: 25.0
+            - Cap_H2            : float  - Capacity of one H2 storage unit (kg). Default: 6
+            - Cap_FC            : float  - Rated power of one fuel cell unit (kW). Default: 2
+            - Cap_EL            : float  - Rated power of one electrolyzer unit (kW). Default: 2
+            - Cap_DG            : float  - Rated power of one diesel generator unit (kW). Default: 50
+            - H_min_percentage  : float  - Minimum H2 storage level as fraction of capacity (0-1). Default: 0
+            - H_max_percentage  : float  - Maximum H2 storage level override as fraction (0-1). Default: 0
+
+            DIESEL FUEL CURVE CONSTANTS:
+            - f_0               : float  - Intercept coefficient (litre/kW/h). Default: 0.246
+            - f_1               : float  - Slope coefficient (litre/kWh). Default: 0.08145
+
             EFFICIENCY PARAMETERS:
-            - eta_PV: PV panel efficiency (dimensionless, 0-1)
-                     Default: 0.15 (15% conversion of solar to electrical)
-            - eta_FC: Fuel cell electrical efficiency (dimensionless, 0-1)
-                     Default: 0.50 (50% of H2 energy to electricity)
-            - eta_EL: Electrolyzer efficiency (dimensionless, 0-1)
-                     Default: 0.70 (70% of electrical energy to H2)
-            - eta_INVT: Inverter Efficiency
-                    Default: 0.90 (90% blah blah blah)
-            
+            - eta_PV            : float  - PV panel efficiency, 0-1. Default: 0.15
+            - eta_FC            : float  - Fuel cell electrical efficiency, 0-1. Default: 0.50
+            - eta_EL            : float  - Electrolyzer efficiency, 0-1. Default: 0.70
+            - eta_INVT          : float  - Inverter efficiency, 0-1. Default: 0.90
+            - H2_LHV            : float  - Hydrogen lower heating value (kWh/kg). Default: 33.3
+
             CAPITAL COSTS (one-time investment):
-            - c_PV: PV capital cost ($/kW)
-            - c_WT: Wind turbine capital cost ($/kW)
-            - c_H2: Hydrogen storage capital cost ($/kg capacity)
-            - c_FC_cap: Fuel cell capital cost ($/kW)
-            - c_EL_cap: Electrolyzer capital cost ($/kW)
-            - c_DG_cap: Diesel generator capital cost ($/kW)
-            
-            - c_INVT : Inverter cost  ($)
+            - c_PV              : float  - PV capital cost ($/kW). Default: 1300
+            - c_WT              : float  - Wind turbine capital cost ($/kW). Default: 2300
+            - c_H2              : float  - Hydrogen storage capital cost ($/kg capacity). Default: 500
+            - c_FC_cap          : float  - Fuel cell capital cost ($/kW). Default: 2000
+            - c_EL_cap          : float  - Electrolyzer capital cost ($/kW). Default: 1500
+            - c_DG_cap          : float  - Diesel generator capital cost ($/kW). Default: 500
+            - c_INVT            : float  - Inverter capital cost, flat total ($). Default: 300
 
-            OPERATING COSTS (per kWh of energy produced/consumed):
-            - c_FC: Fuel cell operating cost ($/kWh produced)
-            - c_DG: Diesel fuel cost ($/kWh produced)
-            - c_EL: Electrolyzer operating cost ($/kWh consumed)
-            - c_DG_FUEL: Diesel cost $/litre
-            
-            OPERATION & MAINTENANCE COSTS (annual, per unit capacity):
-            - om_PV: PV O&M cost ($/kW/year)
-            - om_WT: Wind turbine O&M cost ($/kW/year)
-            - om_H2: Hydrogen storage O&M cost ($/kg/year)
-            - om_FC: Fuel cell O&M cost ($/kW/year)
-            - om_EL: Electrolyzer O&M cost ($/kW/year)
-            - om_DG: Diesel generator O&M cost ($/kW/year)
-            - om_INVT: 0
+            OPERATING COSTS:
+            - c_FC              : float  - Fuel cell operating cost ($/kWh produced). Default: 0
+            - c_DG              : float  - Diesel generator operating cost ($/kWh produced). Default: 0
+            - c_EL              : float  - Electrolyzer operating cost ($/kWh consumed). Default: 0
+            - c_DG_FUEL         : float  - Diesel fuel cost ($/litre). Default: 0.82
 
-            REPLACEMENT COSTS (annual, per unit capacity):
-            - rc_PV: PV O&M cost ($/kW/year)
-            - rc_WT: Wind turbine O&M cost ($/kW/year)
-            - rc_H2: Hydrogen storage O&M cost ($/kg/year)
-            - rc_FC: Fuel cell O&M cost ($/kW/year)
-            - rc_EL: Electrolyzer O&M cost ($/kW/year)
-            - rc_DG: Diesel generator O&M cost ($/kW/year)
-            - rc_INVT: 0
-            
-            EMISSION FACTORS (kg CO2 per kWh):
-            - e_FC: Fuel cell emissions (kg CO2/kWh)
-                   Default: 0.0 (assuming green H2)
-            - e_DG: Diesel generator emissions (kg CO2/litre)
-                   Default: 2.63
-            - e_EL: Electrolyzer emissions (kg CO2/kWh)
-                   Default: 0.0 (direct emissions)
-            
+            OPERATION & MAINTENANCE COSTS:
+            - om_PV             : float  - PV O&M ($/kW/year). Default: 10
+            - om_WT             : float  - Wind turbine O&M ($/kW/year). Default: 69
+            - om_H2             : float  - Hydrogen storage O&M ($/kg/year). Default: 10
+            - om_FC             : float  - Fuel cell O&M ($/kW/year). Default: 30
+            - om_EL             : float  - Electrolyzer O&M ($/kW/year). Default: 25
+            - om_DG             : float  - Diesel generator O&M ($/operating hour). Default: 0.03
+            - om_INVT           : float  - Inverter O&M ($). Default: 0
+
+            REPLACEMENT COSTS (present value, per unit capacity):
+            - rc_PV             : float  - PV replacement cost ($/kW). Default: 0
+            - rc_WT             : float  - Wind turbine replacement cost ($/kW). Default: 1750
+            - rc_H2             : float  - Hydrogen storage replacement cost ($/kg). Default: 10
+            - rc_FC             : float  - Fuel cell replacement cost ($/kW). Default: 30
+            - rc_EL             : float  - Electrolyzer replacement cost ($/kW). Default: 25
+            - rc_DG             : float  - Diesel generator replacement cost ($/kW). Default: 500
+            - rc_INVT           : float  - Inverter replacement cost, flat total ($). Default: 300
+
+            EMISSION FACTORS:
+            - e_FC              : float  - Fuel cell emissions (kg CO2/kWh). Default: 0.0
+            - e_DG              : float  - Diesel generator emissions (kg CO2/litre). Default: 2.6391
+            - e_EL              : float  - Electrolyzer direct emissions (kg CO2/kWh). Default: 0.0
+
             ECONOMIC PARAMETERS:
-            - T_life: Project lifetime (years)
-            - r: Discount rate (dimensionless, e.g., 0.05 = 5%)
-            - p_grid: Grid selling price ($/kWh)
-            
+            - T_life            : int    - Project lifetime (years). Default: 20
+            - r                 : float  - Annual discount rate, e.g. 0.05 = 5%. Default: 0.05
+            - p_grid            : float  - Grid energy selling price ($/kWh). Default: 0.08
+
             TECHNICAL PARAMETERS:
-            - A_PV: PV area per kW capacity (m²/kW)
-                   For eta_PV = 0.15: A_PV = 1000W/m² / (0.15 * 1000W/kW) = 6.67 m²/kW
-            - P_DG_min: Minimum diesel generator load ratio (0-1)
-                       Default: 0.3 (must run at ≥30% of rated capacity)
-            - H2_LHV: Lower heating value of hydrogen (kWh/kg)
-                     Default: 33.3 kWh/kg (thermodynamic constant)
-            
+            - A_PV              : float  - PV panel area per kW capacity (m²/kW). Default: 6.67
+            - P_DG_min          : float  - Minimum diesel generator load ratio, 0-1. Default: 0.3
+
             COMPONENT LIFETIMES (years):
-            - life_PV, life_WT, life_H2, life_FC, life_EL, life_DG
+            - life_PV           : int    - PV panel lifetime. Default: 25
+            - life_WT           : int    - Wind turbine lifetime. Default: 20
+            - life_H2           : int    - Hydrogen storage lifetime. Default: 20
+            - life_FC           : int    - Fuel cell lifetime. Default: 10
+            - life_EL           : int    - Electrolyzer lifetime. Default: 15
+            - life_DG           : int    - Diesel generator lifetime. Default: 15
+            - life_INVT         : int    - Inverter lifetime. Default: 15
         """
         # =================================================================
         # Generator configs
@@ -717,68 +728,107 @@ def example_usage():
     
     # Define system parameters
     parameters = {
-        # Efficiencies (all dimensionless, 0-1)
-        'eta_PV': 0.15,    # 15% solar panel efficiency
-        'eta_FC': 0.50,    # 50% fuel cell efficiency
-        'eta_EL': 0.70,    # 70% electrolyzer efficiency
-        'eta_INVT':0.95,   # 90% inverter efficiency
-        
-        # Hydrogen properties
-        'H2_LHV': 33.3,    # kWh/kg (thermodynamic constant)
-        
-        # Capital costs
-        'c_PV': 1500,      # $/kW
-        'c_WT': 3000,      # $/kW
-        'c_H2': 500,       # $/kg
-        'c_FC_cap': 2000,  # $/kW
-        'c_EL_cap': 1500,  # $/kW
-        'c_DG_cap': 400,   # $/kW
-        'c_INVT' : 300,
-        
-        # Operating costs
-        'c_FC':0,      # $/kWh
-        'c_DG': 0,      # $/kWh
-        'c_EL': 0,      # $/kWh
-        'c_DG_FUEL':0.82 ,  #$/LITRE
-        
-        # O&M costs
-        'om_PV': 20,       # $/kW/year
-        'om_WT': 50,       # $/kW/year
-        'om_H2': 10,       # $/kg/year
-        'om_FC': 30,       # $/kW/year
-        'om_EL': 25,       # $/kW/year
-        'om_DG': 15,       # $/kW/year
+    # =================================================================
+    # GENERATOR CONFIGS
+    # =================================================================
+    'rated_PV': 0.327,          # kW - rated power per PV panel
+    'v_cut_in': 2.75,           # m/s - cut-in wind speed
+    'v_rated': 9.0,             # m/s - rated wind speed
+    'rated_power': 25.0,        # kW - wind turbine rated power
+    'Cap_H2': 6,                # kg - capacity of 1 H2 storage unit
+    'Cap_FC': 2,                # kW - rated power per fuel cell unit
+    'Cap_EL': 2,                # kW - rated power per electrolyzer unit
+    'Cap_DG': 50,               # kW - rated power per diesel generator unit
+    'H_min_percentage': 0,      # fraction - minimum H2 storage level (0 = 0%)
+    'H_max_percentage': 0,      # fraction - maximum H2 storage level override
 
-        # Replacement costs
-        'rc_PV': 20,       # $/kW/year
-        'rc_WT': 50,       # $/kW/year
-        'rc_H2': 10,       # $/kg/year
-        'rc_FC': 30,       # $/kW/year
-        'rc_EL': 25,       # $/kW/year
-        'rc_DG': 15,       # $/kW/year
-        
-        # Emissions
-        'e_FC': 0.0,       # kg CO2/kWh
-        'e_DG': 2.639,      # kg CO2/kWh
-        'e_EL': 0.0,       # kg CO2/kWh
-        
-        # Economic
-        'T_life': 20,      # years
-        'r': 0.05,         # 5% discount rate
-        'p_grid': 0.08,    # $/kWh
-        
-        # Technical
-        'A_PV': 6.67,      # m²/kW
-        'P_DG_min': 0.3,   # 30% minimum load
-        
-        # Lifetimes
-        'life_PV': 25,
-        'life_WT': 20,
-        'life_H2': 20,
-        'life_FC': 10,
-        'life_EL': 15,
-        'life_DG': 15,
-    }
+    # =================================================================
+    # DIESEL CONSTANTS
+    # =================================================================
+    'f_0': 0.246,               # litre/kW/h - diesel curve intercept coefficient
+    'f_1': 0.08145,             # litre/kWh  - diesel curve slope coefficient
+
+    # =================================================================
+    # EFFICIENCY PARAMETERS
+    # =================================================================
+    'eta_PV': 0.15,             # fraction - PV panel efficiency (15%)
+    'eta_FC': 0.50,             # fraction - fuel cell efficiency (50%)
+    'eta_EL': 0.70,             # fraction - electrolyzer efficiency (70%)
+    'eta_INVT': 0.90,           # fraction - inverter efficiency (90%)
+    'H2_LHV': 33.3,             # kWh/kg   - hydrogen lower heating value
+
+    # =================================================================
+    # CAPITAL COSTS
+    # =================================================================
+    'c_PV': 1500,               # $/kW     - PV capital cost
+    'c_WT': 3000,               # $/kW     - wind turbine capital cost
+    'c_H2': 500,                # $/kg     - hydrogen storage capital cost
+    'c_FC_cap': 2000,           # $/kW     - fuel cell capital cost
+    'c_EL_cap': 1500,           # $/kW     - electrolyzer capital cost
+    'c_DG_cap': 400,            # $/kW     - diesel generator capital cost
+    'c_INVT': 300,              # $        - inverter capital cost (flat, not per-kW)
+
+    # =================================================================
+    # OPERATING COSTS
+    # =================================================================
+    'c_FC': 0,                  # $/kWh    - fuel cell operating cost per kWh produced
+    'c_DG': 0,                  # $/kWh    - diesel operating cost per kWh produced
+    'c_EL': 0,                  # $/kWh    - electrolyzer operating cost per kWh consumed
+    'c_DG_FUEL': 0.82,          # $/litre  - diesel fuel cost
+
+    # =================================================================
+    # O&M COSTS
+    # =================================================================
+    'om_PV': 20,                # $/kW/year  - PV O&M
+    'om_WT': 50,                # $/kW/year  - wind turbine O&M
+    'om_H2': 10,                # $/kg/year  - hydrogen storage O&M
+    'om_FC': 30,                # $/kW/year  - fuel cell O&M
+    'om_EL': 25,                # $/kW/year  - electrolyzer O&M
+    'om_DG': 0.03,              # $/h        - diesel generator O&M (per operating hour)
+    'om_INVT': 0,               # $          - inverter O&M
+
+    # =================================================================
+    # REPLACEMENT COSTS
+    # =================================================================
+    'rc_PV': 0,                 # $/kW  - PV replacement cost
+    'rc_WT': 1750,              # $/kW  - wind turbine replacement cost
+    'rc_H2': 10,                # $/kg  - hydrogen storage replacement cost
+    'rc_FC': 30,                # $/kW  - fuel cell replacement cost
+    'rc_EL': 25,                # $/kW  - electrolyzer replacement cost
+    'rc_DG': 500,               # $/kW  - diesel generator replacement cost
+    'rc_INVT': 300,             # $     - inverter replacement cost (flat, per unit)
+
+    # =================================================================
+    # EMISSION FACTORS
+    # =================================================================
+    'e_FC': 0.0,                # kg CO2/kWh    - fuel cell emissions (green H2 = 0)
+    'e_DG': 2.6391,             # kg CO2/litre  - diesel generator emissions
+    'e_EL': 0.0,                # kg CO2/kWh    - electrolyzer direct emissions
+
+    # =================================================================
+    # ECONOMIC PARAMETERS
+    # =================================================================
+    'T_life': 20,               # years    - project lifetime
+    'r': 0.05,                  # fraction - annual discount rate (5%)
+    'p_grid': 0.08,             # $/kWh    - grid energy selling price
+
+    # =================================================================
+    # TECHNICAL PARAMETERS
+    # =================================================================
+    'A_PV': 6.67,               # m²/kW   - PV area per kW capacity
+    'P_DG_min': 0.3,            # fraction - minimum diesel generator load ratio (30%)
+
+    # =================================================================
+    # COMPONENT LIFETIMES
+    # =================================================================
+    'life_PV': 25,              # years - PV panel lifetime
+    'life_WT': 20,              # years - wind turbine lifetime
+    'life_H2': 20,              # years - hydrogen storage lifetime
+    'life_FC': 10,              # years - fuel cell lifetime
+    'life_EL': 15,              # years - electrolyzer lifetime
+    'life_DG': 15,              # years - diesel generator lifetime
+    'life_INVT': 15,            # years - inverter lifetime
+}
 
     
 

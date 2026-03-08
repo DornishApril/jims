@@ -27,68 +27,107 @@ def run_single_simulation(data):
     # DEFINE CORRECTED SYSTEM PARAMETERS
     # =========================================================================
     parameters = {
-        # Efficiencies (all dimensionless, 0-1)
-        'eta_PV': 0.15,    # 15% solar panel efficiency
-        'eta_FC': 0.50,    # 50% fuel cell efficiency
-        'eta_EL': 0.70,    # 70% electrolyzer efficiency
-        'eta_INVT':0.90,   # 90% inverter efficiency
-        
-        # Hydrogen properties
-        'H2_LHV': 33.3,    # kWh/kg (thermodynamic constant)
-        
-        # Capital costs
-        'c_PV': 1500,      # $/kW
-        'c_WT': 3000,      # $/kW
-        'c_H2': 500,       # $/kg
-        'c_FC_cap': 2000,  # $/kW
-        'c_EL_cap': 1500,  # $/kW
-        'c_DG_cap': 400,   # $/kW
-        
-        # Operating costs
-        'c_FC': 0,         # $/kWh
-        'c_DG': 0,         # $/kWh
-        'c_EL': 0,         # $/kWh
-        'c_DG_FUEL': 0.82, # $/litre
-        
-        # O&M costs
-        'om_PV': 20,       # $/kW/year
-        'om_WT': 50,       # $/kW/year
-        'om_H2': 10,       # $/kg/year
-        'om_FC': 30,       # $/kW/year
-        'om_EL': 25,       # $/kW/year
-        'om_DG': 15,       # $/kW/year
+    # =================================================================
+    # GENERATOR CONFIGS
+    # =================================================================
+    'rated_PV': 0.327,          # kW - rated power per PV panel
+    'v_cut_in': 2.75,           # m/s - cut-in wind speed
+    'v_rated': 9.0,             # m/s - rated wind speed
+    'rated_power': 25.0,        # kW - wind turbine rated power
+    'Cap_H2': 6,                # kg - capacity of 1 H2 storage unit
+    'Cap_FC': 2,                # kW - rated power per fuel cell unit
+    'Cap_EL': 2,                # kW - rated power per electrolyzer unit
+    'Cap_DG': 50,               # kW - rated power per diesel generator unit
+    'H_min_percentage': 0,      # fraction - minimum H2 storage level (0 = 0%)
+    'H_max_percentage': 0,      # fraction - maximum H2 storage level override
 
-        # Replacement costs
-        'rc_PV': 20,       # $/kW/year
-        'rc_WT': 50,       # $/kW/year
-        'rc_H2': 10,       # $/kg/year
-        'rc_FC': 30,       # $/kW/year
-        'rc_EL': 25,       # $/kW/year
-        'rc_DG': 15,       # $/kW/year
-        
-        # Emissions
-        'e_FC': 0.0,       # kg CO2/kWh
-        'e_DG': 2.639,     # kg CO2/litre
-        'e_EL': 0.0,       # kg CO2/kWh
-        
-        # Economic
-        'T_life': 20,      # years
-        'r': 0.05,         # 5% discount rate
-        'p_grid': 0.08,    # $/kWh
-        
-        # Technical
-        'A_PV': 6.67,      # m²/kW
-        'P_DG_min': 0.3,   # 30% minimum load
-        
-        # Lifetimes
-        'life_PV': 25,
-        'life_WT': 20,
-        'life_H2': 20,
-        'life_FC': 10,
-        'life_EL': 15,
-        'life_DG': 15,
-    }
+    # =================================================================
+    # DIESEL CONSTANTS
+    # =================================================================
+    'f_0': 0.246,               # litre/kW/h - diesel curve intercept coefficient
+    'f_1': 0.08145,             # litre/kWh  - diesel curve slope coefficient
 
+    # =================================================================
+    # EFFICIENCY PARAMETERS
+    # =================================================================
+    'eta_PV': 0.15,             # fraction - PV panel efficiency (15%)
+    'eta_FC': 0.50,             # fraction - fuel cell efficiency (50%)
+    'eta_EL': 0.70,             # fraction - electrolyzer efficiency (70%)
+    'eta_INVT': 0.90,           # fraction - inverter efficiency (90%)
+    'H2_LHV': 33.3,             # kWh/kg   - hydrogen lower heating value
+
+    # =================================================================
+    # CAPITAL COSTS
+    # =================================================================
+    'c_PV': 1500,               # $/kW     - PV capital cost
+    'c_WT': 3000,               # $/kW     - wind turbine capital cost
+    'c_H2': 500,                # $/kg     - hydrogen storage capital cost
+    'c_FC_cap': 2000,           # $/kW     - fuel cell capital cost
+    'c_EL_cap': 1500,           # $/kW     - electrolyzer capital cost
+    'c_DG_cap': 400,            # $/kW     - diesel generator capital cost
+    'c_INVT': 300,              # $        - inverter capital cost (flat, not per-kW)
+
+    # =================================================================
+    # OPERATING COSTS
+    # =================================================================
+    'c_FC': 0,                  # $/kWh    - fuel cell operating cost per kWh produced
+    'c_DG': 0,                  # $/kWh    - diesel operating cost per kWh produced
+    'c_EL': 0,                  # $/kWh    - electrolyzer operating cost per kWh consumed
+    'c_DG_FUEL': 0.82,          # $/litre  - diesel fuel cost
+
+    # =================================================================
+    # O&M COSTS
+    # =================================================================
+    'om_PV': 20,                # $/kW/year  - PV O&M
+    'om_WT': 50,                # $/kW/year  - wind turbine O&M
+    'om_H2': 10,                # $/kg/year  - hydrogen storage O&M
+    'om_FC': 30,                # $/kW/year  - fuel cell O&M
+    'om_EL': 25,                # $/kW/year  - electrolyzer O&M
+    'om_DG': 0.03,              # $/h        - diesel generator O&M (per operating hour)
+    'om_INVT': 0,               # $          - inverter O&M
+
+    # =================================================================
+    # REPLACEMENT COSTS
+    # =================================================================
+    'rc_PV': 0,                 # $/kW  - PV replacement cost
+    'rc_WT': 1750,              # $/kW  - wind turbine replacement cost
+    'rc_H2': 10,                # $/kg  - hydrogen storage replacement cost
+    'rc_FC': 30,                # $/kW  - fuel cell replacement cost
+    'rc_EL': 25,                # $/kW  - electrolyzer replacement cost
+    'rc_DG': 500,               # $/kW  - diesel generator replacement cost
+    'rc_INVT': 300,             # $     - inverter replacement cost (flat, per unit)
+
+    # =================================================================
+    # EMISSION FACTORS
+    # =================================================================
+    'e_FC': 0.0,                # kg CO2/kWh    - fuel cell emissions (green H2 = 0)
+    'e_DG': 2.6391,             # kg CO2/litre  - diesel generator emissions
+    'e_EL': 0.0,                # kg CO2/kWh    - electrolyzer direct emissions
+
+    # =================================================================
+    # ECONOMIC PARAMETERS
+    # =================================================================
+    'T_life': 20,               # years    - project lifetime
+    'r': 0.05,                  # fraction - annual discount rate (5%)
+    'p_grid': 0.08,             # $/kWh    - grid energy selling price
+
+    # =================================================================
+    # TECHNICAL PARAMETERS
+    # =================================================================
+    'A_PV': 6.67,               # m²/kW   - PV area per kW capacity
+    'P_DG_min': 0.3,            # fraction - minimum diesel generator load ratio (30%)
+
+    # =================================================================
+    # COMPONENT LIFETIMES
+    # =================================================================
+    'life_PV': 25,              # years - PV panel lifetime
+    'life_WT': 20,              # years - wind turbine lifetime
+    'life_H2': 20,              # years - hydrogen storage lifetime
+    'life_FC': 10,              # years - fuel cell lifetime
+    'life_EL': 15,              # years - electrolyzer lifetime
+    'life_DG': 15,              # years - diesel generator lifetime
+    'life_INVT': 15,            # years - inverter lifetime
+}
     # =========================================================================
     # CREATE SYSTEM INSTANCE
     # =========================================================================
