@@ -317,7 +317,8 @@ class HybridEnergySystem:
                 C_rep += invt_rc / ((1 + r) ** replacement_year)
                 replacement_year += self.life_INVT
 
-        return C_rep    
+        return C_rep  
+      
     def simulate_year(self, system: Dict, data: pd.DataFrame) -> Tuple[float, float, float, Dict]:
         """
         Simulate one year of system operation
@@ -383,6 +384,9 @@ class HybridEnergySystem:
         E_FC_total = 0.0
         E_EL_total = 0.0
         E_DG_total = 0.0
+
+        # Hourly log storage
+        hourly_log = []
         
         # Initialize hydrogen storage trajectory
         H = np.zeros(len(data) + 1)
