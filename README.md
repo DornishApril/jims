@@ -1,956 +1,847 @@
-# Hybrid Energy System Simulation - Complete Documentation
+# Hybrid Energy System Simulation
 
-## Table of Contents
-1. [Overview](#overview)
-2. [System Architecture](#system-architecture)
-3. [Input Requirements](#input-requirements)
-4. [Function Parameters](#function-parameters)
-5. [Code Structure](#code-structure)
-6. [Function Flow](#function-flow)
-7. [Output Specifications](#output-specifications)
-8. [Electrolyzer & Fuel Cell Logic Explained](#electrolyzer--fuel-cell-logic-explained)
-9. [Usage Examples](#usage-examples)
+A comprehensive Python-based simulation framework for designing and optimizing **hybrid renewable energy systems** with photovoltaic (PV), wind turbines, hydrogen storage, fuel cells, electrolyzers, and diesel generators.
 
----
+## 📋 Table of Contents
 
-## Overview
+- [Overview](#overview)
+- [Features](#features)
+- [System Architecture](#system-architecture)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Core Components](#core-components)
+- [System Parameters](#system-parameters)
+- [Usage Examples](#usage-examples)
+- [Output & Analysis](#output--analysis)
+- [Unit Conventions](#unit-conventions)
+- [File Structure](#file-structure)
 
-This is a **year-long hourly simulation** (8760 hours) of a hybrid renewable energy system that combines:
-- Solar PV + Wind Turbines (renewable generation)
-- Hydrogen Storage System (energy storage via electrolyzer + fuel cell)
-- Diesel Generator (backup power)
-- Grid Connection (sell excess energy)
+## 🌍 Overview
 
-**Purpose**: Evaluate any system configuration and return its total cost, emissions, and reliability.
+This project simulates a **hybrid renewable energy system** designed to meet electricity loads through a combination of:
 
----
+- **Renewable Sources**: Photovoltaic panels and wind turbines
+- **Energy Storage**: Hydrogen storage with electrolyzer (generation) and fuel cell (discharge)
+- **Backup**: Diesel generator for reliability and peak shaving
+- **Grid Integration**: Optional grid connection for selling excess power
 
-## System Architecture
+The simulation calculates three key performance metrics:
+1. **Economic Performance**: Total annualized costs including capital, operating, and maintenance expenses
+2. **Environmental Impact**: Annual CO₂ emissions from diesel use
+3. **Reliability**: Loss of Power Supply Probability (LPSP) and unmet energy
+
+### Use Cases
+- **Off-grid communities**: Remote locations without grid access
+- **Microgrids**: Industrial facilities or campuses with critical loads
+- **Island systems**: Isolated locations requiring energy independence
+- **Sustainability studies**: Analyzing renewable energy integration strategies
+
+## ✨ Features
+
+### Simulation Capabilities
+- ✅ **Hourly resolution**: Detailed hourly-based energy balance modeling
+- ✅ **Dynamic hydrogen storage**: Real-time hydrogen charging/discharging with efficiency losses
+- ✅ **Wind power curves**: Non-linear wind turbine output based on cut-in, rated, and cut-out speeds
+- ✅ **Diesel fuel consumption**: Realistic fuel curve accounting for no-load consumption
+- ✅ **Multi-year flexibility**: Simulates any duration (typically 1 year of hourly data)
+
+### Economic Analysis
+- ✅ **Capital cost breakdown**: Detailed cost allocation across all components
+- ✅ **Replacement costs**: Time-value-adjusted costs for component replacement over project lifetime
+- ✅ **Operation & maintenance (O&M)**: Annual costs for each component type
+- ✅ **Operating costs**: Fuel and grid interaction costs
+- ✅ **Levelized Cost of Energy (LCOE)**: Economic efficiency metric
+- ✅ **Capital Recovery Factor (CRF)**: Net present value calculations with discounting
+
+### Environmental Analysis
+- ✅ **CO₂ emissions tracking**: Real-time emissions from diesel consumption
+- ✅ **Emission intensity**: g CO₂/kWh metric for comparison
+- ✅ **Green hydrogen support**: Zero-emission operation when using renewable H₂ production
+
+### Reliability Metrics
+- ✅ **Loss of Power Supply Probability (LPSP)**: Percentage of unmet demand
+- ✅ **Reliability percentage**: 1 - LPSP
+- ✅ **Energy balance verification**: Hourly tracking of all flows
+
+## 🏗️ System Architecture
+
+### Component Structure
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    ENERGY SOURCES                            │
-│  ┌──────────┐           ┌──────────┐                        │
-│  │ Solar PV │           │   Wind   │                        │
-│  │  Panels  │           │ Turbine  │                        │
-│  └────┬─────┘           └────┬─────┘                        │
-│       │                      │                               │
-│       └──────────┬───────────┘                               │
-│                  │                                           │
-│            Renewable Energy                                  │
-│                  │                                           │
-│       ┌──────────▼──────────┐                               │
-│       │  Is E_RE >= Load?   │                               │
-│       └──────────┬──────────┘                               │
-│                  │                                           │
-│         ┌────────┴─────────┐                                │
-│         │                  │                                 │
-│    YES (Surplus)      NO (Deficit)                          │
-│         │                  │                                 │
-│         ▼                  ▼                                 │
-│  ┌─────────────┐    ┌─────────────┐                        │
-│  │Electrolyzer │    │  Fuel Cell  │                        │
-│  │ (make H2)   │    │  (use H2)   │                        │
-│  └──────┬──────┘    └──────┬──────┘                        │
-│         │                  │                                 │
-│         ▼                  ▼                                 │
-│  ┌─────────────┐    ┌─────────────┐                        │
-│  │   H2 Tank   │    │ Still need  │                        │
-│  │  (storage)  │    │   power?    │                        │
-│  └──────┬──────┘    └──────┬──────┘                        │
-│         │                  │                                 │
-│    Still excess?      YES  │                                │
-│         │                  ▼                                 │
-│         │          ┌──────────────┐                         │
-│         │          │    Diesel    │                         │
-│         │          │  Generator   │                         │
-│         │          └──────┬───────┘                         │
-│         │                 │                                  │
-│         │            Still need                             │
-│         │             power?                                │
-│         │                 │                                  │
-│         ▼                 ▼                                  │
-│  ┌─────────────┐   ┌─────────────┐                         │
-│  │  Sell to    │   │   Unmet     │                         │
-│  │    Grid     │   │   Demand    │                         │
-│  └─────────────┘   └─────────────┘                         │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│         HYBRID RENEWABLE ENERGY SYSTEM               │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  ┌─────────────┐    ┌──────────────┐                │
+│  │     PV      │    │  Wind Turbine│                │
+│  │   Panels    │    │      (WT)    │                │
+│  └────┬────────┘    └───────┬──────┘                │
+│       │                    │                        │
+│       └────────┬───────────┘                        │
+│                │ (kWh) Renewable Power              │
+│       ┌────────▼─────────────────┐                 │
+│       │  Inverter (AC/DC Conv.)  │                 │
+│       └────────┬─────────────────┘                 │
+│                │                                   │
+│    ┌───────────┴──────────┬──────────────┐         │
+│    │                      │              │         │
+│ ┌──▼──┐            ┌──────▼───┐     ┌───▼───┐     │
+│ │ EL  │ →Excess→   │    H2    │ →   │ Fuel  │     │
+│ │     │   Power    │ Storage  │  Demand   Cell│    │
+│ │     │ ◄─Shortage │    (H2)  │ ◄─  │      │     │
+│ └─────┘            └──────────┘     └───────┘     │
+│                      (kg)                          │
+│                                                   │
+│       ┌────────────────────────┐                  │
+│       │  Diesel Generator (DG) │                  │
+│       │  (Last Resort/Peak)    │                  │
+│       └────────────────────────┘                  │
+│                                                   │
+│       ┌────────────────────────┐                  │
+│       │   Grid Connection      │                  │
+│       │   (Optional)           │                  │
+│       └────────────────────────┘                  │
+│                                                   │
+└─────────────────────────────────────────────────────┘
+         │ Supplies → Community Load
+         │ ← Unmet Load = Shortage (LPSP)
 ```
 
----
+### Energy Flow Priority
+1. **Renewable Generation** (PV + WT) meets load first
+2. **Excess** power charges electrolyzer → H₂ storage
+3. **Shortage** discharged from fuel cell (if H₂ available) or diesel backup
+4. **Grid** sells excess or buys power (if available)
 
-## Input Requirements
+## 📦 Installation
 
-### 1. **System Configuration** (dict)
-This defines the SIZE of each component:
+### Requirements
+- **Python 3.8+**
+- **pandas**: Data manipulation and analysis
+- **numpy**: Numerical computations
+- **matplotlib**: Plotting and visualization
+- **openpyxl**: Excel file reading for load data
+
+### Setup
+
+```bash
+# Clone or download the repository
+cd c:\Users\Admin\OneDrive\Desktop\jims
+
+# Install required packages
+pip install pandas numpy matplotlib openpyxl
+
+# Verify installation
+python -c "import pandas; import numpy; import matplotlib; print('All dependencies installed!')"
+```
+
+## 🚀 Quick Start
+
+### 1. Prepare Your Data
+Your hourly load data should be in Excel format with columns:
+- `Community Load` (kWh): Hourly electricity demand
+- `Solar Power` or `Solar Irradiance (W/sq.m)`: Solar resource data
+- `Wind Speed (m/s)`: Hourly wind speed
+
+Example data files:
+- `data/semi_final_load.xlsx`
+- `data/combined.xlsx`
+
+### 2. Run a Basic Simulation
 
 ```python
-system = {
-    'N_PV': 150,      # PV capacity in kW
-    'N_WT': 100,      # Wind turbine rated capacity in kW
-    'Cap_H2': 200,    # Hydrogen storage capacity in kg
-    'Cap_FC': 80,     # Fuel cell maximum power in kW
-    'Cap_EL': 80,     # Electrolyzer maximum power in kW
-    'Cap_DG': 50,     # Diesel generator capacity in kW
-}
-```
-
-**What each means**:
-- `N_PV`: Total solar panel capacity (e.g., 150 kW = 150 panels × 1 kW each)
-- `N_WT`: Total wind turbine capacity when wind is at rated speed
-- `Cap_H2`: How many kg of hydrogen can be stored
-- `Cap_FC`: Maximum electrical output from fuel cell
-- `Cap_EL`: Maximum electrical input to electrolyzer
-- `Cap_DG`: Maximum diesel generator output
-
-### 2. **Hourly Data** (pandas DataFrame)
-Must contain **8760 rows** (one year of hourly data):
-
-| Required Columns | Description | Units | Example |
-|-----------------|-------------|-------|---------|
-| `Solar Irradiance (W/sq.m)` OR `Avg Solar Irradiance` | Solar radiation | W/m² | 800 |
-| `Wind Speed (m/s)` OR `Avg Wind Speed` | Wind speed | m/s | 5.2 |
-| `Community Load` | Electricity demand | kW | 110.79 |
-| `RO Load (kWh)` (optional) | Additional load | kW | 0 |
-
-**Example data format**:
-```
-HR   Community Load   RO Load   Avg Solar Irradiance   Avg Wind Speed
-0    110.79          0         0                      3.41
-1    92.33           0         0                      3.75
-2    88.45           0         50                     4.20
-...
-8759 105.23          0         0                      3.88
-```
-
----
-
-## Function Parameters
-
-### HybridEnergySystem Class Constructor
-
-```python
-HybridEnergySystem(parameters: Dict)
-```
-
-The `parameters` dictionary contains **all system constants**. Here's what goes in:
-
-#### **A. Efficiency Parameters**
-```python
-'eta_PV': 0.15       # PV efficiency (15% = typical silicon panel)
-'eta_FC': 16.65      # Fuel cell: kWh electricity OUT per kg H2 IN
-'eta_EL': 0.020      # Electrolyzer: kg H2 OUT per kWh electricity IN
-```
-
-#### **B. Capital Costs** (one-time purchase price)
-```python
-'c_PV': 1500         # $/kW of PV capacity
-'c_WT': 3000         # $/kW of wind turbine capacity
-'c_H2': 500          # $/kg of H2 storage capacity
-'c_FC_cap': 2000     # $/kW of fuel cell capacity
-'c_EL_cap': 1500     # $/kW of electrolyzer capacity
-'c_DG_cap': 400      # $/kW of diesel generator capacity
-```
-
-#### **C. Operating Costs** (per kWh of energy processed)
-```python
-'c_FC': 0.01         # $/kWh cost to RUN the fuel cell
-'c_DG': 0.30         # $/kWh cost to RUN the diesel (fuel price)
-'c_EL': 0.01         # $/kWh cost to RUN the electrolyzer
-```
-
-#### **D. Operation & Maintenance Costs** (annual cost per unit)
-```python
-'om_PV': 20          # $/kW/year for PV maintenance
-'om_WT': 50          # $/kW/year for wind turbine maintenance
-'om_H2': 10          # $/kg/year for H2 tank maintenance
-'om_FC': 30          # $/kW/year for fuel cell maintenance
-'om_EL': 25          # $/kW/year for electrolyzer maintenance
-'om_DG': 15          # $/kW/year for diesel generator maintenance
-```
-
-#### **E. Emission Factors** (kg CO2 per kWh)
-```python
-'e_FC': 0.0          # Fuel cell emissions (0 if H2 from renewables)
-'e_DG': 0.8          # Diesel generator emissions
-'e_EL': 0.0          # Electrolyzer emissions
-```
-
-#### **F. Economic Parameters**
-```python
-'T_life': 20         # Project lifetime in years
-'r': 0.05            # Discount rate (5% = 0.05)
-'p_grid': 0.08       # Grid electricity selling price in $/kWh
-```
-
-#### **G. Technical Parameters**
-```python
-'A_PV': 6.67         # PV area in m² per kW (for 15% efficiency)
-'P_DG_min': 0.3      # Minimum diesel loading (30% of capacity)
-```
-
-#### **H. Component Lifetimes** (for replacement cost calculation)
-```python
-'life_PV': 25        # PV panels last 25 years
-'life_WT': 20        # Wind turbines last 20 years
-'life_H2': 20        # H2 storage lasts 20 years
-'life_FC': 10        # Fuel cells last 10 years (replaced once)
-'life_EL': 15        # Electrolyzers last 15 years
-'life_DG': 15        # Diesel generators last 15 years
-```
-
----
-
-## Code Structure
-
-### File Organization
-
-```
-project/
-│
-├── simulation.py              # Main simulation engine
-│   ├── HybridEnergySystem     # Main class
-│   │   ├── __init__()         # Initialize parameters
-│   │   ├── wind_power_curve() # Calculate wind turbine output
-│   │   ├── calculate_replacement_cost()  # NPV of replacements
-│   │   └── simulate_year()    # MAIN SIMULATION FUNCTION
-│   │
-│   └── example_usage()        # Quick demo
-│
-├── example_simulation.py      # Complete working examples
-│   ├── load_data()            # Load Excel data
-│   ├── run_single_simulation() # Run one configuration
-│   └── sensitivity_analysis() # Test multiple configurations
-│
-└── README.md                  # This file
-```
-
-### Class Methods Overview
-
-#### 1. `__init__(parameters)`
-**Purpose**: Initialize all system constants  
-**Input**: Dictionary of parameters  
-**Output**: None (stores parameters as instance variables)  
-**Called**: Once when creating system object
-
-#### 2. `wind_power_curve(v, rated_power=20.0)`
-**Purpose**: Convert wind speed to power output  
-**Input**: 
-- `v`: Wind speed (m/s)
-- `rated_power`: Turbine rated power (kW)
-
-**Output**: Power output (kW)  
-**Logic**:
-```
-If v < 3 m/s OR v > 25 m/s:     → Power = 0 (cut-in/cut-out)
-If 3 ≤ v < 12 m/s:              → Power = rated × ((v-3)/(12-3))³
-If 12 ≤ v ≤ 25 m/s:             → Power = rated
-```
-
-#### 3. `calculate_replacement_cost(system, T_life, r)`
-**Purpose**: Calculate present value of all future replacements  
-**Input**: 
-- `system`: Configuration dict
-- `T_life`: Project lifetime
-- `r`: Discount rate
-
-**Output**: Total replacement cost ($)  
-**Logic**:
-- For each component, check if lifetime < project lifetime
-- Calculate how many times it needs replacement
-- Discount each replacement to present value
-- Sum all replacement costs
-
-**Example**: Fuel cell costs $100k, lasts 10 years, project is 20 years
-- 1 replacement needed at year 10
-- PV of replacement = $100k / (1.05)^10 = $61,391
-
-#### 4. `simulate_year(system, data)` ⭐ **MAIN FUNCTION**
-**Purpose**: Simulate 8760 hours and calculate cost/emissions/reliability  
-**Input**: 
-- `system`: Configuration dict (N_PV, N_WT, etc.)
-- `data`: DataFrame with hourly weather/load data
-
-**Output**: Tuple of (C_total, E_total, LPSP)
-
----
-
-## Function Flow
-
-### High-Level Flow of `simulate_year()`
-
-```
-START
-  │
-  ├─ Extract system configuration (N_PV, N_WT, Cap_H2, etc.)
-  ├─ Initialize cumulative variables (C_op=0, E_CO2=0, E_unmet=0, etc.)
-  ├─ Initialize hydrogen storage array H[0:8761], H[0] = 50% of Cap_H2
-  │
-  ├─ FOR each hour t from 0 to 8759:
-  │   │
-  │   ├─ Get inputs: I[t] (irradiance), v[t] (wind), L[t] (load)
-  │   │
-  │   ├─ Calculate generation:
-  │   │   ├─ E_PV = eta_PV × A_PV × I[t] × N_PV
-  │   │   ├─ E_WT = wind_power_curve(v[t]) × N_WT
-  │   │   └─ E_RE = E_PV + E_WT
-  │   │
-  │   ├─ Calculate net power: E_net = E_RE - L[t]
-  │   │
-  │   ├─ IF E_net < 0 (DEFICIT):
-  │   │   └─ Call DEFICIT_HANDLING()
-  │   │
-  │   ├─ ELSE IF E_net > 0 (SURPLUS):
-  │   │   └─ Call SURPLUS_HANDLING()
-  │   │
-  │   └─ ELSE (E_net == 0):
-  │       └─ H[t+1] = H[t]
-  │
-  ├─ Calculate LPSP = E_unmet / L_year
-  │
-  ├─ Calculate costs:
-  │   ├─ C_cap = sum of all capital costs
-  │   ├─ C_om = sum of all O&M costs × T_life
-  │   ├─ C_rep = calculate_replacement_cost()
-  │   ├─ CRF = (r(1+r)^T) / ((1+r)^T - 1)
-  │   └─ C_total = (C_cap + C_rep) × CRF + C_om + C_op
-  │
-  └─ RETURN (C_total, E_total, LPSP)
-END
-```
-
-### Detailed Deficit Handling Logic
-
-```
-DEFICIT_HANDLING(E_deficit, H[t]):
-  │
-  ├─ IF H[t] > H_min (hydrogen available):
-  │   │
-  │   ├─ Calculate P_FC_limit = min(H[t] × eta_FC, Cap_FC)
-  │   │
-  │   ├─ IF E_deficit ≤ P_FC_limit:
-  │   │   ├─ E_FC = E_deficit
-  │   │   ├─ H_consumed = E_FC / eta_FC
-  │   │   ├─ H[t+1] = H[t] - H_consumed
-  │   │   ├─ C_op += c_FC × E_FC
-  │   │   ├─ E_CO2 += e_FC × E_FC
-  │   │   └─ DONE (deficit fully met)
-  │   │
-  │   ├─ ELSE (fuel cell at maximum, still need power):
-  │   │   │
-  │   │   ├─ E_FC = P_FC_limit
-  │   │   ├─ H_consumed = E_FC / eta_FC
-  │   │   ├─ E_remaining = E_deficit - E_FC
-  │   │   │
-  │   │   ├─ IF E_remaining in [P_DG_min × Cap_DG, Cap_DG]:
-  │   │   │   ├─ E_DG = E_remaining
-  │   │   │   ├─ H[t+1] = H[t] - H_consumed
-  │   │   │   ├─ C_op += c_FC × E_FC + c_DG × E_DG
-  │   │   │   ├─ E_CO2 += e_FC × E_FC + e_DG × E_DG
-  │   │   │   │
-  │   │   │   ├─ E_total = E_RE + E_FC + E_DG
-  │   │   │   ├─ E_excess = E_total - L[t]
-  │   │   │   │
-  │   │   │   ├─ IF E_excess > 0:
-  │   │   │   │   ├─ E_grid += E_excess
-  │   │   │   │   └─ C_op -= p_grid × E_excess (revenue)
-  │   │   │   │
-  │   │   │   └─ ELSE:
-  │   │   │       └─ E_unmet += abs(E_excess)
-  │   │   │
-  │   │   └─ ELSE (diesel can't help):
-  │   │       ├─ H[t+1] = H[t] - H_consumed
-  │   │       ├─ E_unmet += E_remaining
-  │   │       ├─ C_op += c_FC × E_FC
-  │   │       └─ E_CO2 += e_FC × E_FC
-  │
-  └─ ELSE (no hydrogen available):
-      ├─ H[t+1] = H[t]
-      └─ E_unmet += E_deficit
-```
-
-### Detailed Surplus Handling Logic
-
-```
-SURPLUS_HANDLING(E_surplus, H[t]):
-  │
-  ├─ IF E_surplus == 0:
-  │   └─ H[t+1] = H[t]
-  │
-  ├─ ELSE IF H[t] < H_max (storage not full):
-  │   │
-  │   ├─ H_space = H_max - H[t]
-  │   │
-  │   ├─ E_EL_limit = min(E_surplus, Cap_EL, H_space / eta_EL)
-  │   │
-  │   ├─ E_EL = E_EL_limit
-  │   ├─ H_produced = E_EL × eta_EL
-  │   ├─ H[t+1] = H[t] + H_produced
-  │   │
-  │   ├─ C_op += c_EL × E_EL
-  │   ├─ E_CO2 += e_EL × E_EL
-  │   │
-  │   ├─ E_leftover = E_surplus - E_EL
-  │   │
-  │   └─ IF E_leftover > 0:
-  │       ├─ E_grid += E_leftover
-  │       └─ C_op -= p_grid × E_leftover (revenue)
-  │
-  └─ ELSE (storage is full):
-      ├─ H[t+1] = H[t]
-      ├─ E_grid += E_surplus
-      └─ C_op -= p_grid × E_surplus (sell all to grid)
-```
-
----
-
-## Output Specifications
-
-### Return Values
-
-```python
-C_total, E_total, LPSP = system.simulate_year(config, data)
-```
-
-#### 1. `C_total` (float)
-**Total Annualized Cost** in $/year
-
-**Components**:
-```
-C_total = (C_cap + C_rep) × CRF + C_om + C_op
-```
-
-Where:
-- **C_cap**: Initial capital cost
-  ```
-  C_cap = c_PV × N_PV 
-        + c_WT × N_WT 
-        + c_H2 × Cap_H2 
-        + c_FC_cap × Cap_FC 
-        + c_EL_cap × Cap_EL 
-        + c_DG_cap × Cap_DG
-  ```
-
-- **C_rep**: Present value of all replacements over project lifetime
-
-- **CRF**: Capital Recovery Factor (converts lump sum to annuity)
-  ```
-  CRF = [r × (1+r)^T_life] / [(1+r)^T_life - 1]
-  ```
-
-- **C_om**: Total O&M costs over lifetime
-  ```
-  C_om = (om_PV × N_PV 
-        + om_WT × N_WT 
-        + om_H2 × Cap_H2 
-        + om_FC × Cap_FC 
-        + om_EL × Cap_EL 
-        + om_DG × Cap_DG) × T_life
-  ```
-
-- **C_op**: Annual operating cost (accumulated over 8760 hours)
-  - Includes: fuel costs, electrolyzer operation
-  - Minus: grid revenue from selling excess
-
-**Example**: $285,432/year means this system costs $285k annually to own and operate
-
-#### 2. `E_total` (float)
-**Total Annual CO2 Emissions** in kg/year
-
-```
-E_total = E_CO2 (accumulated over 8760 hours)
-```
-
-**Sources**:
-- Fuel cell operation: `e_FC × E_FC` (usually 0 if H2 from renewables)
-- Diesel generator: `e_DG × E_DG`
-- Electrolyzer: `e_EL × E_EL` (usually 0)
-
-**Example**: 15,234 kg CO2/year
-
-#### 3. `LPSP` (float)
-**Loss of Power Supply Probability** (0 to 1)
-
-```
-LPSP = E_unmet / L_year
-```
-
-Where:
-- **E_unmet**: Total unmet energy over the year (kWh)
-- **L_year**: Total annual load demand (kWh)
-
-**Interpretation**:
-- `LPSP = 0.00`: Perfect reliability (100% of demand met)
-- `LPSP = 0.01`: 99% reliable (1% unmet)
-- `LPSP = 0.05`: 95% reliable (5% unmet)
-- `LPSP = 0.10`: 90% reliable (10% unmet)
-
-**Typical target**: LPSP ≤ 0.05 (95% reliability or better)
-
----
-
-## Electrolyzer & Fuel Cell Logic Explained
-
-### The Hydrogen Energy Storage System
-
-Think of hydrogen storage as a **rechargeable battery**, but instead of storing electrons, you're storing hydrogen gas:
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                  HYDROGEN STORAGE SYSTEM                 │
-│                                                          │
-│  CHARGING (Surplus Energy):                             │
-│  ┌──────────┐      ┌──────────┐      ┌──────────┐     │
-│  │Excess    │      │          │      │  H2 Gas  │     │
-│  │Renewable │─────▶│Electro-  │─────▶│ Storage  │     │
-│  │Energy    │ kWh  │ lyzer    │  kg  │  Tank    │     │
-│  └──────────┘      └──────────┘      └──────────┘     │
-│                                                          │
-│  DISCHARGING (Deficit Energy):                          │
-│  ┌──────────┐      ┌──────────┐      ┌──────────┐     │
-│  │  H2 Gas  │      │          │      │Electric  │     │
-│  │ Storage  │─────▶│  Fuel    │─────▶│ Power    │     │
-│  │  Tank    │  kg  │  Cell    │ kWh  │          │     │
-│  └──────────┘      └──────────┘      └──────────┘     │
-└─────────────────────────────────────────────────────────┘
-```
-
----
-
-### Part 1: Electrolyzer (Making Hydrogen)
-
-**When does it run?** When you have MORE renewable energy than the load needs (surplus).
-
-**What does it do?** Converts excess electricity into hydrogen gas for storage.
-
-**The Chemical Process**:
-```
-Electricity + Water (H2O) → Hydrogen gas (H2) + Oxygen (O2)
-```
-
-**The Math**:
-```python
-# Input: E_EL kWh of electricity
-# Output: H_produced kg of hydrogen
-
-H_produced = E_EL × eta_EL
-
-# Example with eta_EL = 0.020 kg/kWh:
-# If E_EL = 100 kWh
-# H_produced = 100 × 0.020 = 2 kg of H2
-```
-
-**What limits the electrolyzer?**
-
-Three constraints (it picks the SMALLEST):
-
-1. **Available surplus energy**: Can't use more than you have
-   ```
-   E_EL ≤ E_surplus
-   ```
-
-2. **Electrolyzer capacity**: Machine has maximum power rating
-   ```
-   E_EL ≤ Cap_EL
-   ```
-
-3. **Storage space**: Can't make more H2 than tank can hold
-   ```
-   H_produced ≤ (H_max - H[t])
-   Therefore: E_EL ≤ (H_max - H[t]) / eta_EL
-   ```
-
-**Code Implementation**:
-```python
-if H[t] < H_max:  # Storage not full
-    H_space = H_max - H[t]
-    
-    # Find limiting constraint
-    E_EL_limit = min(E_surplus, Cap_EL, H_space / eta_EL)
-    
-    # Run electrolyzer
-    E_EL = E_EL_limit
-    H_produced = E_EL × eta_EL
-    
-    # Update storage
-    H[t+1] = H[t] + H_produced
-    
-    # Track costs
-    C_op += c_EL × E_EL  # Operating cost
-    E_CO2 += e_EL × E_EL  # Emissions (usually 0)
-```
-
-**Real Example**:
-```
-Hour 1200: Sunny day, high solar generation
-- Solar produces: 180 kW
-- Load needs: 100 kW
-- Surplus: 80 kW
-
-Storage status:
-- Current H2: H[1200] = 150 kg
-- Maximum H2: H_max = 200 kg
-- Space available: 50 kg
-
-Electrolyzer constraints:
-- Surplus available: 80 kW ✓
-- Electrolyzer capacity: Cap_EL = 100 kW ✓
-- Storage limit: 50 kg ÷ 0.020 kg/kWh = 2500 kW ✓
-
-Limiting factor: 80 kW (surplus)
-
-Result:
-- E_EL = 80 kW consumed
-- H_produced = 80 × 0.020 = 1.6 kg made
-- H[1201] = 150 + 1.6 = 151.6 kg
-- No leftover energy (all surplus used)
-```
-
----
-
-### Part 2: Fuel Cell (Using Hydrogen)
-
-**When does it run?** When renewables can't meet the load (deficit).
-
-**What does it do?** Converts stored hydrogen back into electricity.
-
-**The Chemical Process**:
-```
-Hydrogen gas (H2) + Oxygen (O2) → Electricity + Water (H2O) + Heat
-```
-
-**The Math**:
-```python
-# Input: H_consumed kg of hydrogen
-# Output: E_FC kWh of electricity
-
-E_FC = H_consumed × eta_FC
-
-# Example with eta_FC = 16.65 kWh/kg:
-# If H_consumed = 2 kg
-# E_FC = 2 × 16.65 = 33.3 kWh
-```
-
-**Understanding eta_FC = 16.65 kWh/kg**:
-
-Hydrogen has energy content (Lower Heating Value) = 33.3 kWh/kg
-
-But fuel cells aren't 100% efficient. Typical efficiency = 50%
-
-So: eta_FC = 33.3 kWh/kg × 0.50 = 16.65 kWh/kg
-
-This means:
-- 1 kg of H2 → produces 16.65 kWh of electricity
-- To get 100 kWh → need 100 ÷ 16.65 = 6 kg of H2
-
-**What limits the fuel cell?**
-
-Two constraints (it picks the SMALLEST):
-
-1. **Available hydrogen**: Can't use more than you have stored
-   ```
-   E_FC ≤ H[t] × eta_FC
-   ```
-   (Also respect minimum level: H[t] > H_min)
-
-2. **Fuel cell capacity**: Machine has maximum power rating
-   ```
-   E_FC ≤ Cap_FC
-   ```
-
-**Code Implementation**:
-```python
-if H[t] > H_min:  # Hydrogen available
-    # Find maximum FC can provide
-    P_FC_limit = min(H[t] × eta_FC, Cap_FC)
-    
-    if E_deficit <= P_FC_limit:
-        # FC can cover entire deficit
-        E_FC = E_deficit
-        H_consumed = E_FC / eta_FC
-        H[t+1] = H[t] - H_consumed
-        
-        # Track costs and emissions
-        C_op += c_FC × E_FC
-        E_CO2 += e_FC × E_FC
-        
-    else:
-        # FC runs at maximum, but not enough
-        E_FC = P_FC_limit
-        H_consumed = E_FC / eta_FC
-        E_remaining = E_deficit - E_FC
-        
-        # Try diesel generator next...
-        # (see deficit handling logic above)
-```
-
-**Real Example**:
-```
-Hour 2300: Night, no solar, low wind
-- Solar produces: 0 kW
-- Wind produces: 20 kW
-- Load needs: 100 kW
-- Deficit: 80 kW
-
-Storage status:
-- Current H2: H[2300] = 151.6 kg
-- Minimum H2: H_min = 20 kg (10% of 200 kg)
-
-Fuel cell constraints:
-- Hydrogen available: 151.6 kg × 16.65 kWh/kg = 2524 kWh worth
-- Fuel cell capacity: Cap_FC = 80 kW
-
-Limiting factor: 80 kW (capacity)
-
-Check if FC can meet deficit:
-- Deficit = 80 kW
-- P_FC_limit = 80 kW
-- 80 ≤ 80 ✓ (can meet entire deficit!)
-
-Result:
-- E_FC = 80 kW produced
-- H_consumed = 80 ÷ 16.65 = 4.8 kg used
-- H[2301] = 151.6 - 4.8 = 146.8 kg
-- Deficit fully met!
-```
-
----
-
-### Part 3: Round-Trip Efficiency (The Energy Loss)
-
-**This is critical to understand**: You lose energy in the conversion process!
-
-**Going around the loop**:
-```
-Start with 100 kWh of excess solar
-  ↓
-Electrolyzer (70% efficient)
-  → Makes: 100 × 0.020 = 2 kg H2
-  ↓
-Store in tank (100% efficient, ignoring leakage)
-  → Still have: 2 kg H2
-  ↓
-Fuel Cell (50% efficient)
-  → Makes: 2 × 16.65 = 33.3 kWh
-  ↓
-End with 33.3 kWh of electricity
-```
-
-**Round-trip efficiency**: 33.3 kWh out ÷ 100 kWh in = **33.3%**
-
-**You lost 66.7% of the energy!** This is why hydrogen storage is expensive from an energy perspective.
-
-**The Math Behind Efficiencies**:
-
-```python
-# Electrolyzer efficiency (70%):
-eta_EL = 0.70 / 33.3 kWh/kg = 0.021 kg/kWh
-# "For every kWh I put in, I get 0.021 kg of H2"
-
-# Fuel cell efficiency (50%):
-eta_FC = 0.50 × 33.3 kWh/kg = 16.65 kWh/kg
-# "For every kg of H2 I consume, I get 16.65 kWh out"
-
-# Round-trip:
-1 kWh → 0.021 kg H2 → 0.021 × 16.65 = 0.35 kWh
-# Lost: 1 - 0.35 = 0.65 (65% loss)
-```
-
----
-
-### Part 4: Why This System Design?
-
-**Q: Why not just use batteries?**
-
-A: Batteries are better for short-term (hours), hydrogen for long-term (days/weeks):
-- Batteries: 85-95% round-trip efficiency, but expensive for large capacity
-- Hydrogen: 30-40% round-trip efficiency, but cheap for large capacity
-
-**Q: When does the electrolyzer run most?**
-
-A: Midday when solar is highest and load might be lower:
-```
-Hour 1200-1500: Peak solar production
-- PV might produce 150-200 kW
-- Load might be 80-120 kW
-- Surplus of 50-100 kW → perfect for electrolyzer
-```
-
-**Q: When does the fuel cell run most?**
-
-A: Night and early morning when no solar:
-```
-Hour 0100-0600: No solar, low wind
-- PV produces 0 kW
-- Wind might produce 20-40 kW
-- Load might be 80-100 kW
-- Deficit of 40-80 kW → need fuel cell
-```
-
-**Q: What happens if both electrolyzer AND fuel cell can't handle everything?**
-
-A: Priority cascade:
-1. **Surplus**:
-   - First: Electrolyzer (store as H2)
-   - Then: Sell to grid (get revenue)
-
-2. **Deficit**:
-   - First: Fuel cell (use stored H2)
-   - Then: Diesel generator (expensive, polluting)
-   - Finally: Unmet demand (LPSP goes up)
-
----
-
-### Part 5: Storage State Tracking
-
-The hydrogen tank level changes every hour:
-
-```python
-# Initialize (start of simulation)
-H[0] = 0.5 × Cap_H2  # Start at 50% full
-
-# Every hour:
-FOR t = 0 to 8759:
-    if SURPLUS:
-        H[t+1] = H[t] + H_produced  # Add hydrogen
-    
-    elif DEFICIT:
-        H[t+1] = H[t] - H_consumed  # Remove hydrogen
-    
-    else:
-        H[t+1] = H[t]  # No change
-    
-    # Enforce limits
-    H[t+1] = max(0, min(H[t+1], H_max))
-```
-
-**Important constraints**:
-- **Never below H_min**: Keep 10% reserve (safety margin)
-- **Never above H_max**: Physical tank limit
-- **State dependent**: Can't use H2 if you don't have it!
-
-**Example Timeline**:
-```
-Hour    Event               H2 Level    Change
-0       Start               100.0 kg    (50% of 200 kg)
-1       Surplus +2.0 kg     102.0 kg    +2.0
-2       Surplus +1.5 kg     103.5 kg    +1.5
-3       Balanced            103.5 kg     0.0
-4       Deficit -3.2 kg     100.3 kg    -3.2
-5       Deficit -4.8 kg     95.5 kg     -4.8
-...
-8760    End                 98.3 kg     (varies)
-```
-
----
-
-## Usage Examples
-
-### Example 1: Basic Simulation
-
-```python
-from simulation import HybridEnergySystem
+from trial1_simulation import HybridEnergySystem
 import pandas as pd
 
-# Step 1: Define parameters
-params = {
-    'eta_PV': 0.15, 'eta_FC': 16.65, 'eta_EL': 0.020,
-    'c_PV': 1500, 'c_WT': 3000, 'c_H2': 500,
-    'c_FC_cap': 2000, 'c_EL_cap': 1500, 'c_DG_cap': 400,
-    'c_FC': 0.01, 'c_DG': 0.30, 'c_EL': 0.01,
-    'om_PV': 20, 'om_WT': 50, 'om_H2': 10,
-    'om_FC': 30, 'om_EL': 25, 'om_DG': 15,
-    'e_FC': 0.0, 'e_DG': 0.8, 'e_EL': 0.0,
-    'T_life': 20, 'r': 0.05, 'p_grid': 0.08,
-    'A_PV': 6.67, 'P_DG_min': 0.3,
-    'life_PV': 25, 'life_WT': 20, 'life_H2': 20,
-    'life_FC': 10, 'life_EL': 15, 'life_DG': 15,
+# Load your data
+data = pd.read_excel('data/semi_final_load.xlsx')
+
+# Define system parameters (see System Parameters section for all options)
+parameters = {
+    'rated_PV': 0.327,          # kW per panel
+    'rated_power': 25.0,        # kW per wind turbine
+    'Cap_H2': 6,                # kg per storage unit
+    'Cap_FC': 2,                # kW per fuel cell
+    'Cap_EL': 2,                # kW per electrolyzer
+    'Cap_DG': 50,               # kW per diesel generator
+    'eta_PV': 0.15,             # 15% efficiency
+    'eta_FC': 0.50,             # 50% efficiency
+    'eta_EL': 0.70,             # 70% efficiency
+    'H2_LHV': 33.3,             # kWh/kg
+    'c_PV': 1500,               # $/kW
+    'c_WT': 3000,               # $/kW
+    'c_H2': 500,                # $/kg
+    # ... (see example_simulation.py for complete parameters)
 }
 
-# Step 2: Create system
-system = HybridEnergySystem(params)
+# Create system instance
+system = HybridEnergySystem(parameters)
 
-# Step 3: Define configuration
+# Define system configuration
 config = {
-    'N_PV': 150,
-    'N_WT': 100,
-    'Cap_H2': 200,
-    'Cap_FC': 80,
-    'Cap_EL': 80,
-    'Cap_DG': 50,
+    'N_PV': 200,                # 200 PV panels → 65.4 kW capacity
+    'N_WT': 10,                 # 10 wind turbines → 250 kW capacity
+    'N_H2': 50,                 # 50 storage units → 300 kg capacity
+    'N_FC': 50,                 # 50 fuel cells → 100 kW capacity
+    'N_EL': 50,                 # 50 electrolyzers → 100 kW capacity
+    'N_DG': 5,                  # 5 diesel generators → 250 kW capacity
 }
 
-# Step 4: Load data
-data = pd.read_excel('data/Load.xlsx')
+# Run simulation
+C_total, E_total, LPSP, details = system.simulate_year(config, data)
 
-# Step 5: Run simulation
-cost, emissions, lpsp = system.simulate_year(config, data)
-
-# Step 6: Display results
-print(f"Cost: ${cost:,.2f}/year")
-print(f"Emissions: {emissions:,.2f} kg CO2/year")
-print(f"Reliability: {(1-lpsp)*100:.2f}%")
+print(f"Total Annual Cost: ${C_total:,.2f}")
+print(f"Annual Emissions: {E_total:,.2f} kg CO2")
+print(f"Reliability: {(1-LPSP)*100:.2f}%")
 ```
 
-### Example 2: Compare Multiple Configurations
+### 3. Visualize Results
 
 ```python
-configs = [
-    {'N_PV': 100, 'N_WT': 50, 'Cap_H2': 100, 'Cap_FC': 50, 'Cap_EL': 50, 'Cap_DG': 30},
-    {'N_PV': 150, 'N_WT': 100, 'Cap_H2': 200, 'Cap_FC': 80, 'Cap_EL': 80, 'Cap_DG': 50},
-    {'N_PV': 200, 'N_WT': 150, 'Cap_H2': 300, 'Cap_FC': 100, 'Cap_EL': 100, 'Cap_DG': 50},
-]
-
-for i, config in enumerate(configs):
-    cost, emissions, lpsp = system.simulate_year(config, data)
-    print(f"\nConfig {i+1}:")
-    print(f"  Cost: ${cost:,.0f}/year")
-    print(f"  Emissions: {emissions:,.0f} kg CO2/year")
-    print(f"  LPSP: {lpsp*100:.3f}%")
-```
-
-### Example 3: Find Minimum Cost for Target Reliability
-
-```python
+import matplotlib.pyplot as plt
 import numpy as np
 
-target_lpsp = 0.05  # 95% reliability
+# Plot hydrogen storage trajectory
+fig, axes = plt.subplots(2, 1, figsize=(12, 8))
 
-best_cost = float('inf')
-best_config = None
+hours = np.arange(len(details['H_trajectory']))
+axes[0].plot(hours / 24, details['H_trajectory'], linewidth=0.8)
+axes[0].set_xlabel('Day')
+axes[0].set_ylabel('Hydrogen Storage (kg)')
+axes[0].set_title('Hydrogen Storage Level Over Time')
+axes[0].grid(True, alpha=0.3)
 
-# Grid search
-for pv in range(50, 251, 50):
-    for wt in range(50, 151, 50):
-        for h2 in range(100, 301, 100):
-            config = {
-                'N_PV': pv,
-                'N_WT': wt,
-                'Cap_H2': h2,
-                'Cap_FC': int(0.4 * h2),
-                'Cap_EL': int(0.4 * h2),
-                'Cap_DG': 50,
-            }
-            
-            cost, emissions, lpsp = system.simulate_year(config, data)
-            
-            if lpsp <= target_lpsp and cost < best_cost:
-                best_cost = cost
-                best_config = config
+# Plot energy generation mix
+energy_sources = ['PV', 'Wind', 'Fuel Cell', 'Diesel']
+energy_values = [
+    details['E_PV_total'],
+    details['E_WT_total'],
+    details['E_FC_total'],
+    details['E_DG_total'],
+]
+axes[1].pie(energy_values, labels=energy_sources, autopct='%1.1f%%')
+axes[1].set_title('Annual Energy Generation Mix')
 
-print(f"Best configuration: {best_config}")
-print(f"Cost: ${best_cost:,.2f}/year")
+plt.tight_layout()
+plt.savefig('simulation_results.png', dpi=150)
+plt.show()
 ```
+
+## 🔧 Core Components
+
+### HybridEnergySystem Class
+
+The main simulation engine. Located in `trial1_simulation.py`.
+
+#### Key Methods
+
+```python
+# Initialize system with parameters
+system = HybridEnergySystem(parameters)
+
+# Run annual simulation
+C_total, E_total, LPSP, details = system.simulate_year(config, data)
+```
+
+#### Wind Power Curve
+
+```python
+def wind_power_curve(self, v: float) -> float:
+    """
+    Calculate wind output based on wind speed using cubic interpolation.
+    
+    - Below cut-in (2.75 m/s): Zero output
+    - Cut-in to rated (2.75-9.0 m/s): Cubic relationship
+    - Above rated (>9.0 m/s): Rated power
+    """
+```
+
+#### Cost Calculations
+
+**Capital Costs** (one-time):
+```
+C_cap = (N_PV × rated_PV × c_PV) 
+      + (N_WT × rated_power × c_WT)
+      + (N_H2 × Cap_H2 × c_H2)
+      + (N_FC × Cap_FC × c_FC_cap)
+      + (N_EL × Cap_EL × c_EL_cap)
+      + (N_DG × Cap_DG × c_DG_cap)
+      + c_INVT
+```
+
+**Operating Costs** (annual):
+```
+C_op = ∑(fuel consumed × c_DG_FUEL) + ∑(grid energy sold × p_grid)
+```
+
+**O&M Costs** (annual):
+```
+C_om = (cap_PV × om_PV) + (cap_WT × om_WT) + (cap_H2 × om_H2) + ...
+```
+
+**Annualized Cost**:
+```
+C_total = C_cap × CRF + C_om + C_op_annual + C_rep_annual
+```
+
+Where `CRF = r(1+r)^T / ((1+r)^T - 1)` (Capital Recovery Factor)
+
+### Example Simulation Script
+
+Located in `example_simulation.py`. Includes:
+- `run_single_simulation(data)`: Full simulation with detailed output
+- `plot_results(details, config, system)`: Visualization functions
+- `sensitivity_analysis(file_path)`: Parameter sweep analysis
+
+## 📊 System Parameters
+
+All parameters are defined in a dictionary and passed to `HybridEnergySystem()`. Below is the complete parameter list:
+
+### Generator Configurations
+
+| Parameter | Type | Unit | Default | Description |
+|-----------|------|------|---------|-------------|
+| `rated_PV` | float | kW | 0.327 | Rated power per PV panel |
+| `v_cut_in` | float | m/s | 2.75 | Wind turbine cut-in speed |
+| `v_rated` | float | m/s | 9.0 | Wind turbine rated speed |
+| `rated_power` | float | kW | 25.0 | Rated power per wind turbine |
+| `Cap_H2` | float | kg | 6 | Capacity of one H₂ storage unit |
+| `Cap_FC` | float | kW | 2 | Rated power of one fuel cell unit |
+| `Cap_EL` | float | kW | 2 | Rated power of one electrolyzer unit |
+| `Cap_DG` | float | kW | 50 | Rated power of one diesel generator unit |
+| `H_min_percentage` | float | fraction | 0 | Minimum H₂ storage level (0-1) |
+| `H_max_percentage` | float | fraction | 0 | Maximum H₂ storage override (0-1) |
+
+### Diesel Fuel Curve
+
+| Parameter | Type | Unit | Default | Description |
+|-----------|------|------|---------|-------------|
+| `f_0` | float | litre/kW/h | 0.246 | Intercept coefficient (no-load consumption) |
+| `f_1` | float | litre/kWh | 0.08145 | Slope coefficient (load-dependent) |
+
+**Fuel consumption formula**: `fuel = (f_0 × P_rated + f_1 × P_output) × dt`
+
+### Efficiency Parameters
+
+| Parameter | Type | Unit | Default | Description |
+|-----------|------|------|---------|-------------|
+| `eta_PV` | float | fraction | 0.15 | PV panel efficiency (15%) |
+| `eta_FC` | float | fraction | 0.50 | Fuel cell efficiency (50%) |
+| `eta_EL` | float | fraction | 0.70 | Electrolyzer efficiency (70%) |
+| `eta_INVT` | float | fraction | 0.90 | Inverter efficiency (90%) |
+| `H2_LHV` | float | kWh/kg | 33.3 | Hydrogen lower heating value |
+
+**Key relationships**:
+- Fuel cell output: `P_FC = H2_kg_consumed × H2_LHV × eta_FC`
+- Electrolyzer input: `E_required = kg_produced × H2_LHV / eta_EL`
+- Round-trip efficiency: `eta_FC × eta_EL ≈ 35%`
+
+### Capital Costs (one-time investment)
+
+| Parameter | Type | Unit | Default | Description |
+|-----------|------|------|---------|-------------|
+| `c_PV` | float | $/kW | 1500 | PV system capital cost |
+| `c_WT` | float | $/kW | 3000 | Wind turbine capital cost |
+| `c_H2` | float | $/kg | 500 | Hydrogen storage capital cost |
+| `c_FC_cap` | float | $/kW | 2000 | Fuel cell capital cost |
+| `c_EL_cap` | float | $/kW | 1500 | Electrolyzer capital cost |
+| `c_DG_cap` | float | $/kW | 400 | Diesel generator capital cost |
+| `c_INVT` | float | $ | 300 | Inverter capital cost (flat) |
+
+### Operating Costs
+
+| Parameter | Type | Unit | Default | Description |
+|-----------|------|------|---------|-------------|
+| `c_FC` | float | $/kWh | 0 | Fuel cell operating cost per kWh produced |
+| `c_DG` | float | $/kWh | 0 | Diesel operating cost per kWh |
+| `c_EL` | float | $/kWh | 0 | Electrolyzer operating cost per kWh |
+| `c_DG_FUEL` | float | $/litre | 0.82 | Diesel fuel cost |
+
+### Operation & Maintenance (O&M) Costs (annual)
+
+| Parameter | Type | Unit | Default | Description |
+|-----------|------|------|---------|-------------|
+| `om_PV` | float | $/kW/year | 20 | PV O&M cost |
+| `om_WT` | float | $/kW/year | 50 | Wind turbine O&M |
+| `om_H2` | float | $/kg/year | 10 | Hydrogen storage O&M |
+| `om_FC` | float | $/kW/year | 30 | Fuel cell O&M |
+| `om_EL` | float | $/kW/year | 25 | Electrolyzer O&M |
+| `om_DG` | float | $/h | 0.03 | Diesel generator O&M (per operating hour) |
+| `om_INVT` | float | $ | 0 | Inverter O&M (flat) |
+
+### Replacement Costs (present value)
+
+| Parameter | Type | Unit | Default | Description |
+|-----------|------|------|---------|-------------|
+| `rc_PV` | float | $/kW | 0 | PV replacement cost |
+| `rc_WT` | float | $/kW | 1750 | Wind turbine replacement |
+| `rc_H2` | float | $/kg | 10 | Hydrogen storage replacement |
+| `rc_FC` | float | $/kW | 30 | Fuel cell replacement |
+| `rc_EL` | float | $/kW | 25 | Electrolyzer replacement |
+| `rc_DG` | float | $/kW | 500 | Diesel generator replacement |
+| `rc_INVT` | float | $ | 300 | Inverter replacement |
+
+### Emission Factors
+
+| Parameter | Type | Unit | Default | Description |
+|-----------|------|------|---------|-------------|
+| `e_FC` | float | kg CO₂/kWh | 0.0 | Fuel cell emissions (green H₂ = 0) |
+| `e_DG` | float | kg CO₂/litre | 2.6391 | Diesel emissions (per litre) |
+| `e_EL` | float | kg CO₂/kWh | 0.0 | Electrolyzer direct emissions |
+
+### Economic Parameters
+
+| Parameter | Type | Unit | Default | Description |
+|-----------|------|------|---------|-------------|
+| `T_life` | int | years | 20 | Project lifetime |
+| `r` | float | fraction | 0.05 | Annual discount rate (5%) |
+| `p_grid` | float | $/kWh | 0.08 | Grid energy selling price |
+
+### Technical Parameters
+
+| Parameter | Type | Unit | Default | Description |
+|-----------|------|------|---------|-------------|
+| `A_PV` | float | m²/kW | 6.67 | PV area per kW capacity |
+| `P_DG_min` | float | fraction | 0.3 | Minimum diesel load ratio (30%) |
+
+### Component Lifetimes
+
+| Parameter | Type | Unit | Default | Description |
+|-----------|------|------|---------|-------------|
+| `life_PV` | int | years | 25 | PV panel lifetime |
+| `life_WT` | int | years | 20 | Wind turbine lifetime |
+| `life_H2` | int | years | 20 | Hydrogen storage lifetime |
+| `life_FC` | int | years | 10 | Fuel cell lifetime |
+| `life_EL` | int | years | 15 | Electrolyzer lifetime |
+| `life_DG` | int | years | 15 | Diesel generator lifetime |
+| `life_INVT` | int | years | 15 | Inverter lifetime |
+
+## 💡 Usage Examples
+
+### Example 1: Basic Simulation with Default Parameters
+
+```python
+from trial1_simulation import HybridEnergySystem
+import pandas as pd
+
+# Load hourly data (8760 hours = 1 year)
+data = pd.read_excel('data/semi_final_load.xlsx')
+
+# Use example configuration
+parameters = {
+    'rated_PV': 0.327,
+    'rated_power': 25.0,
+    'Cap_H2': 6,
+    'Cap_FC': 2,
+    'Cap_EL': 2,
+    'Cap_DG': 50,
+    'eta_PV': 0.15,
+    'eta_FC': 0.50,
+    'eta_EL': 0.70,
+    'eta_INVT': 0.90,
+    'H2_LHV': 33.3,
+    'c_PV': 1500,
+    'c_WT': 3000,
+    'c_H2': 500,
+    'c_FC_cap': 2000,
+    'c_EL_cap': 1500,
+    'c_DG_cap': 400,
+    'c_INVT': 300,
+    'c_DG_FUEL': 0.82,
+    'om_PV': 20,
+    'om_WT': 50,
+    'om_H2': 10,
+    'om_FC': 30,
+    'om_EL': 25,
+    'om_DG': 0.03,
+    'om_INVT': 0,
+    'rc_PV': 0,
+    'rc_WT': 1750,
+    'rc_H2': 10,
+    'rc_FC': 30,
+    'rc_EL': 25,
+    'rc_DG': 500,
+    'rc_INVT': 300,
+    'e_FC': 0.0,
+    'e_DG': 2.6391,
+    'e_EL': 0.0,
+    'T_life': 20,
+    'r': 0.05,
+    'p_grid': 0.08,
+    'A_PV': 6.67,
+    'P_DG_min': 0.3,
+    'life_PV': 25,
+    'life_WT': 20,
+    'life_H2': 20,
+    'life_FC': 10,
+    'life_EL': 15,
+    'life_DG': 15,
+    'life_INVT': 15,
+}
+
+system = HybridEnergySystem(parameters)
+
+config = {
+    'N_PV': 200,
+    'N_WT': 10,
+    'N_H2': 50,
+    'N_FC': 50,
+    'N_EL': 50,
+    'N_DG': 5,
+}
+
+C_total, E_total, LPSP, details = system.simulate_year(config, data)
+```
+
+### Example 2: Sensitivity Analysis (H₂ Storage Capacity)
+
+```python
+from trial1_simulation import HybridEnergySystem
+import pandas as pd
+
+data = pd.read_excel('data/semi_final_load.xlsx')
+system = HybridEnergySystem(parameters)
+
+# Sweep hydrogen storage capacity
+n_h2_values = [10, 20, 30, 40, 50, 75, 100]
+
+results = []
+for n_h2 in n_h2_values:
+    config = {
+        'N_PV': 200,
+        'N_WT': 10,
+        'N_H2': n_h2,          # Vary H₂ storage
+        'N_FC': 50,
+        'N_EL': 50,
+        'N_DG': 5,
+    }
+    
+    C_total, E_total, LPSP, details = system.simulate_year(config, data)
+    h2_capacity = n_h2 * system.Cap_H2
+    
+    results.append({
+        'N_H2': n_h2,
+        'H2_Capacity_kg': h2_capacity,
+        'Cost_$/yr': C_total,
+        'Emissions_kg_CO2': E_total,
+        'LPSP_%': LPSP * 100,
+    })
+    
+    print(f"N_H2={n_h2:3d} | Capacity={h2_capacity:6.1f} kg | Cost=${C_total:10,.0f} | LPSP={LPSP*100:6.2f}%")
+```
+
+### Example 3: Multi-Scenario Comparison
+
+```python
+from trial1_simulation import HybridEnergySystem
+import pandas as pd
+
+data = pd.read_excel('data/semi_final_load.xlsx')
+
+scenarios = {
+    "High Renewable": {
+        'N_PV': 300, 'N_WT': 15, 'N_H2': 75, 'N_FC': 75, 'N_EL': 75, 'N_DG': 2
+    },
+    "Balanced": {
+        'N_PV': 200, 'N_WT': 10, 'N_H2': 50, 'N_FC': 50, 'N_EL': 50, 'N_DG': 5
+    },
+    "Low Cost": {
+        'N_PV': 100, 'N_WT': 5, 'N_H2': 25, 'N_FC': 25, 'N_EL': 25, 'N_DG': 10
+    },
+}
+
+system = HybridEnergySystem(parameters)
+
+print(f"{'Scenario':<20} | {'Cost ($/yr)':<15} | {'Emissions':<15} | {'Reliability':<12}")
+print("-" * 70)
+
+for name, config in scenarios.items():
+    C_total, E_total, LPSP, details = system.simulate_year(config, data)
+    reliability = (1 - LPSP) * 100
+    print(f"{name:<20} | ${C_total:>12,.0f} | {E_total:>12,.0f} kg CO₂ | {reliability:>10.2f}%")
+```
+
+## 📈 Output & Analysis
+
+### Simulation Output Structure
+
+The `simulate_year()` method returns a tuple:
+
+```python
+C_total, E_total, LPSP, details = system.simulate_year(config, data)
+```
+
+#### Return Values
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `C_total` | float | Total annualized cost ($/year) |
+| `E_total` | float | Total annual CO₂ emissions (kg CO₂/year) |
+| `LPSP` | float | Loss of Power Supply Probability (0-1) |
+| `details` | dict | Comprehensive results dictionary (see below) |
+
+#### Details Dictionary
+
+```python
+details = {
+    # Economic
+    'C_cap': float,              # Capital cost ($)
+    'C_rep': float,              # Replacement costs ($)
+    'C_om_annual': float,        # Annual O&M cost ($/year)
+    'C_op': float,               # Annual operating cost ($/year)
+    'CRF': float,                # Capital recovery factor
+    
+    # Energy (kWh/year)
+    'L_year': float,             # Total annual load
+    'E_PV_total': float,         # PV generation
+    'E_WT_total': float,         # Wind generation
+    'E_FC_total': float,         # Fuel cell output
+    'E_EL_total': float,         # Electrolyzer input
+    'E_DG_total': float,         # Diesel generation
+    'E_unmet': float,            # Unmet energy (blackouts)
+    'E_grid': float,             # Grid interaction (positive = sales)
+    
+    # Hydrogen (kg)
+    'H_trajectory': list,        # Hourly H₂ storage level
+    
+    # Reliability
+    'LPSP': float,               # Loss of power supply probability
+}
+```
+
+### Example Output Display
+
+```
+================================================================================
+SIMULATION RESULTS
+================================================================================
+
+--- ECONOMIC PERFORMANCE ---
+  Total Annualized Cost:    $125,450.00 /year
+  Capital Cost:             $450,000.00
+  Replacement Cost (PV):    $15,000.00
+  Annual O&M Cost:          $25,450.00 /year
+  Annual Operating Cost:    $35,000.00 /year
+  Capital Recovery Factor:  0.065410
+
+--- ENVIRONMENTAL PERFORMANCE ---
+  Total Annual Emissions:   285,432.50 kg CO2/year
+  Emission Intensity:       0.2603 g CO2/kWh
+
+--- RELIABILITY PERFORMANCE ---
+  Loss of Power Supply:     2.3400 %
+  Reliability:              97.6600 %
+  Unmet Energy:             25,680.00 kWh/year
+
+--- ENERGY BALANCE ---
+  Annual Load:              1,100,000.00 kWh/year
+  PV Generation:            180,000.00 kWh/year
+  Wind Generation:          450,000.00 kWh/year
+  Total Renewable:          630,000.00 kWh/year
+  FC Output:                320,000.00 kWh/year
+  DG Output:                150,000.00 kWh/year
+  EL Input:                 280,000.00 kWh/year
+  Grid Sales:               40,000.00 kWh/year
+
+--- COST & PERFORMANCE SUMMARY ---
+  Renewable Fraction:       57.27 %
+  Levelized Cost (LCOE):    $0.1140 /kWh
+
+--- CAPITAL COST BREAKDOWN ---
+  PV System:                $90,000.00 (20.0%)
+  Wind Turbines:            $300,000.00 (66.7%)
+  H2 Storage:               $30,000.00 (6.7%)
+  Fuel Cell:                $50,000.00 (11.1%)
+  Electrolyzer:             $37,500.00 (8.3%)
+  Diesel Generator:         $10,000.00 (2.2%)
+```
+
+## 📝 Unit Conventions
+
+All calculations use consistent SI-derived units:
+
+| Quantity | Unit | Symbol | Notes |
+|----------|------|--------|-------|
+| Power | Kilowatt | kW | Instantaneous generation/demand |
+| Energy | Kilowatt-hour | kWh | Energy over time (1 kWh = 3.6 MJ) |
+| Hydrogen mass | Kilogram | kg | Storage quantity |
+| Temperature | Celsius | °C | Ambient conditions |
+| Wind speed | Meters/second | m/s | Weather input |
+| Solar irradiance | Watts/m² | W/m² | Weather input |
+| Currency | US Dollar | $ | All monetary values |
+| Time | Hour | h | Simulation timestep |
+| Emissions | Kilograms CO₂ | kg CO₂ | Annual total |
+| Efficiency | Fraction | 0-1 | Percentage as decimal |
+| Cost | Dollar per unit | $/kW, $/kg | Prices and rates |
+
+## 📂 File Structure
+
+```
+c:\Users\Admin\OneDrive\Desktop\jims\
+│
+├── trial1_simulation.py          # Core simulation engine
+│   └── HybridEnergySystem class
+│       ├── __init__()            # Parameter initialization
+│       ├── wind_power_curve()    # Wind turbine model
+│       ├── calculate_replacement_cost()
+│       └── simulate_year()       # Main simulation loop
+│
+├── example_simulation.py          # Example usage and visualization
+│   ├── run_single_simulation()   # Complete simulation workflow
+│   ├── plot_results()            # Matplotlib visualizations
+│   └── sensitivity_analysis()    # Parameter sweep
+│
+├── data/
+│   ├── semi_final_load.xlsx      # Primary load data
+│   ├── combined.xlsx             # Alternative dataset
+│   ├── Load.xlsx
+│   └── Thesis_Load.xlsx
+│
+├── README.md                      # Original documentation
+├── README2.md                     # This file (comprehensive guide)
+├── simulation_results_cutin2.75.png  # Sample output plot
+│
+└── gitignore_files/              # Archive and supporting materials
+```
+
+## 🔍 Key Formulas
+
+### Wind Power Output
+
+```
+If v < v_cut_in:
+    P_wind = 0
+
+If v_cut_in ≤ v < v_rated:
+    P_wind = P_rated × (v³ - v_cut_in³) / (v_rated³ - v_cut_in³)
+
+If v ≥ v_rated:
+    P_wind = P_rated
+```
+
+### Diesel Fuel Consumption
+
+```
+fuel_consumed (litre/hour) = f_0 × P_rated + f_1 × P_output
+```
+
+Where:
+- `f_0`: No-load fuel consumption coefficient
+- `f_1`: Load-dependent fuel consumption coefficient
+- `P_rated`: Diesel generator rated power
+- `P_output`: Actual power output
+
+### Hydrogen Mass Balance (per hour)
+
+```
+H_new = H_old + E_surplus × eta_EL / H2_LHV - E_shortage / (eta_FC × H2_LHV)
+
+Where:
+- E_surplus: Excess renewable generation (kWh)
+- E_shortage: Unmet energy demand (kWh)
+- eta_EL: Electrolyzer efficiency (70%)
+- eta_FC: Fuel cell efficiency (50%)
+- H2_LHV: Hydrogen lower heating value (33.3 kWh/kg)
+```
+
+### Capital Recovery Factor (CRF)
+
+```
+CRF = r(1 + r)^T / ((1 + r)^T - 1)
+
+Where:
+- r: Annual discount rate
+- T: Project lifetime (years)
+```
+
+### Levelized Cost of Energy (LCOE)
+
+```
+LCOE = C_total / L_year
+
+Where:
+- C_total: Total annualized cost ($/year)
+- L_year: Total annual energy demand (kWh)
+```
+
+### Loss of Power Supply Probability (LPSP)
+
+```
+LPSP = E_unmet / L_year × 100%
+
+Where:
+- E_unmet: Total unmet energy (kWh/year)
+- L_year: Total load (kWh/year)
+```
+
+## 🤝 Contributing & Modifications
+
+### Adding Custom Components
+
+To extend the system with new components:
+
+1. **Add parameters** in `__init__()` method
+2. **Create a method** for the component (e.g., `calculate_component_output()`)
+3. **Update `simulate_year()`** to include component in hourly loop
+4. **Update cost calculations** with capital, O&M, and replacement costs
+5. **Update emission calculations** if relevant
+
+### Common Modifications
+
+**Increase PV efficiency to 20%**:
+```python
+parameters['eta_PV'] = 0.20
+```
+
+**Add grid purchase price**:
+```python
+parameters['p_grid_purchase'] = 0.15  # $/kWh to buy from grid
+# Then modify cost tracking in simulate_year()
+```
+
+**Adjust hydrogen storage minimum level**:
+```python
+parameters['H_min_percentage'] = 0.15  # Keep 15% minimum
+```
+
+## 📚 References & Resources
+
+- **Hydrogen Energy**: Lower Heating Value (LHV) = 33.3 kWh/kg
+- **Diesel Emissions**: 2.6391 kg CO₂ per litre
+- **PV Technology**: Typical efficiency 15-22% (varies by type)
+- **Wind Turbines**: Power curve depends on blade design
+- **Fuel Cells**: Typical efficiency 40-60% (PEM type)
+- **Electrolyzers**: Typical efficiency 60-75%
+
+## 📞 Support & Troubleshooting
+
+### Common Issues
+
+**Error: "Data not found"**
+- Ensure `data/semi_final_load.xlsx` exists
+- Check file path and Excel formatting
+- Verify columns exist: `Community Load`, solar data, wind speed
+
+**Error: "Negative capacity"**
+- Ensure all `N_*` values in config are non-negative
+- Check parameter dictionary for errors
+
+**LPSP too high (>10%)**
+- Increase renewable capacity (↑ N_PV, N_WT)
+- Increase hydrogen storage (↑ N_H2)
+- Increase fuel cell capacity (↑ N_FC)
+
+**Cost too high**
+- Reduce system size
+- Check efficiency parameters (should be 0-1)
+- Verify cost parameters are realistic
+
+## 📄 License & Citation
+
+This project is provided as-is for research and educational purposes.
 
 ---
 
-## Summary
-
-This simulation provides a **complete techno-economic evaluation** of hybrid renewable energy systems with hydrogen storage. It:
-
-1. Takes in system sizing and hourly weather/load data
-2. Simulates every hour of the year following realistic operation logic
-3. Returns cost, emissions, and reliability metrics
-4. Can be integrated into optimization algorithms (NSGA-II) to find optimal designs
-
-The key insight is the **electrolyzer-fuel cell-storage trio** acts as a long-duration energy storage system, converting surplus renewable energy into hydrogen for later use during deficit periods.
+**Last Updated**: March 2026  
+**Version**: 2.0 (Corrected with proper unit conversions)  
+**Status**: Production Ready
