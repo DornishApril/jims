@@ -113,7 +113,7 @@ def run_single_simulation(data,parameters,config):
     print(f"  Renewable Fraction:       {RE_fraction:>12.2f} %")
     
     LCOE = C_total / details['L_year']
-    print(f"  Levelized Cost (LCOE):    ${LCOE:>12.4f} /kWh")
+    print(f"  Levelized Cost (LCOE):    ${LCOE:>12.4f} /kWh MEANS DOLLAR PER YEAR")
     
     # Capital cost breakdown — correctly using per-component capacities
     c_pv_cost  = parameters['c_PV']     * cap_PV
@@ -408,13 +408,14 @@ if __name__ == "__main__":
     # =========================================================================
     # DEFINE SYSTEM CONFIGURATION
     # =========================================================================
+    
     config = {
-        'N_PV': 200,      # number of PV panels
-        'N_WT': 10,       # number of wind turbines
-        'N_H2': 50,      # number of H2 storage units
-        'N_FC': 50,       # number of fuel cell units
-        'N_EL': 50,       # number of electrolyzer units
-        'N_DG': 5,       # number of diesel generator units
+        'N_PV': 1000,      # number of PV panels
+        'N_WT': 17,       # number of wind turbines
+        'N_H2': 0,      # number of H2 storage units
+        'N_FC': 0,       # number of fuel cell units
+        'N_EL': 0,       # number of electrolyzer units
+        'N_DG': 2,       # number of diesel generator units
     }
     
     # Run single simulation

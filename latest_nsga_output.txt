@@ -1,0 +1,27 @@
+Best solution by Cost:
+N_PV                         1000
+N_WT                           17
+N_H2                            0
+N_FC                            0
+N_EL                            0
+N_DG                            2
+Cost                240996.861646
+Emissions            270269.81434
+viol_reliability              0.0
+viol_min_re                   0.0
+feasible                     True
+Name: 0, dtype: object
+
+Best solution by Emissions:
+N_PV                         1000
+N_WT                           50
+N_H2                          200
+N_FC                           80
+N_EL                          122
+N_DG                            1
+Cost                473715.407275
+Emissions             38171.79368
+viol_reliability              0.0
+viol_min_re                   0.0
+feasible                     True
+Name: 1, dtype: object

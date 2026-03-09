@@ -379,6 +379,13 @@ def run_nsga2(sim: 'HybridEnergySystem', data: pd.DataFrame) -> Tuple[pd.DataFra
             mins = '  '.join(f"{entry[f'{lbl}_min']:>12.4g}" for lbl, _, _ in OBJECTIVES)
             print(f"  Gen {gen+1:>4}  |  feasible: {len(feasible):>3}  |  {mins}  |  {time.time()-t0:.0f}s")
 
+            # Print best individual by first objective
+            best = min(feasible, key=lambda ind: ind.objectives[0])
+            cfg  = best.to_config()
+            print(f"    Best: N_PV={cfg['N_PV']:>4}  N_WT={cfg['N_WT']:>3}  N_H2={cfg['N_H2']:>3}  N_FC={cfg['N_FC']:>3}  N_EL={cfg['N_EL']:>3}  N_DG={cfg['N_DG']:>3}"
+                f"  ->  " + "  ".join(f"{lbl}={best.objectives[i]:.4g}" for i, (lbl,_,_) in enumerate(OBJECTIVES)))
+
+
     # Extract Pareto front
     pareto = [ind for ind in pop if ind.rank == 0 and ind.feasible]
     if not pareto:
