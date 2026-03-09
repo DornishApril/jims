@@ -120,6 +120,12 @@ class HybridEnergySystem:
             - output_simulation : Bool     - Set True to output .csv file of the simulation
         """
         # =================================================================
+        # Hudai Configs
+        # =================================================================
+
+        self.load_scaler = parameters.get('load_scaler',1)
+
+        # =================================================================
         # Generator configs
         # =================================================================
         self.rated_PV = parameters.get('rated_PV',0.327)
@@ -372,11 +378,7 @@ class HybridEnergySystem:
         # =================================================================
         # EXTRACT SYSTEM CONFIGURATION
         # =================================================================
-        if self.output_simulation:
 
-            print(len(data))          # Should be 8760 for hourly annual data
-            print(data['Community Load'].sum())  # Should match ~1,096,946
-            print(data['Community Load'].describe())
         N_PV = system.get('N_PV', 0)
         N_WT = system.get('N_WT', 0)
         Capacity_H2 = system.get('N_H2', 0)*self.Cap_H2
@@ -443,10 +445,16 @@ class HybridEnergySystem:
         # CALCULATE TOTAL LOAD
         # =================================================================
         L = data['Community Load'].values.copy()
+        L = self.load_scaler * L
         # if 'RO Load (kWh)' in data.columns:
         #     L = L + 0*data['RO Load (kWh)'].values
         
         L_year = np.sum(L)  # Total annual load (kWh)
+        if self.output_simulation:
+
+            print(len(data))          # Should be 8760 for hourly annual data
+            print(L.sum())  # Should match ~1,096,946
+            print(pd.Series(L).describe())
         
         # =================================================================
         # HOURLY SIMULATION LOOP

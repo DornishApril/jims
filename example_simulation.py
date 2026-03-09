@@ -84,7 +84,7 @@ def run_single_simulation(data,parameters,config):
     print("\n--- ECONOMIC PERFORMANCE ---")
     print(f"  Total Annualized Cost:    ${C_total:>12,.2f} /year")
     print(f"  Capital Cost:             ${details['C_cap']:>12,.2f}")
-    print(f"  Replacement Cost (PV):    ${details['C_rep']:>12,.2f}")
+    print(f"  Replacement Cost:         ${details['C_rep']:>12,.2f}")
     print(f"  Annual O&M Cost:          ${details['C_om_annual']:>12,.2f} /year")
     print(f"  Annual Operating Cost:    ${details['C_op']:>12,.2f} /year")
     print(f"  Capital Recovery Factor:  {details['CRF']:>12.6f}")
@@ -97,45 +97,92 @@ def run_single_simulation(data,parameters,config):
     print(f"  Loss of Power Supply:     {LPSP*100:>12.4f} %")
     print(f"  Reliability:              {(1-LPSP)*100:>12.4f} %")
     print(f"  Unmet Energy:             {details['E_unmet']:>12,.2f} kWh/year")
-    
-    print("\n--- ENERGY BALANCE ---")
-    print(f"  Annual Load:              {details['L_year']:>12,.2f} kWh/year")
-    print(f"  PV Generation:            {details['E_PV_total']:>12,.2f} kWh/year")
-    print(f"  Wind Generation:          {details['E_WT_total']:>12,.2f} kWh/year")
-    print(f"  Total Renewable:          {details['E_PV_total']+details['E_WT_total']:>12,.2f} kWh/year")
-    print(f"  FC Output:                {details['E_FC_total']:>12,.2f} kWh/year")
-    print(f"  DG Output:                {details['E_DG_total']:>12,.2f} kWh/year")
-    print(f"  EL Input:                 {details['E_EL_total']:>12,.2f} kWh/year")
-    print(f"  Grid Sales:               {details['E_grid']:>12,.2f} kWh/year")
-    
+
+    # -------------------------------------------------------------------------
+    # Pre-compute derived quantities for energy breakdown
+    # -------------------------------------------------------------------------
+    E_PV        = details['E_PV_total']
+    E_WT        = details['E_WT_total']
+    E_FC        = details['E_FC_total']
+    E_DG        = details['E_DG_total']
+    E_EL        = details['E_EL_total']
+    E_spilled   = details['E_grid']
+    E_unmet     = details['E_unmet']
+    L_year      = details['L_year']
+
+    E_RE_generated  = E_PV + E_WT                        # total renewable generated
+    E_total_gen     = E_RE_generated + E_FC + E_DG       # everything generated
+
+    # Renewable energy that actually served the load (not spilled)
+    E_RE_consumed   = max(0.0, E_RE_generated - E_spilled)
+
+    # Total energy actually consumed by the load
+    E_consumed      = L_year - E_unmet                   # = served load
+
+    # Non-renewable share consumed
+    E_nonRE_consumed = E_consumed - E_RE_consumed        # FC + DG portion
+
+    # Fractions of CONSUMED energy
+    frac_RE_consumed    = E_RE_consumed    / E_consumed  * 100 if E_consumed > 0 else 0
+    frac_nonRE_consumed = E_nonRE_consumed / E_consumed  * 100 if E_consumed > 0 else 0
+
+    # Fractions of TOTAL GENERATION
+    frac_PV_gen  = E_PV / E_total_gen * 100 if E_total_gen > 0 else 0
+    frac_WT_gen  = E_WT / E_total_gen * 100 if E_total_gen > 0 else 0
+    frac_FC_gen  = E_FC / E_total_gen * 100 if E_total_gen > 0 else 0
+    frac_DG_gen  = E_DG / E_total_gen * 100 if E_total_gen > 0 else 0
+    frac_RE_gen  = E_RE_generated / E_total_gen * 100 if E_total_gen > 0 else 0
+
+    print("\n--- GENERATION (What Was Produced) ---")
+    print(f"  Total Generation:         {E_total_gen:>12,.2f} kWh/year  (100.0%)")
+    print(f"  - Renewable Subtotal:    {E_RE_generated:>12,.2f} kWh/year  ({frac_RE_gen:>5.1f}%)")
+    print(f"      - PV:                {E_PV:>12,.2f} kWh/year  ({frac_PV_gen:>5.1f}%)")
+    print(f"      - Wind:              {E_WT:>12,.2f} kWh/year  ({frac_WT_gen:>5.1f}%)")
+    print(f"  - Fuel Cell:             {E_FC:>12,.2f} kWh/year  ({frac_FC_gen:>5.1f}%)")
+    print(f"  - Diesel Generator:      {E_DG:>12,.2f} kWh/year  ({frac_DG_gen:>5.1f}%)")
+
+    print("\n--- GENERATION ROUTING (Where Did It Go) ---")
+    print(f"  Total Generated:          {E_total_gen:>12,.2f} kWh/year")
+    print(f"  - Served Load:           {E_consumed:>12,.2f} kWh/year  ({E_consumed/E_total_gen*100:>5.1f}%)")
+    print(f"  - Spilled to Grid:       {E_spilled:>12,.2f} kWh/year  ({E_spilled/E_total_gen*100:>5.1f}%)")
+    print(f"  - Electrolyzer Input:    {E_EL:>12,.2f} kWh/year  ({E_EL/E_total_gen*100:>5.1f}%)")
+
+    print("\n--- LOAD BREAKDOWN (What the Load Actually Received) ---")
+    print(f"  Total Load Demand:        {L_year:>12,.2f} kWh/year  (100.0%)")
+    print(f"  - Served:                {E_consumed:>12,.2f} kWh/year  ({E_consumed/L_year*100:>5.1f}%)")
+    print(f"      - From Renewables:   {E_RE_consumed:>12,.2f} kWh/year  ({frac_RE_consumed:>5.1f}% of served)")
+    print(f"      - From Non-RE:       {E_nonRE_consumed:>12,.2f} kWh/year  ({frac_nonRE_consumed:>5.1f}% of served)")
+    print(f"  - Unmet:                 {E_unmet:>12,.2f} kWh/year  ({E_unmet/L_year*100:>5.1f}%)")
+
+    print("\n--- RENEWABLE FRACTION (Three Ways to Measure) ---")
+    print(f"  RE Generated / Load:      {E_RE_generated/L_year*100:>12.2f} %  <- inflated (counts spilled RE)")
+    print(f"  RE Generated / Total Gen: {frac_RE_gen:>12.2f} %  <- pie chart number")
+    print(f"  RE Consumed / Load Served:{frac_RE_consumed:>12.2f} %  <- most honest")
+
     print("\n--- COST & PERFORMANCE SUMMARY ---")
-    RE_fraction = (details['E_PV_total'] + details['E_WT_total']) / details['L_year'] * 100
-    print(f"  Renewable Fraction:       {RE_fraction:>12.2f} %")
-    
-    LCOE = C_total / details['L_year']
-    print(f"  Levelized Cost (LCOE):    ${LCOE:>12.4f} /kWh MEANS DOLLAR PER YEAR")
-    
-    # Capital cost breakdown — correctly using per-component capacities
+    LCOE = C_total / L_year
+    print(f"  Levelized Cost (LCOE):    ${LCOE:>12.4f} /kWh")
+
+    # Capital cost breakdown
     c_pv_cost  = parameters['c_PV']     * cap_PV
     c_wt_cost  = parameters['c_WT']     * cap_WT
     c_h2_cost  = parameters['c_H2']     * cap_H2
     c_fc_cost  = parameters['c_FC_cap'] * cap_FC
     c_el_cost  = parameters['c_EL_cap'] * cap_EL
     c_dg_cost  = parameters['c_DG_cap'] * cap_DG
-    
-    print("\n--- CAPITAL COST BREAKDOWN ---")
-    print(f"  PV System:                ${c_pv_cost:>12,.2f} ({c_pv_cost/details['C_cap']*100:>5.1f}%)")
-    print(f"  Wind Turbines:            ${c_wt_cost:>12,.2f} ({c_wt_cost/details['C_cap']*100:>5.1f}%)")
-    print(f"  H2 Storage:               ${c_h2_cost:>12,.2f} ({c_h2_cost/details['C_cap']*100:>5.1f}%)")
-    print(f"  Fuel Cell:                ${c_fc_cost:>12,.2f} ({c_fc_cost/details['C_cap']*100:>5.1f}%)")
-    print(f"  Electrolyzer:             ${c_el_cost:>12,.2f} ({c_el_cost/details['C_cap']*100:>5.1f}%)")
-    print(f"  Diesel Generator:         ${c_dg_cost:>12,.2f} ({c_dg_cost/details['C_cap']*100:>5.1f}%)")
-    
-    print("\n" + "="*80)
-    
-    # Return system and config so callers can use them (e.g. for plotting)
-    return C_total, E_total, LPSP, system, config, data, details
 
+    print("\n--- CAPITAL COST BREAKDOWN ---")
+    print(f"  Total Capital Cost:       ${details['C_cap']:>12,.2f}  (100.0%)")
+    print(f"  - PV System:             ${c_pv_cost:>12,.2f}  ({c_pv_cost/details['C_cap']*100:>5.1f}%)")
+    print(f"  - Wind Turbines:         ${c_wt_cost:>12,.2f}  ({c_wt_cost/details['C_cap']*100:>5.1f}%)")
+    print(f"  - H2 Storage:            ${c_h2_cost:>12,.2f}  ({c_h2_cost/details['C_cap']*100:>5.1f}%)")
+    print(f"  - Fuel Cell:             ${c_fc_cost:>12,.2f}  ({c_fc_cost/details['C_cap']*100:>5.1f}%)")
+    print(f"  - Electrolyzer:          ${c_el_cost:>12,.2f}  ({c_el_cost/details['C_cap']*100:>5.1f}%)")
+    print(f"  - Diesel Generator:      ${c_dg_cost:>12,.2f}  ({c_dg_cost/details['C_cap']*100:>5.1f}%)")
+
+    print("\n" + "="*80)
+
+    return C_total, E_total, LPSP, system, config, data, details
 
 def plot_results(details, config, system):
     """

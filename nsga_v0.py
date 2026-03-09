@@ -36,7 +36,7 @@ from simulation import HybridEnergySystem
 # [min, max] integer range for each component
 # ------------------------------------------------------------
 BOUNDS = {
-    'N_PV': (0,  1000),
+    'N_PV': (0,  570),
     'N_WT': (0,    50),
     'N_H2': (0,   200),
     'N_FC': (0,   200),
@@ -72,8 +72,8 @@ CONSTRAINTS = [
 # ------------------------------------------------------------
 # SECTION 4: GA PARAMETERS
 # ------------------------------------------------------------
-POP_SIZE       = 20     # population size (keep even)
-N_GENERATIONS  = 500    # number of generations
+POP_SIZE       = 10     # population size (keep even)
+N_GENERATIONS  = 50    # number of generations
 CROSSOVER_PROB = 0.9    # probability of crossover per pair
 MUTATION_PROB  = 0.1    # probability of mutating each gene
 TOURNAMENT_K   = 3      # tournament selection pool size
