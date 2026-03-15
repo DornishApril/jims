@@ -114,7 +114,7 @@ def run_single_simulation(data,parameters,config):
     E_total_gen     = E_RE_generated + E_FC + E_DG       # everything generated
 
     # Renewable energy that actually served the load (not spilled)
-    E_RE_consumed   = max(0.0, E_RE_generated - E_spilled)
+    E_RE_consumed   = max(0.0, E_RE_generated - E_spilled-E_EL)
 
     # Total energy actually consumed by the load
     E_consumed      = L_year - E_unmet                   # = served load
@@ -160,7 +160,7 @@ def run_single_simulation(data,parameters,config):
     print(f"  RE Consumed / Load Served:{frac_RE_consumed:>12.2f} %  <- most honest")
 
     print("\n--- COST & PERFORMANCE SUMMARY ---")
-    LCOE = C_total / L_year
+    LCOE = C_total / (L_year - E_unmet)
     print(f"  Levelized Cost (LCOE):    ${LCOE:>12.4f} /kWh")
 
     # Capital cost breakdown
@@ -235,7 +235,10 @@ def plot_results(details, config, system):
         axes[1].set_title('Energy Generation Mix')
     
     plt.tight_layout()
-    plt.savefig('simulation_results_cutin2.75.png', dpi=150, bbox_inches='tight')
+    plt.savefig(
+    f"simulation_results_NP{config['N_PV']}_NW{config['N_WT']}_NH{config['N_H2']}_NF{config['N_FC']}_NE{config['N_EL']}_ND{config['N_DG']}.png",
+    dpi=150, bbox_inches='tight'
+)
     print("\nPlot saved to: simulation_results_cutin2.75.png")
     plt.close()
 
@@ -459,12 +462,12 @@ if __name__ == "__main__":
     config = {
         'N_PV': 600,      # number of PV panels
         'N_WT': 50,       # number of wind turbines
-        'N_H2': 142,      # number of H2 storage units
-        'N_FC': 43,       # number of fuel cell units
-        'N_EL': 49,       # number of electrolyzer units
+        'N_H2': 112,      # number of H2 storage units
+        'N_FC': 21,       # number of fuel cell units
+        'N_EL': 200,       # number of electrolyzer units
         'N_DG': 20,       # number of diesel generator units
     }
-    
+    #N_PV= 600  N_WT= 50  N_H2= 37  N_FC=  1  N_EL=  4  N_DG=  4
     # Run single simulation
     result = run_single_simulation(data,parameters,config)
     
