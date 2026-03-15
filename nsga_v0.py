@@ -1,3 +1,5 @@
+
+
 """
 NSGA-II Optimization for Hybrid Energy System
 ==============================================
@@ -13,13 +15,15 @@ import random
 import time
 import warnings
 from typing import Dict, List, Tuple, Optional
+# AFTER the existing imports, add:
+from multiprocessing import Pool
+import os
 
 warnings.filterwarnings('ignore')
 
 # ============================================================
 # IMPORT YOUR SIMULATION  (adjust path if needed)
 # ============================================================
-from simulation import HybridEnergySystem
 
 
 # ============================================================
@@ -36,7 +40,7 @@ from simulation import HybridEnergySystem
 # [min, max] integer range for each component
 # ------------------------------------------------------------
 BOUNDS = {
-    'N_PV': (0,  570),
+    'N_PV': (0,  600),
     'N_WT': (0,    50),
     'N_H2': (0,   200),
     'N_FC': (0,   200),
@@ -66,14 +70,14 @@ OBJECTIVES = [
 CONSTRAINTS = [
     ('reliability',   'LPSP',    '<=', 0.05),
     # ('max_cost',    'C_total', '<=', 500_000),
-     ('min_re',      'renewable_fraction', '>=', 0.90),
+     # ('min_re',      'renewable_fraction', '>=', 0.90),
 ]
 
 # ------------------------------------------------------------
 # SECTION 4: GA PARAMETERS
 # ------------------------------------------------------------
-POP_SIZE       = 10     # population size (keep even)
-N_GENERATIONS  = 50    # number of generations
+POP_SIZE       = 20     # population size (keep even)
+N_GENERATIONS  = 200    # number of generations
 CROSSOVER_PROB = 0.9    # probability of crossover per pair
 MUTATION_PROB  = 0.1    # probability of mutating each gene
 TOURNAMENT_K   = 3      # tournament selection pool size
@@ -103,13 +107,22 @@ CUSTOM_OBJECTIVE_FN = None
 # Add a matching entry in CONSTRAINTS above.
 # Return value > 0 means the constraint is violated.
 # ------------------------------------------------------------
-# def custom_constraint(config_dict, C_total, E_total, LPSP, details):
-#     """Non-renewable (diesel) fraction must be <= 10% of total load."""
-#     L  = details.get('L_year', 1) or 1
-#     dg = details.get('E_DG_total', 0)
-#     return max(0.0, dg / L - 0.10)   # violated when diesel > 10% of load
+def custom_constraint(config_dict, C_total, E_total, LPSP, details):
+    """Non-renewable fraction of *served* load must be <= 10% (i.e. RE_consumed/Load_served >= 90%)."""
+    E_PV        = details.get('E_PV_total', 0)
+    E_WT        = details.get('E_WT_total', 0)
+    E_spilled   = details.get('E_grid', 0)          # RE spilled to grid
+    L_year      = details.get('L_year', 1) or 1
+    E_unmet     = details.get('E_unmet', 0)
 
-CUSTOM_CONSTRAINT_FN = None
+    E_RE_generated  = E_PV + E_WT
+    E_RE_consumed   = max(0.0, E_RE_generated - E_spilled)   # RE that actually hit the load
+    E_consumed      = max(1.0, L_year - E_unmet)             # total served load (avoid /0)
+    E_nonRE_consumed = E_consumed - E_RE_consumed
+
+    return max(0.0, E_nonRE_consumed / E_consumed - 0.10)    # violated when nonRE share > 10%
+
+CUSTOM_CONSTRAINT_FN = custom_constraint
 
 
 # ============================================================
@@ -161,36 +174,35 @@ class Individual:
 # EVALUATION
 # ============================================================
 
-def evaluate(ind: Individual, sim: 'HybridEnergySystem', data: pd.DataFrame):
+def evaluate(ind: Individual, sim: 'HybridEnergySystem', data: pd.DataFrame) -> Individual:
     cfg = ind.to_config()
     try:
         C_total, E_total, LPSP, details = sim.simulate_year(cfg, data)
     except Exception as e:
-        print(f"EVAL FAILED: {cfg}")   # <-- add this
-        print(f"ERROR: {e}")           # <-- and this
+        print(f"EVAL FAILED: {cfg}")
+        print(f"ERROR: {e}")
         import traceback
-        traceback.print_exc()          # <-- full stack trace
+        traceback.print_exc()
         ind.objectives  = np.full(N_OBJ, 1e12)
         ind.constraints = np.full(max(N_CON, 1), 1e12)
         ind.feasible    = False
-        return
+        return ind                                        # ← return ind
 
     L    = details.get('L_year', 1) or 1
     E_re = details.get('E_PV_total', 0) + details.get('E_WT_total', 0)
+    E_spilled = details.get('E_grid', 0)
     metrics = {
         'C_total': C_total, 'E_total': E_total, 'LPSP': LPSP,
-        'renewable_fraction': E_re / L,
-        **{k: v for k, v in details.items() if np.isscalar(v)},
+        'renewable_fraction': max(0.0, E_re - E_spilled) / max(1.0, L - details.get('E_unmet', 0)) # ← honest RE fraction
+        ,**{k: v for k, v in details.items() if np.isscalar(v)},
     }
 
-    # Objectives
     obj_vals = [float(metrics.get(m, 0.0)) for _, m, _ in OBJECTIVES]
     if CUSTOM_OBJECTIVE_FN is not None:
         extra = CUSTOM_OBJECTIVE_FN(cfg, C_total, E_total, LPSP, details)
         obj_vals += [extra] if np.isscalar(extra) else list(extra)
     ind.objectives = np.array(obj_vals)
 
-    # Constraints
     con_vals = []
     for _, m, op, limit in CONSTRAINTS:
         v = float(metrics.get(m, 0.0))
@@ -204,6 +216,7 @@ def evaluate(ind: Individual, sim: 'HybridEnergySystem', data: pd.DataFrame):
         con_vals += [extra] if np.isscalar(extra) else list(extra)
     ind.constraints = np.array(con_vals) if con_vals else np.zeros(1)
     ind.feasible    = bool(np.all(ind.constraints <= 1e-9))
+    return ind                                            # ← return ind
 
 
 # ============================================================
@@ -330,8 +343,9 @@ def run_nsga2(sim: 'HybridEnergySystem', data: pd.DataFrame) -> Tuple[pd.DataFra
         Individual(np.array([random.randint(int(LB[i]), int(UB[i])) for i in range(N_VAR)], dtype=float))
         for _ in range(POP_SIZE)
     ]
-    for ind in pop:
-        evaluate(ind, sim, data)
+    with Pool(processes=os.cpu_count()) as pool:
+        results = pool.starmap(evaluate, [(ind, sim, data) for ind in pop])
+    pop = results
     fronts = fast_nondominated_sort(pop)
     assign_crowding(pop, fronts)
 
@@ -349,8 +363,9 @@ def run_nsga2(sim: 'HybridEnergySystem', data: pd.DataFrame) -> Tuple[pd.DataFra
                 c.objectives = c.constraints = None
                 offspring.append(c)
         offspring = offspring[:POP_SIZE]
-        for ind in offspring:
-            evaluate(ind, sim, data)
+        with Pool(processes=os.cpu_count()) as pool:
+            results = pool.starmap(evaluate, [(ind, sim, data) for ind in offspring])
+        offspring = results
 
         # Combine, sort, select
         combined = pop + offspring
@@ -420,7 +435,7 @@ def run_nsga2(sim: 'HybridEnergySystem', data: pd.DataFrame) -> Tuple[pd.DataFra
 
 PARAMETERS = {
     'rated_PV': 0.327, 'v_cut_in': 2.75, 'v_rated': 9.0, 'rated_power': 25.0,
-    'Cap_H2': 6, 'Cap_FC': 2, 'Cap_EL': 2, 'Cap_DG': 50,
+    'Cap_H2': 6, 'Cap_FC': 2, 'Cap_EL': 2, 'Cap_DG': 3,
     'H_min_percentage': 0, 'H_max_percentage': 0,
     'f_0': 0.246, 'f_1': 0.08145,
     'eta_PV': 0.15, 'eta_FC': 0.50, 'eta_EL': 0.70, 'eta_INVT': 0.90, 'H2_LHV': 33.3,
@@ -444,9 +459,10 @@ PARAMETERS = {
 # ============================================================
 
 if __name__ == '__main__':
+    print(f"CPU cores available: {os.cpu_count()}")  # ← add this
 
     # 1. Load your data
-    data = pd.read_excel('data/semi_final_load.xlsx')    # <-- change filename
+    data = pd.read_excel('/kaggle/input/datasets/feyddautha/jimsttttttttttttt/semi_final_load.xlsx')    # <-- change filename
 
     # 2. Instantiate simulation
     sim = HybridEnergySystem(PARAMETERS)
@@ -461,5 +477,5 @@ if __name__ == '__main__':
     print("\nBest solution by Emissions:")
     print(pareto_df.loc[pareto_df['Emissions'].idxmin()])
 
-    print("\nBest solution by LPSP:")
-    print(pareto_df.loc[pareto_df['LPSP'].idxmin()])
+    # print("\nBest solution by LPSP:")
+    # print(pareto_df.loc[pareto_df['LPSP'].idxmin()])

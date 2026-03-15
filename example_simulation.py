@@ -357,7 +357,7 @@ if __name__ == "__main__":
     'Cap_H2': 6,                # kg - capacity of 1 H2 storage unit
     'Cap_FC': 2,                # kW - rated power per fuel cell unit
     'Cap_EL': 2,                # kW - rated power per electrolyzer unit
-    'Cap_DG': 50,               # kW - rated power per diesel generator unit
+    'Cap_DG': 3,               # kW - rated power per diesel generator unit
     'H_min_percentage': 0,      # fraction - minimum H2 storage level (0 = 0%)
     'H_max_percentage': 0,      # fraction - maximum H2 storage level override
 
@@ -453,16 +453,16 @@ if __name__ == "__main__":
         
     
     # =========================================================================
-    # DEFINE SYSTEM CONFIGURATION
+    # DEFINE SYSTEM CONFIGURATION    N_PV= 600  N_WT= 50  N_H2=142  N_FC= 43  N_EL= 49  N_DG= 20
     # =========================================================================
     
     config = {
-        'N_PV': 1000,      # number of PV panels
-        'N_WT': 17,       # number of wind turbines
-        'N_H2': 0,      # number of H2 storage units
-        'N_FC': 0,       # number of fuel cell units
-        'N_EL': 0,       # number of electrolyzer units
-        'N_DG': 2,       # number of diesel generator units
+        'N_PV': 600,      # number of PV panels
+        'N_WT': 50,       # number of wind turbines
+        'N_H2': 142,      # number of H2 storage units
+        'N_FC': 43,       # number of fuel cell units
+        'N_EL': 49,       # number of electrolyzer units
+        'N_DG': 20,       # number of diesel generator units
     }
     
     # Run single simulation
