@@ -669,7 +669,7 @@ class HybridEnergySystem:
         if self.output_simulation:
 
             hourly_df = pd.DataFrame(hourly_log)
-            hourly_df.to_csv(f'simulation_hourly_log_NP{config['N_PV']}_NW{config['N_WT']}_NH{config['N_H2']}_NF{config['N_FC']}_NE{config['N_EL']}_ND{config['N_DG']}.csv', index=False)
+            hourly_df.to_csv(f'simulation_hourly_log_NP{N_PV}_NW{N_WT}_NH{system.get('N_H2', 0)}_NF{system.get('N_FC', 0)}_NE{system.get('N_EL', 0)}_ND{system.get('N_DG', 0)}.csv', index=False)
             print("Hourly log saved to simulation_hourly_log.csv")
 
         # =================================================================
