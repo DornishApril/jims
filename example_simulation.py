@@ -466,9 +466,9 @@ if __name__ == "__main__":
     'f_0': 0.246, 'f_1': 0.08145,
     'eta_PV': 0.15, 'eta_FC': 0.50, 'eta_EL': 0.70, 'eta_INVT': 0.90, 'H2_LHV': 33.3,
     'c_PV': 1500, 'c_WT': 3000,
-    'c_H2':     300,   # $/kg   — was 500, scaled for 100 kg unit
-    'c_FC_cap': 1200,  # $/kW   — was 2000, scaled for 100 kW unit
-    'c_EL_cap': 1000,  # $/kW   — was 1500, scaled for 100 kW unit
+    'c_H2':     300,
+    'c_FC_cap': 1200,
+    'c_EL_cap': 1000,
     'c_DG_cap': 400, 'c_INVT': 300,
     'c_FC': 0, 'c_DG': 0, 'c_EL': 0, 'c_DG_FUEL': 0.82,
     'om_PV': 20, 'om_WT': 50, 'om_H2': 10, 'om_FC': 30, 'om_EL': 25,
@@ -480,6 +480,7 @@ if __name__ == "__main__":
     'A_PV': 6.67, 'P_DG_min': 0.3,
     'life_PV': 25, 'life_WT': 20, 'life_H2': 20, 'life_FC': 10,
     'life_EL': 15, 'life_DG': 15, 'life_INVT': 15,
+
     'output_simulatuion':True
 }
         
@@ -488,15 +489,8 @@ if __name__ == "__main__":
     # DEFINE SYSTEM CONFIGURATION    N_PV= 600  N_WT= 50  N_H2=142  N_FC= 43  N_EL= 49  N_DG= 20
     # =========================================================================
     
-    config = {
-        'N_PV': 600,      # number of PV panels
-        'N_WT': 50,       # number of wind turbines
-        'N_H2': 37,      # number of H2 storage units
-        'N_FC': 1,       # number of fuel cell units
-        'N_EL': 4,       # number of electrolyzer units
-        'N_DG': 4,       # number of diesel generator units
-    }
-    #N_PV= 600  N_WT= 50  N_H2= 37  N_FC=  1  N_EL=  4  N_DG=  4
+    config = {'N_PV': 567, 'N_WT': 41, 'N_H2': 60, 'N_FC': 1, 'N_EL': 2, 'N_DG': 0}
+    #N_PV= 567  N_WT= 41  N_H2= 60  N_FC=  1  N_EL=  2  N_DG=  0
     # Run single simulation
     result = run_single_simulation(data,parameters,config)
     
