@@ -4,10 +4,14 @@ Example Script: Running the CORRECTED Hybrid Energy System Simulation
 This script demonstrates the corrected version with proper unit conversions
 """
 
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from simulation import HybridEnergySystem
+
+OUTPUT_DIR = 'outputs'
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
 def run_single_simulation(data,parameters,config):
@@ -240,11 +244,12 @@ def plot_results(details, config, system):
         axes[1].set_title('Energy Generation Mix')
     
     plt.tight_layout()
-    plt.savefig(
-    f"simulation_results_NP{config['N_PV']}_NW{config['N_WT']}_NH{config['N_H2']}_NF{config['N_FC']}_NE{config['N_EL']}_ND{config['N_DG']}.png",
-    dpi=150, bbox_inches='tight'
-)
-    print("\nPlot saved to: simulation_results_cutin2.75.png")
+    fname = os.path.join(
+        OUTPUT_DIR,
+        f"simulation_results_NP{config['N_PV']}_NW{config['N_WT']}_NH{config['N_H2']}_NF{config['N_FC']}_NE{config['N_EL']}_ND{config['N_DG']}.png"
+    )
+    plt.savefig(fname, dpi=150, bbox_inches='tight')
+    print(f"\nPlot saved to: {fname}")
     plt.close()
 
 
@@ -488,7 +493,7 @@ if __name__ == "__main__":
     # DEFINE SYSTEM CONFIGURATION    N_PV= 600  N_WT= 50  N_H2=142  N_FC= 43  N_EL= 49  N_DG= 20
     # =========================================================================
     
-    config = {'N_PV': 596, 'N_WT': 49, 'N_H2': 59, 'N_FC': 2, 'N_EL': 2, 'N_DG': 1}
+    config = {'N_PV': 596, 'N_WT': 20, 'N_H2': 59, 'N_FC': 2, 'N_EL': 2, 'N_DG': 1}
     #N_PV= 600  N_WT= 47  N_H2= 46  N_FC=  1  N_EL=  2  N_DG= 20
     # Run single simulation
     result = run_single_simulation(data,parameters,config)

@@ -5,9 +5,13 @@ Based on NSGA-II Optimization Algorithm
 CORRECTED VERSION with proper unit conversions and cost calculations
 """
 
+import os
 import numpy as np
 import pandas as pd
 from typing import Dict, Tuple, List
+
+OUTPUT_DIR = 'outputs'
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
 class HybridEnergySystem:
@@ -669,8 +673,10 @@ class HybridEnergySystem:
         if self.output_simulation:
 
             hourly_df = pd.DataFrame(hourly_log)
-            hourly_df.to_csv(f'simulation_hourly_log_NP{N_PV}_NW{N_WT}_NH{system.get('N_H2', 0)}_NF{system.get('N_FC', 0)}_NE{system.get('N_EL', 0)}_ND{system.get('N_DG', 0)}.csv', index=False)
-            print("Hourly log saved to simulation_hourly_log.csv")
+            csv_name = f'simulation_hourly_log_NP{N_PV}_NW{N_WT}_NH{system.get("N_H2", 0)}_NF{system.get("N_FC", 0)}_NE{system.get("N_EL", 0)}_ND{system.get("N_DG", 0)}.csv'
+            csv_path = os.path.join(OUTPUT_DIR, csv_name)
+            hourly_df.to_csv(csv_path, index=False)
+            print(f"Hourly log saved to {csv_path}")
 
         # =================================================================
         # CALCULATE PERFORMANCE METRICS
