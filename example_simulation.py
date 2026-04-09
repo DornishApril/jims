@@ -460,30 +460,29 @@ if __name__ == "__main__":
 # }
 
     parameters = {
-    'rated_PV': 0.327, 'v_cut_in': 2.75, 'v_rated': 9.0, 'rated_power': 25.0,
-    'Cap_H2': 100, 'Cap_FC': 100, 'Cap_EL': 100, 'Cap_DG': 3,
-    'H_min_percentage': 0, 'H_max_percentage': 0,
-    'f_0': 0.246, 'f_1': 0.08145,
-    'eta_PV': 0.15, 'eta_FC': 0.50, 'eta_EL': 0.70, 'eta_INVT': 0.90, 'H2_LHV': 33.3,
-    'c_PV': 1500, 'c_WT': 3000,
-    'c_H2':     300,
-    'c_FC_cap': 1200,
-    'c_EL_cap': 1000,
-    'c_DG_cap': 400, 'c_INVT': 300,
-    'c_FC': 0, 'c_DG': 0, 'c_EL': 0, 'c_DG_FUEL': 0.82,
-    'om_PV': 20, 'om_WT': 50, 'om_H2': 10, 'om_FC': 30, 'om_EL': 25,
-    'om_DG': 0.03, 'om_INVT': 0,
-    'rc_PV': 0, 'rc_WT': 1750, 'rc_H2': 10, 'rc_FC': 30, 'rc_EL': 25,
-    'rc_DG': 500, 'rc_INVT': 300,
-    'e_FC': 0.0, 'e_DG': 2.6391, 'e_EL': 0.0,
-    'T_life': 20, 'r': 0.05, 'p_grid': 0.08,
-    'A_PV': 6.67, 'P_DG_min': 0.3,
-    'life_PV': 25, 'life_WT': 20, 'life_H2': 20, 'life_FC': 10,
-    'life_EL': 15, 'life_DG': 15, 'life_INVT': 15,
+        'rated_PV': 0.327, 'v_cut_in': 2.75, 'v_rated': 9.0, 'rated_power': 25.0,
+        'Cap_H2': 100, 'Cap_FC': 100, 'Cap_EL': 100, 'Cap_DG': 3,
+        'H_min_percentage': 0, 'H_max_percentage': 0,
+        'f_0': 0.246, 'f_1': 0.08145,
+        'eta_PV': 0.15, 'eta_FC': 0.50, 'eta_EL': 0.70, 'eta_INVT': 0.90, 'H2_LHV': 33.3,
+        'c_PV': 1500, 'c_WT': 3000,
+        'c_H2':     300,
+        'c_FC_cap': 1200,
+        'c_EL_cap': 1000,
+        'c_DG_cap': 400, 'c_INVT': 300,
+        'c_FC': 0, 'c_DG': 0, 'c_EL': 0, 'c_DG_FUEL': 0.82,
+        'om_PV': 20, 'om_WT': 50, 'om_H2': 10, 'om_FC': 30, 'om_EL': 25,
+        'om_DG': 0.03, 'om_INVT': 0,
+        'rc_PV': 0, 'rc_WT': 1750, 'rc_H2': 10, 'rc_FC': 30, 'rc_EL': 25,
+        'rc_DG': 500, 'rc_INVT': 300,
+        'e_FC': 0.0, 'e_DG': 2.6391, 'e_EL': 0.0,
+        'T_life': 100, 'r': 0.05, 'p_grid': 0.08,
+        'A_PV': 6.67, 'P_DG_min': 0.3,
+        'life_PV': 25, 'life_WT': 20, 'life_H2': 20, 'life_FC': 10,
+        'life_EL': 15, 'life_DG': 15, 'life_INVT': 15,
 
-    'output_simulatuion':True
-}
-        
+        'output_simulatuion':True
+    }
     
     # =========================================================================
     # DEFINE SYSTEM CONFIGURATION    N_PV= 600  N_WT= 50  N_H2=142  N_FC= 43  N_EL= 49  N_DG= 20
