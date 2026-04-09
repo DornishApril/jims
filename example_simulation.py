@@ -489,7 +489,7 @@ if __name__ == "__main__":
     # DEFINE SYSTEM CONFIGURATION    N_PV= 600  N_WT= 50  N_H2=142  N_FC= 43  N_EL= 49  N_DG= 20
     # =========================================================================
     
-    config = {'N_PV': 600, 'N_WT': 47, 'N_H2': 47, 'N_FC': 1, 'N_EL': 1, 'N_DG': 20}
+    config = {'N_PV': 596, 'N_WT': 49, 'N_H2': 59, 'N_FC': 2, 'N_EL': 2, 'N_DG': 1}
     #N_PV= 600  N_WT= 47  N_H2= 46  N_FC=  1  N_EL=  2  N_DG= 20
     # Run single simulation
     result = run_single_simulation(data,parameters,config)
