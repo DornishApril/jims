@@ -63,7 +63,7 @@ for %%F in ("%PAPER_DIR%\*.pdf") do (
     
     echo [CREATE] Task !COUNT!: %%~nxF
     
-    hermes kanban create "Param Extraction: %%~nxF" --assignee %PROFILE% --body "Research Data Extraction agent. ONE paper only. ASSIGNED PAPER: %%~nxF. PAPER PATH: %PAPER_DIR%\%%~nxF. OUTPUT: Write a single JSON object to !AGENT_OUTPUT!. Use exact column names from prompt as keys. Missing values = null. Extract ONLY explicitly reported values, no inference. Read full extraction rules from %PROMPT_FILE%. WORKSPACE: %WORK_DIR%. Work ONLY here. Do NOT touch other papers. Do NOT write to results.xlsx. When done call kanban_complete with summary."
+    hermes kanban create "Param Extraction: %%~nxF" --assignee %PROFILE% --body "Research Data Extraction agent. ONE paper only. ASSIGNED PAPER: %%~nxF. PAPER PATH: %PAPER_DIR%\%%~nxF. OUTPUT: Write a single JSON object to !AGENT_OUTPUT!. Use exact column names from prompt as keys. Missing values = null. Extract explicitly reported values first. Intelligent inference is allowed when clearly implied (daily load x365 = annual, LPSP bounds, COE/LCOE equivalence etc). Always document inferences in NOTES. Read full extraction rules from %PROMPT_FILE%. WORKSPACE: %WORK_DIR%. Work ONLY here. Do NOT touch other papers. Do NOT write to results.xlsx. When done call kanban_complete with summary."
 )
 
 echo.
@@ -71,10 +71,12 @@ echo [OK] %COUNT% tasks created.
 echo.
 
 REM ---------------------------------------------------------------------------
-REM Step 3: Start gateway
+REM Step 3: Start gateway (background)
 REM ---------------------------------------------------------------------------
-echo [INFO] Starting gateway...
-hermes gateway run --accept-hooks
+echo [INFO] Starting gateway in background...
+start "Hermes Gateway" /B cmd /c "hermes gateway run --accept-hooks"
+timeout /t 5 /nobreak >nul
+echo [OK] Gateway started.
 echo.
 
 REM ---------------------------------------------------------------------------
@@ -85,23 +87,20 @@ echo [INFO] (This may take several minutes. Press Ctrl+C to cancel monitoring.)
 echo.
 
 :WAIT_LOOP
-REM Count running + ready tasks (tasks not yet done)
-SET REMAINING=0
-for /f "tokens=2 delims= " %%A in ('hermes kanban list 2^>nul ^| findstr /i "running ready blocked"') do (
-    SET /a REMAINING+=1
-)
-
 REM Check if any tasks are still active
 hermes kanban list 2>nul | findstr /i "running ready blocked" >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
-    echo [%DATE% %TIME%] Tasks still running. Checking again in 30 seconds...
+    echo [%DATE% %TIME%] Tasks still active, checking again in 30s...
     timeout /t 30 /nobreak >nul
     goto WAIT_LOOP
 )
 
+REM Stop the gateway when done
 echo.
-echo [OK] All agents have finished.
-echo.
+echo [OK] All agents have finished. Stopping gateway...
+tasklist /fi "imagename eq python.exe" /fo csv 2>nul | findstr /i "hermes" >nul && (
+    echo [INFO] Gateway still running in background.
+)
 
 REM ---------------------------------------------------------------------------
 REM Step 5: Merge per-paper JSONs into results.xlsx

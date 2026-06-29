@@ -165,7 +165,38 @@ Running `create_kanban_swarm.bat` will:
 
 ---
 
-## Running the Swarm
+## Quick Start
+
+### Step 1: Run the .bat file
+
+**From File Explorer:**
+Navigate to `C:\Users\Admin\OneDrive\Desktop\jims\` and double-click `create_kanban_swarm.bat`
+
+**From cmd.exe:**
+
+```
+cd C:\Users\Admin\OneDrive\Desktop\jims
+create_kanban_swarm.bat
+```
+
+**From git-bash:**
+
+```bash
+cd /c/Users/Admin/OneDrive/Desktop/jims
+cmd //c create_kanban_swarm.bat
+```
+
+The .bat will:
+
+1. Create `results/` and `results/per_paper/` directories
+2. Create one kanban task per PDF (auto-discovers all PDFs in paper_folder)
+3. Start the gateway in background
+4. Wait and poll every 30 seconds until all agents finish
+5. Auto-merge all per-paper JSONs into `results/results.xlsx`
+
+---
+
+## Running the Swarm (Manual / Advanced)
 
 ### Option A: Run the .bat file (Windows cmd.exe)
 
@@ -200,57 +231,84 @@ If you're in git-bash, run the `hermes kanban create` commands directly. See the
 
 ## Monitoring Task Progress
 
-### View all tasks
+### While the .bat is running
+
+The .bat auto-polls every 30 seconds and shows:
+
+```
+[6/29/2026 22:15:30] 18 tasks still active...
+```
+
+When all done, it auto-merges and shows:
+
+```
+[OK] All agents have finished. Stopping gateway...
+```
+
+### Manual monitoring (open a separate terminal)
+
+**See all tasks:**
 
 ```bash
 hermes kanban list
 ```
 
-### View only running tasks
+**See only running:**
 
 ```bash
 hermes kanban list --status running
 ```
 
-### View only done tasks
+**See only done:**
 
 ```bash
 hermes kanban list --status done
 ```
 
-### View a specific task's details (including summary)
+**See only blocked (need attention):**
+
+```bash
+hermes kanban list --status blocked
+```
+
+**See a specific task's full details + summary:**
 
 ```bash
 hermes kanban show <task_id>
 hermes kanban show <task_id> --json
 ```
 
-### Check gateway status
-
-```bash
-hermes gateway status
-```
-
-### Watch live updates (poll every 10 seconds)
-
-```bash
-watch -n 10 "hermes kanban list"
-```
-
-Or in a loop:
+**Live auto-refresh (every 10 seconds):**
 
 ```bash
 while true; do clear; hermes kanban list; sleep 10; done
 ```
 
-### Count tasks by status
+Press Ctrl+C to stop.
+
+**Count by status:**
 
 ```bash
-hermes kanban list | grep -c "running"   # how many still working
-hermes kanban list | grep -c "done"      # how many finished
-hermes kanban list | grep -c "ready"     # how many waiting
-hermes kanban list | grep -c "blocked"   # how many need attention
+hermes kanban list | grep -c "running"
+hermes kanban list | grep -c "done"
+hermes kanban list | grep -c "ready"
+hermes kanban list | grep -c "blocked"
 ```
+
+**Check gateway is running:**
+
+```bash
+hermes gateway status
+```
+
+### Understanding task symbols
+
+| Symbol | Status  | Meaning                        |
+| ------ | ------- | ------------------------------ |
+| ▶     | ready   | Waiting for gateway to pick up |
+| ●     | running | Agent is actively working      |
+| ✓     | done    | Completed successfully         |
+| ⚠     | blocked | Needs human input/decision     |
 
 ---
 
@@ -343,13 +401,41 @@ This combines all per-paper outputs into a single `results.xlsx`.
 
 ## Troubleshooting
 
-| Problem                    | Solution                                                                  |
-| -------------------------- | ------------------------------------------------------------------------- |
-| Task stuck in`running`   | `hermes kanban reclaim <id>` to reset                                   |
-| Task needs human input     | `hermes kanban block <id> "reason"` then `hermes kanban unblock <id>` |
-| Agent wrote wrong output   | Check`hermes kanban show <id>` for summary                              |
-| Gateway not running        | `hermes gateway start`                                                  |
-| Too many concurrent agents | Reduce batch size (run .bat twice, half the tasks each)                   |
+| Problem                        | Solution                                                                           |
+| ------------------------------ | ---------------------------------------------------------------------------------- |
+| .bat shows "command not found" | You're in git-bash. Run`cmd //c create_kanban_swarm.bat` instead                 |
+| Task stuck in`running`       | `hermes kanban reclaim <id>` to reset, then re-run                               |
+| Task blocked                   | `hermes kanban show <id>` to see why, then `hermes kanban unblock <id>`        |
+| Agent wrote wrong output       | Check`hermes kanban show <id>` for summary/metadata                              |
+| Gateway not running            | `hermes gateway run --accept-hooks` (in a separate terminal)                     |
+| Too many concurrent agents     | Edit .bat: change`for %%F in ("%PAPER_DIR%\*.pdf")` to process half              |
+| Need to stop everything        | Ctrl+C in .bat terminal, then`hermes kanban list` to check                       |
+| Merge failed                   | Run manually:`cd results && python merge_results.py`                             |
+| No JSON files created          | Check agent summaries:`hermes kanban show <id>` — agent may have hit an error   |
+| results.xlsx has few rows      | Agents collided on shared xlsx — use per-paper JSON pattern (already fixed in v2) |
+
+### Checking agent output after completion
+
+```bash
+# See what an agent extracted
+hermes kanban show <task_id>
+
+# See full JSON metadata
+hermes kanban show <task_id> --json
+
+# Check the per-paper JSON file
+cat results/per_paper/<filename>.json
+```
+
+### Re-running a single failed task
+
+```bash
+# Reclaim (reset from running to ready)
+hermes kanban reclaim <task_id>
+
+# Or create a new task for just that paper
+hermes kanban create "Param Extraction: paper.pdf" --assignee default --body "..."
+```
 
 ---
 
