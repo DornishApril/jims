@@ -1,0 +1,85 @@
+{
+  "Paper Name": "Design and Economic Analysis of a Stand-alone microgrid system using Dandelion Optimizer - A rural case in Southwest Morocco",
+
+  "TOTAL ANNUAL LOAD DEMAND": null,
+  "LCOE": null,
+  "LPSP": 0.0499,
+  "COE": "0.2674 $/kWh",
+
+  "rated_PV": "1 kW",
+  "v_cut_in": "3 m/s",
+  "v_rated": "11 m/s",
+  "rated_power": "1 kW",
+  "Cap_H2": "74.93 Kg",
+  "Cap_FC": "20.22 kW",
+  "Cap_EL": "18.85 kW",
+  "Cap_DG": null,
+  "H_min_percentage": null,
+  "H_max_percentage": null,
+
+  "f_0": null,
+  "f_1": null,
+
+  "eta_PV": null,
+  "eta_FC": "60%",
+  "eta_EL": "75%",
+  "eta_INVT": "95%",
+  "H2_LHV": null,
+
+  "c_PV": "2000 $/kW",
+  "c_WT": "3200 $/kW",
+  "c_H2": "1300 $/Kg",
+  "c_FC_cap": "3000 $/kW",
+  "c_EL_cap": "2000 $/kW",
+  "c_DG_cap": null,
+  "c_INVT": "800 $/kW",
+
+  "c_FC": null,
+  "c_DG": null,
+  "c_EL": null,
+  "c_DG_FUEL": null,
+
+  "om_PV": "20 $/kW",
+  "om_WT": "32 $/kW",
+  "om_H2": "15 $/Kg",
+  "om_FC": "40 $/kW",
+  "om_EL": "20 $/kW",
+  "om_DG": null,
+  "om_INVT": "7 $/kW",
+
+  "rc_PV": "1800 $/kW",
+  "rc_WT": "3000 $/kW",
+  "rc_H2": "1200 $/Kg",
+  "rc_FC": "2500 $/kW",
+  "rc_EL": "1500 $/kW",
+  "rc_DG": null,
+  "rc_INVT": "750 $/kW",
+
+  "e_FC": null,
+  "e_DG": null,
+  "e_EL": null,
+
+  "T_life": "20 years",
+  "r": "6%",
+  "p_grid": null,
+
+  "A_PV": null,
+  "P_DG_min": null,
+
+  "life_PV": "20 years",
+  "life_WT": "20 years",
+  "life_H2": "20 years",
+  "life_FC": "5 years",
+  "life_EL": "20 years",
+  "life_DG": null,
+  "life_INVT": "15 years",
+
+  "N_PV": 60,
+  "N_WT": 55,
+  "N_H2": null,
+  "N_FC": null,
+  "N_EL": null,
+  "N_DG": null,
+
+  "NOTES": "Paper by Bouaouda & Sayouti (2023) IEEE IRASET. System: PV/WT/FC/EL/HT (no DG, no battery). All values from Table I (economic), Table II (technical), Table III (DO optimal results). TOTAL ANNUAL LOAD DEMAND not explicitly reported — only hourly load profile shown (Fig 6, range ~20-50 kW). COE reported as 'CEO' in Table III header but context confirms COE. LCOE not reported. H2_LHV not reported; HHV_H2=39.72 kWh/kg reported instead (Table II). om_* values from Table I OM column — unit not explicitly stated, assumed $/kW for rated size. N_H2/N_FC/N_EL not discretely given — Cap_H2=74.93 Kg, Cap_FC=20.22 kW, Cap_EL=18.85 kW provided as continuous values. eta_PV not explicitly reported. LPSPmax constraint = 0.05 (5%). Interest rate=6%, project lifespan=20 years. No grid connection (stand-alone)."
+}

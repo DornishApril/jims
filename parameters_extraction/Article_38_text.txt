@@ -1,0 +1,1492 @@
+===PAGE 1===
+Research papers
+Assessing the 3E performance of multiple energy supply scenarios based on
+photovoltaic, wind turbine, battery and hydrogen systems
+Y. Elaouzy , A. El Fadar *, O.B. Achkari
+Laboratory of Innovative Technologies, National School of Applied Sciences of Tangier, Abdelmalek Essaadi University, Tetouan, Morocco
+A R T I C L E I N F O
+Keywords:
+Energy supply
+Photovoltaic system
+Wind turbine
+Battery
+Hydrogen storage
+3E analysis
+A B S T R A C T
+Supplying buildings with cost-effective, eco-friendly and reliable energy by hybridizing sustainable renewable
+energy systems (RESs) and energy storage methods is becoming increasingly interesting. This study investigates
+the energy, environmental and economic (3E) effectiveness of three energy supply scenarios (ESSs) designed to
+meet the electricity and thermal needs of a typical residential building under the Mediterranean climate of
+Morocco. The first scenario aims to directly supply the energy produced by two RESs, namely photovoltaic and
+wind systems, to the building and inject the surplus electricity into the grid. In contrast, in the second scenario,
+the excess solar and wind energy is stored in batteries, while in the third one a proton exchange membrane
+electrolyzer is used to produce hydrogen and store it for later use through fuel cells. To examine the performance
+of these scenarios, numerous software, such as EnergyPlus and PVsyst, as well as numerical models are used. The
+findings indicate that the second and third scenarios can achieve an energy coverage ratio of up to 100 %, whilst
+the first scenario reaches lower ratio of 52.56 %. Environmentally, the first scenario exhibits the best outcomes
+with a carbon payback period of one year and a reduction in carbon emissions of 18.21 tCO2e/year. On the other
+side, the carbon payback period and carbon emissions reduction are 1.66 years and 15.13 tCO2e/year for the
+second scenario, and 1.14 years and 14.82 tCO2e/year for the third scenario. Economically, the first scenario
+reveals the best economic findings, followed by the second one, while the third scenario is not economically
+feasible. The obtained simple payback period values for the first, second and third scenarios are 5.80, 7.89 and
+16.30 years, whereas their levelized cost of energy shares are 0.05, 0.09 and 0.21 $/kWh, sequentially. The
+outcomes of this research significantly contribute to the field by providing crucial information for building
+owners and professionals to help them in discerning the most efficient ESSs in the 3E prospects, and hence
+improving their decision-making and implementation processes.
+1. Introduction
+1.1. Background
+The increased exploitation of fossil fuels has raised the energy usage's
+environmental burden. This issue is particularly pressing in the building
+sector, accounting for around 39 % of global energy-related carbon
+emissions [1]. Subsequently, shifting towards clean and sustainable
+energy supply chains becomes an urgent need to mitigate the negative
+energy, social, economic and environmental impacts of buildings [2]. In
+this vein, the integration of renewable-based systems instead of fossil
+fuel-based ones for generating electricity, and providing the required
+heating and cooling loads for buildings is crucial [3]. With the
+increasing development and significant cost reductions of renewable
+energy systems (RESs), especially solar and wind-based ones, their use
+for improving the sustainability of buildings and ensuring clean energy
+supply is becoming increasingly important [4,5]. The variant possibil-
+ities to store the surplus energy produced by RESs are also one of their
+primary advantages. Currently, two main storage methods can be inte-
+grated with RESs and used in buildings: conventional electrochemical
+energy storage and hydrogen storage.
+Conventional electrochemical energy storage devices, like lithium-
+ion batteries, provide high energy efficiency and cost-effectiveness but
+they suffer from limitations like limited capacity, environmental con-
+cerns and shortened lifespan [6]. In contrast, hydrogen is emerging as a
+promising and viable solution for energy storage. Its production can be
+carried out through diverse methods, including renewable and fossil-
+based routes [7]. Regarding renewable-based processes, water elec-
+trolysis is the most mature and eco-friendly technique for producing
+* Corresponding author.
+E-mail address: aelfadar@uae.ac.ma (A. El Fadar).
+Contents lists available at ScienceDirect
+Journal of Energy Storage
+journal homepage: www.elsevier.com/locate/est
+https://doi.org/10.1016/j.est.2024.113378
+Received 1 April 2024; Received in revised form 28 July 2024; Accepted 13 August 2024
+Journal of Energy Storage 99 (2024) 113378 
+Available online 17 August 2024 
+2352-152X/© 2024 Elsevier Ltd. All rights are reserved, including those for text and data mining, AI training, and similar technologies. 
+
+===PAGE 2===
+green hydrogen [8] that can be stored, and/or transformed into elec-
+tricity and heat using fuel cells [9]. This heat can be harnessed in diverse
+applications in buildings, mainly for space heating, water heating and
+cooking. Overall, compared to energy supply scenarios (ESSs) based on
+batteries, hydrogen-based ones offer additional benefits, including
+higher energy density, lower carbon footprint and extended lifespan
+[10]. However, the elevated energy efficiency, cost-effectiveness and
+maturity of batteries make them a preferred energy storage option for
+building owners over hydrogen storage [11].
+1.2. Literature review
+Recently, many countries around the world have undertaken efforts
+to decarbonize their final energy consumption, especially those with
+abundant renewable energy resources, such as Morocco. In this context,
+the Moroccan's authorities have launched numerous initiatives to
+exploit its exceptional potential in renewable energy, using mainly
+photovoltaic (PV) and wind turbine (WT) systems [12,13]. Nonetheless,
+the wider adoption of these systems still faces major barriers, particu-
+larly concerning their intermittent generation and the energy, economic
+and environmental (3E) efficacy of energy storage systems.
+In the literature, a dearth of studies examining the 3E performance of
+ESSs employing RESs, and batteries or hydrogen storage in Morocco is
+noticeable. For example, Ourya et al. [14] examined the economic
+profits of utilizing a hybrid PV-WT system powering an electrolyzer for
+hydrogen production in five Moroccan cities. The findings reported that
+the levelized cost of hydrogen (LCOH) could be as low as 2.54 $/kg.
+Similarly, Khouya [15] evaluated the costs of energy and hydrogen
+associated with hydrogen generation employing an alkaline water
+electrolyzer supplied by electricity generated from wind farms and
+concentrated PV thermal plants in the Mediterranean climate of Tangier.
+The findings indicated that the expenditures related to energy and
+hydrogen produced using WTs were marginally elevated compared to
+those harnessing concentrated PV plants. Ennemiri et al. [16] assessed
+the economic and environmental impacts of integrating a hybrid energy
+plant, combining PV, biogas and battery systems, aimed to supply
+electricity to a commercial platform located in Berkane. They revealed
+that using the hybrid system resulted in an electricity cost of 0.28 $/kWh
+and a decrease in CO2 emissions of almost 40 % in comparison to an ESS
+based on a standalone biogas system. These works underscore the
+crucial role of incorporating RESs and energy storage technologies in
+enhancing the sustainability of building energy supply networks in
+Morocco.
+On a global scale, many researchers have studied the performance of
+integrating different building ESSs, including both RESs and energy
+storage methods. For example, Jung et al. [17] analyzed the perfor-
+mance of net zero energy buildings supplied by two distinct energy
+sources: electricity and hydrogen. The results revealed that the
+electricity-based scenario outperformed the hydrogen-based one as
+concerns both energy efficiency and environmental effect. Jin et al. [18]
+Nomenclature
+Abbreviations
+CAPEX
+Capital Expenditure, $
+CER
+Carbon Emissions Reduction, tCO2e/year
+CPBP
+Carbon Payback Period, years
+DPP
+Discounted Payback Period, years
+ECR
+Energy Coverage Ratio, %
+ESS
+Energy Supply Scenario
+HVAC
+Heating, Ventilation and Air Conditioning
+LCOE
+Levelized Cost of Energy, $/kWh
+LCOH
+Levelized Cost of Hydrogen, $/kgH2
+OPEX
+Operating Expenditure, $
+PEM
+Proton Exchange Membrane
+PV
+Photovoltaic
+RES
+Renewable Energy System
+SIR
+Savings-to-Investment Ratio
+SPP
+Simple Payback Period, years
+WT
+Wind Turbine
+3E
+Energy, Environmental and Economic
+Symbols
+APV
+surface area of PV panel, m2
+Ar
+swept area of rotor, m2
+Baut
+battery autonomy, hours
+CB
+battery capacity, Ah
+CEF
+carbon emission factor, kgCO2e/kWh
+CF
+capacity factor of a WT, %
+CF
+annual cash flow, $
+Cp
+performance coefficient
+cp
+specific heat, J/(kg.K)
+d
+discount rate, %
+E
+electricity, kWh
+EC
+embodied carbon, kgCO2e
+Et
+generated/stored energy during the t-th year, kWh
+factive
+fraction of active PV panel area to the total PV panel
+surface area, %
+GT
+solar radiation received by the PV module, kWh/m2
+h
+number of hours, hours
+It
+investments during the t-th year, $
+LHV
+lower heating value of hydrogen, kWh/kg
+m
+mass, kg
+N
+lifetime, years
+P
+power, kW
+Q
+thermal energy, kWh
+qnet
+net heat transfer rate into the water tank, kW
+SoCmin
+minimum state of charge, %
+St
+savings during the t-th year, $
+T
+temperature, K
+t
+time, s
+V
+wind speed, m/s
+VB
+nominal voltage of battery, V
+Greek symbols
+β
+temperature coefficient, K−1
+η
+efficiency, %
+ρ
+air density, kg/m3
+Δt
+time step, s
+Subscripts
+B
+battery
+cell
+PV cell
+ch
+charged
+disch
+discharged
+ele
+electrolyzer
+FC
+fuel cell
+gen
+generated loads
+H2
+hydrogen
+invert
+inverter
+req
+requested loads
+SC
+scenario
+ST
+storage tank
+STC
+standard test conditions
+Y. Elaouzy et al.
+Journal of Energy Storage 99 (2024) 113378 
+2 
+
+===PAGE 3===
+demonstrated that the use of batteries is an effective way for energy
+storage, but the high capital expenditure (CAPEX) is their main draw-
+backs. Moreover, they reported that the incorporation of hydrogen in
+buildings is not economically viable, which can mainly be attributed to
+the high CAPEXs. Likewise, Wang et al. [19] indicated that hydrogen
+storage was more eco-friendly than electrochemical storage. However,
+the implementation of the hydrogen storage method proved to be more
+expensive, reducing its cost-effectiveness. On the other hand, Assareh
+et al. [20] evaluated the performance of a combined cooling, heating
+and power system comprising various RESs and energy storage units.
+This system includes PV thermal panels, WTs, an electrolyzer, fuel cells
+and a heat pump, while the energy storage package consists of a
+hydrogen storage tank and a battery system. They concluded that the
+integration of both hydrogen storage tank and batteries is essential to
+manage the stored energy and reduce the unpredictability in supply and
+demand imbalances. Xu and Chen [21] investigated the effectiveness of
+integrating a rooftop PV system with hybrid electric, hydrogen and
+thermal energy storage in a residential building. The explored system
+exhibited excellent economic benefits, achieving a low levelized cost of
+energy (LCOE) of 0.10 $/kWh. Actually, the economic profits of this
+system were greater when it was connected to the grid compared to the
+stand-alone option. Environmentally, they noted that this system is more
+eco-friendly when supplied by PV collectors rather than the local grid.
+Therefore, a comprehensive life cycle assessment and comparison of the
+3E performance of various ESSs is needed in order to gain deeper in-
+sights into their overall efficiency and limitations.
+1.3. Research gaps and key contributions
+Based on the above works and an extensive review of the literature, it
+is evident that despite the considerable research devoted to studying the
+feasibility of some ESSs, significant gaps remain unaddressed. Primarily,
+there is a lack of detailed life cycle assessments of multiple ESSs based on
+RESs, energy storage systems, and the grid. Previous studies have pre-
+dominantly concentrated on the energy and/or economic aspects of
+ESSs, neglecting other crucial prospects, such as their environmental
+performance. Moreover, the majority of prior research focused solely on
+the provision and storage of a single type of energy, such as electricity or
+heat, without considering the potential synergies of a more holistic
+approach. Additionally, most studies have been conducted in developed
+countries, distinguished by specific climatic, environmental, and eco-
+nomic contexts, thus limiting the generalizability of findings to broader
+global scenarios. These gaps highlight the need for more comprehensive
+research to examine and compare the sustainability of different ESSs
+under various conditions. In this respect, the current study aims to reach
+the following objectives:
+i. Perform detailed life cycle assessments of the energy perfor-
+mance, environmental friendliness and cost-effectiveness of three
+ESSs, taking into account their energy losses, embodied carbon
+and life cycle costs. These ESSs are designed to store and provide
+electricity, heating, cooling and hot water for a typical residential
+building in the Mediterranean climate of Morocco.
+ii. Assess the effectiveness of the proposed ESSs utilizing a combi-
+nation of software tools, including EnergyPlus and PVsyst, along
+with numerical modeling techniques.
+iii. Analyze the results using key metrics in the 3E perspectives,
+namely energy production, energy coverage ratio (ECR), carbon
+payback period (CPBP), carbon emissions reduction (CER), sim-
+ple payback period (SPP), discounted payback period (DPP),
+savings-to-investment ratio (SIR) and LCOE.
+Reaching these objectives would offer original insights into energy
+sustainability scenarios and provide valuable recommendations for
+policymakers, industry stakeholders, and researchers to identify the best
+ESSs according to the 3E aspects and improve their performance.
+Furthermore, this study aims to enhance the understanding of inte-
+grating RESs and energy storage systems into energy supply chains,
+leading to more resilient and sustainable energy solutions.
+2. Materials and methods
+2.1. Reference building
+In this work, a three-story residential building located in Tangier,
+Morocco, and connected to the electrical grid is considered as a base
+case. The primary features of this building are depicted in Table 1, while
+Fig. 1 provides data on direct normal irradiance, dry bulb temperature
+and wind speed for Tangier, characterized by a Mediterranean climate.
+Moreover, Table 2 illustrates the principal characteristics of energy
+systems taken into account in the reference ESS, designed to provide hot
+water, maintain a comfortable indoor environment, and power house-
+hold electrical equipment. A heat pump with direct expansion coils is
+utilized for space heating and cooling, whilst an electric stratified water
+heater with a hot water storage tank is employed to provide hot water.
+These energy systems were meticulously chosen through rigorous opti-
+mization, aligning their capabilities with the specific requirements of
+the reference building. Parameters such as maximum flow rate of
+heating/cooling supply fan, nominal heating/cooling capacity of the
+heat pump, hot water storage tank volume, and coil nominal capacity
+were optimized using EnergyPlus software [22]. Additionally, consul-
+tations with the local market were conducted to select the other factors
+such as coil efficiency, heat pump coefficient of performance, and water
+heater efficiency. These data, along with others, have been taken into
+account within EnergyPlus to calculate the energy requirements of the
+reference building for heating, ventilation and air conditioning (HVAC),
+and providing hot water.
+The results of modeling the energy needs of the reference building for
+water heating and air conditioning are depicted in Fig. 2. As this figure
+exhibits, the electricity demand for water heating is more significant
+than that for space heating and cooling. In addition, it is obvious that the
+energy demand of the HVAC system is more significant in summer than
+that in winter. This is mainly due to the Mediterranean climate of
+Tangier, which is distinguished by a predominance of cooling over
+heating [23]. Regarding the other household electrical equipment, their
+daily energy consumption on each floor is estimated at 5.57 kWh/day.
+These data are essential for sizing the energy systems in each ESS.
+2.2. Proposed energy supply scenarios
+Given the elevated energy demands of the reference building and the
+favorable climatic conditions (Fig. 1) for PV and WT installations,
+coupled with their exceptional cost-effectiveness in comparison with
+other RESs [24], assessing the 3E efficiency of PV and WT systems in
+Table 1
+Primary features of the explored building.
+Feature
+Value
+Unit
+Total floor area
+396
+m2
+Number of floors
+3
+–
+Ceiling height
+2.8
+m
+Building volume
+1108.8
+m3
+Number of facades
+3
+–
+Occupants in each floor
+4
+peoples
+Heat transfer coefficient of exterior walls
+0.67
+W/(m2.K)
+Heat transfer coefficient of interior walls
+1.75
+W/(m2.K)
+Heat transfer coefficient of floor
+2.24
+W/(m2.K)
+Heat transfer coefficient of ceiling
+0.62
+W/(m2.K)
+Heat transfer coefficient of exterior windows
+3.3
+W/(m2.K)
+Gross window-to-wall ratio
+12.34
+%
+Air change per hour
+0.5
+volume/h
+Cooling/heating setpoint
+26/20
+◦C
+Water consumption
+102.28
+m3/year
+Y. Elaouzy et al.
+Journal of Energy Storage 99 (2024) 113378 
+3 
+
+===PAGE 4===
+supplying the building with clean electricity is of great importance.
+Additionally, there is a growing interest in evaluating the effectiveness
+of energy storage methods, mainly batteries and hydrogen storage, for
+storing excess electricity for later use. Therefore, this research examines
+the 3E performance of three ESSs compared to the reference ESS where
+neither RES nor energy storage system is implemented and the required
+energy is supplied entirely from the grid. The overall schematic diagram
+of these three ESSs is exhibited in Fig. 3.
+In the three ESSs, the required electricity to power electrical equip-
+ment, achieve comfortable air conditions and provide the building with
+hot water is planned to be supplied from the grid, the PV and WT sys-
+tems, and/or the energy storage banks. The PV system of a total capacity
+of 13.2 kWp is configured to be installed on the entire building roof with
+a slope angle of 31◦oriented towards south. These configurations (slope
+angle and orientation) have been selected based on their optimal per-
+formance identified in Ref. [25] under the climatic conditions of Tang-
+ier. The principal properties of this system are listed in Table 3. The
+second technology for producing electricity is the implementation of a
+horizontal axis WT (Table 3), which is installed to produce the
+remaining electricity demanded by the building. It should be empha-
+sized that the investigated PV and WT systems are configured to maxi-
+mize the direct supply of electricity to the building, while the surplus
+energy can be stored in two different devices: a battery unit and/or a
+hydrogen storage tank. For the battery bank, Li-ion batteries are used,
+owing to their elevated efficiency, extended lifespan, and compact
+physical dimensions relative to their capacity [26,27]. Regarding the
+electrolyzer and fuel cells, the proton exchange membrane (PEM)
+technology is considered owing to its maturity, substantial hydrogen
+production rate, elevated hydrogen purity and compact design [28,29].
+Besides, the compressed hydrogen gas storage method is chosen because
+Fig. 1. Hourly weather data in Tangier city.
+Table 2
+Key features of the energy systems considered for each floor of the reference
+building.
+Purpose
+Device
+Parameter
+Input value
+Unit
+Space heating
+and cooling
+Supply heating/
+cooling fan
+Maximum flow rate
+0.84
+m3/s
+Total efficiency
+80
+%
+Heat pump
+Nominal heating/
+cooling capacity
+18.19
+kW
+Direct expansion
+cooling coil
+Gross rated sensible
+heat ratio
+74.81
+%
+Electric heating
+coil
+Efficiency
+90
+%
+Nominal capacity
+37
+kW
+Water heating
+Stratified water
+heater
+Maximum capacity
+4.5
+kW
+Maximum
+temperature limit
+82.22
+◦C
+Thermal efficiency
+98
+%
+Maximum hot water
+flow rate
+3.36
+L/
+min
+Hot water
+storage tank
+Volume
+0.1893
+m3
+Height
+1.4
+m
+Shape
+Vertical
+cylinder
+–
+Fig. 2. Electricity needs for water heating and HVAC systems in the reference building.
+Y. Elaouzy et al.
+Journal of Energy Storage 99 (2024) 113378 
+4 
+
+===PAGE 5===
+Fig. 3. Schematic diagram of the proposed ESSs.
+Y. Elaouzy et al.
+Journal of Energy Storage 99 (2024) 113378 
+5 
+
+===PAGE 6===
+of its relatively high energy density, maturity, proven safety and cost-
+effectiveness [30].
+3. Modeling and evaluation procedures
+3.1. Modeling of energy supply scenarios
+To model the investigated ESSs, multiple software tools have been
+employed. Fig. 4 displays the main stages of simulating the proposed
+ESSs. First, to calculate the energy needs of the reference building, the
+latter was designed utilizing SketchUp software [31] and the Open-
+Studio plugin [32]. The established model was then exported as an
+EnergyPlus file to input other properties of the reference building, such
+as envelope materials, internal gains, and HVAC system features.
+Regarding electrical needs for water heating, the WaterHeater:Stratified
+object was used to specify the main characteristics of the utilized water
+heater and hot water storage tank. The energy balance of a hot water
+tank, used in EnergyPlus, can be expressed as indicated by Eq. (1) [33].
+EnergyPlus software was used due to its comprehensive modeling ca-
+pabilities, high accuracy and extensive validation in building energy
+simulation [34–37].
+mcp
+dTST
+dt
+= Qboiler −Qloss −Qload
+(1)
+in which m is the total mass of water inside the tank. cp is the specific
+heat of water, while T and t are the water temperature in the tank and
+time, sequentially. The thermal energy delivered by the electrical boiler
+is denoted as Qboiler, while Qloss represents the rate of energy loss from the
+storage tank to the surrounding environment. Finally, Qload is the
+amount of energy extracted from the tank to meet the hot water needs.
+On the other side, to estimate the electrical output of the considered
+WT system, the Generator:WindTurbine object within EnergyPlus was
+applied, in which numerous parameters like those listed in Table 3 were
+entered. This object employs a simple approximation approach to
+determine the coefficient of performance (Cp) and actual power output
+of a WT (PWT), including conversion and supply losses. The coefficient of
+performance and capacity factor (CF) of a WT can be calculated using
+Eqs. (2) and (3) [38]. Concerning the PV system's energy production, it
+was estimated using PVsyst software [39]. The energy yields (EPV) and
+the performance ratio (PR) of the examined PV system, revealed by
+PVsyst, can be obtained using Eqs. (4–6). This software was employed
+Table 3
+Primary properties of the studied systems.
+Feature
+Value/type
+Unit
+PV system
+Number of PV panels (series × parallel)
+24 (12 × 2)
+–
+Panel dimensions
+2278 × 1134 × 35
+mm
+Maximum efficiency of PV panels
+21.32
+%
+Array slope
+31
+◦
+Array azimuth
+0
+◦
+Nominal power of the inverter
+10
+kW
+Maximum PV power allowed by the inverter
+15
+kW
+Maximum efficiency of the inverter
+97.8
+%
+WT system
+Rated rotor speed
+200
+rev/
+min
+Rotor diameter
+6.3
+m
+Number of blades
+3
+–
+Rated power
+7.5
+kW
+Rated wind speed
+12
+m/s
+Cut-in wind speed
+3
+m/s
+Cut-out wind speed
+20
+m/s
+Annual local wind speed
+4.9
+m/s
+Hydrogen systems
+Electrolyzer type
+PEM
+–
+Electrolyzer mean electrical conversion efficiency
+70
+%
+Electrolyzer rated capacity
+14
+kW
+Hydrogen storage type
+Compressed gas
+–
+Hydrogen storage tank capacity
+2.7
+kg
+Density of the stored hydrogen
+7.7
+kg/m3
+Lower heating value of hydrogen
+33.33
+kWh/kg
+Fuel cell type
+PEM
+–
+Fuel cell mean electrical conversion efficiency
+40
+%
+Fuel cell rated capacity
+14
+kW
+Heat exchanger capacity
+10
+kW
+Battery system
+Battery type
+Li-ion
+–
+Rated capacity of the battery unit
+45
+kWh
+Charging/discharging efficiency of batteries
+90
+%
+Fig. 4. Flowchart of the primary steps to simulate the studied ESSs.
+Y. Elaouzy et al.
+Journal of Energy Storage 99 (2024) 113378 
+6 
+
+===PAGE 7===
+because of its detailed simulation capabilities, extensive database of PV
+components, and proven accuracy in predicting system performance,
+resulting in reliable and optimized design results [40].
+Cp =
+PWT
+0.5ρArV3
+(2)
+CF =
+EWT
+Pw × h × 100
+(3)
+EPV = APV × factive × GT × ηcell × ηinvert
+(4)
+ηcell = ηSTC[1 −β(Tcell −TSTC) ]
+(5)
+PR =
+EPV
+EPV−STC
+(6)
+where Pw denotes the rated power output at the rated wind speed V, and
+EWT expresses the amount of energy generated by the WT in a specific
+period. ρ and Ar signify the air density and swept area of rotor, respec-
+tively. h indicates the number of hours in a given time frame (e.g., a
+month or year). APV is the total surface area of the PV module, while
+factive is its fraction with active PV cells. GT describes the overall solar
+radiation reached the PV module, whereas ηcell and ηinvert are the elec-
+trical efficiency of the solar cells and inverter, respectively. EPV-STC and
+ηSTC correspond to the ideal PV system's energy output and the nominal
+electrical efficiency of the PV panel measured at standard test conditions
+of 1000 W/m2 irradiance and 25 ◦C cell temperature (TSTC). Tcell and β
+represent
+the
+cell
+temperature
+and
+temperature
+coefficient,
+consecutively.
+To evaluate both investigated storage techniques, a mathematical
+model is used to calculate the amount of electricity produced from
+generators (Egen) and comparing it to the requested electrical loads
+(Ereq). Any surplus electricity is stored for future use, and in case of a
+shortfall, the remaining electricity demand is drawn from storage sys-
+tems. The energy charged to/discharged from (Ech/Edisch) a storage
+system can be computed using Eqs. (7) and (8).
+If Ereq < Egen:
+Ech = Egen −Ereq
+(7)
+Else:
+Edisch = Ereq −Egen
+(8)
+For hydrogen storage and consumption calculations, Eqs. (9–11) are
+used to estimate the consumed power by the incorporated electrolyzer
+(Eele), the amount of hydrogen produced (mH2), along with the fuel cells'
+power (EFC) and thermal energy (QFC) outputs [15,41–43]. Additionally,
+the quantity of electricity stored in the battery unit during charging and
+discharging states are calculated using Eqs. (12) and (13), respectively,
+while its autonomy (Baut) is computed utilizing Eq. (14) [44].
+Eele = mH2 × LHVH2
+ηele
+(9)
+EFC = mH2 × LHVH2 × ηFC
+(10)
+QFC = EFC
+(1 −ηFC
+ηFC
+)
+(11)
+Et+Δt
+stor = Et
+stor + Ech × ηB−ch × Δt
+(12)
+Et+Δt
+stor = Et
+stor −Edisch × Δt
+ηB−disch
+(13)
+Baut =
+VB × CB ×
+(
+100−SoCmin
+100
+)
+PB
+(14)
+where LHVH2 denotes the hydrogen's lower heating value. ηele/ηFC is the
+electrolyzer/fuel cell efficiency, while ηB-ch/ηB-disch designates the
+charging/discharging efficiency of the battery system. Et+Δt
+stor signifies the
+quantity of electricity stored in the battery system at the time of
+charging or discharging processes, while Et
+storis the stored electricity
+when neither process is taking place. Δt is the time step and VB/CB is the
+nominal voltage/capacity of a single battery. SoCmin represents the
+minimum state of charge and PB stands for the load power of the battery.
+3.2. Evaluation criteria
+This section presents the primary metrics used to assess the effec-
+tiveness of the studied ESSs. In energy terms, the performance of these
+scenarios is evaluated employing the parameters outlined in Eqs. (1)–
+(14) and the energy coverage ratio (ECR). The latter is an essential in-
+dicator as it indicates the proportion of energy demand met by the in-
+tegrated RESs, hence evaluating the feasibility of ESSs by considering
+the balance between renewable energy generation and demand. This
+metric can be calculated using Eqs. (15)–(17) [45].
+ECR1 = EPV + EWT
+Ereq
+(15)
+ECR2 = EPV + EWT + EB
+Ereq
+(16)
+ECR3 = EPV + EWT + EFC
+Ereq
+(17)
+where ECR1, ECR2 and ECR3 represent the ECR for ESS 1, 2 and 3,
+respectively. EPV, EWT, EB and EFC are the energy provided by PV, WT,
+battery unit and fuel cells, sequentially.
+To assess the environmental friendliness of the explored systems
+according to every ESS, two primary indicators are used: CPBP and CER.
+They were chosen for their ability to thoroughly assess the environ-
+mental impact and sustainability of different ESSs. The CPBP is
+employed to estimate the period that a system will take to offset the
+emissions generated during its manufacturing, implementation and
+operation, highlighting its long-term environmental benefits. Besides,
+the CER is used to calculate the amount of CO2 emission reductions
+utilizing the examined ESSs compared to the reference scenario in which
+all of the reference building's needs are supplied by the local grid, with a
+carbon emission factor (CEF) of 0.547 kgCO2e/kWh [46]. These metrics
+are evaluated using Eqs. (18) and (19) [47,48]. Indeed, evaluating these
+indicators offers valuable information for decision-makers to identify
+the ESSs with minimal environmental impacts.
+CPBP = EC
+CS
+(18)
+CER = ESC × CEF −EC
+(19)
+where EC is the embodied carbon of the examined system, while CS is its
+resulted annual carbon savings. The embodied carbon values of the main
+systems used in this paper have been meticulously taken from the
+literature and are summarized in Table 4. ESC expresses the overall en-
+ergy supplied to the building and/or injected into the grid using each
+investigated ESS.
+Table 4
+Embodied carbon of the main systems explored in this study.
+Element
+Embodied carbon
+Unit
+Ref.
+PV system
+267.5
+kgCO2e/m2
+[49]
+WT
+11
+gCO2e/kWh
+[50]
+Battery
+200
+kgCO2e/kWh
+[51]
+Hydrogen
+1.26
+gCO2e/gH2
+[8]
+Y. Elaouzy et al.
+Journal of Energy Storage 99 (2024) 113378 
+7 
+
+===PAGE 8===
+The economic profitability of the explored ESSs is assessed utilizing
+five distinct metrics, specifically SPP, DPP, SIR, LCOE and LCOH. These
+metrics were selected because of their comprehensive effectiveness in
+evaluating the economic viability of ESSs. The SPP specifies the time
+required to recover the initial investment in a project. DPP is quite
+similar to SPP with the slight difference that DPP considers the time
+value of money, indicating the long-term financial attractiveness of the
+project. SIR compares the savings to the upfront investment to help
+evaluate the profitability of a given system, and the LCOE/LCOH esti-
+mates the cost of energy/hydrogen production. The formulas for
+calculating these metrics are given in Eqs. (20)–(24) [40,52]. Assessing
+these indicators will provide a comprehensive economic analysis,
+helping stakeholders make appropriate decisions, examine long-term
+viability, and reduce financial risks associated with each studied ESS.
+SPP = CAPEX
+CF
+(20)
+DPP =
+ln
+⎛
+⎜
+⎜
+⎝
+1
+1−CAPEX×d
+CF
+⎞
+⎟
+⎟
+⎠
+ln(1 + d)
+(21)
+SIR =
+∑
+N
+t=0
+St
+(1+d)t
+∑
+N
+t=0
+It
+(1+d)t
+(22)
+LCOE = CAPEX + OPEX
+∑
+N
+t=1
+Et
+(1+d)t
+(23)
+LCOH = CAPEX + OPEX
+∑
+N
+t=1
+(H2)t
+(1+d)t
+(24)
+in which OPEX represents the operating and maintenance costs. Table 5
+outlines the main costs taken in the economic evaluation. CF refers to the
+annual cash flow, while St, It, Et and (H2)t express the savings, in-
+vestments, the generated/stored energy and the amount of hydrogen
+produced during the t-th year, respectively. The system's lifetime is
+denoted by N, and the discount rate is represented by d.
+3.3. Model validation
+In this research, to meticulously calculate the energy needs for both
+HVAC and water heating systems in the reference scenario, alongside
+assessing the energy yields from the examined WT, EnergyPlus software
+was utilized. The accuracy of this tool in evaluating the space heating
+and cooling loads, as well as energy requirements for water heating, has
+been verified in many studies in the literature [59–61]. In addition, the
+reliability of the WT generator model integrated in EnergyPlus has been
+confirmed by numerous researchers [62]. This collective body of
+research strengthens the robustness and reliability of the instruments
+used in the current study, providing a solid foundation for the obtained
+energy-related calculations and analyses. Similarly, the accuracy of
+PVsyst software, utilized in this research to calculate the energy outputs
+of the investigated PV system, has been validated by several studies
+[63–65]. To further corroborate the findings of the explored PV system,
+the productibility and the performance ratio of the investigated PV
+system are compared with those found in the experimental study con-
+ducted by Ameur et al. [66] under comparable climatic conditions. The
+values obtained in the present study are 5.44 Wh/Wp/day and 83.92 %,
+while Ref. [66] found values of up to 5.23 Wh/Wp/day and 86.3 %, with
+corresponding relative errors of 4 % and 2.76 %, respectively.
+Concerning the hydrogen calculation method applied in this paper, it
+is validated by comparing the LCOH achieved in this study with that
+acquired by Berrada and Laasmi [67]. It should be noted that this pre-
+vious work used a similar methodology to evaluate the outputs of the
+hydrogen systems used in the current paper, and their findings were
+validated by experimental and analytical studies published in the liter-
+ature. In the specific context of supplying electricity to PEM electrolyzer
+from a PV system in the Mediterranean climate of Morocco, the resulting
+LCOH in Ref. [67] was 5.8 $/kg, whilst in our study it is approximately
+5.3 $/kg. Comparing the LCOH in these two studies yields a relative
+error of 8.6 %.
+4. Results and discussion
+4.1. Energy performance
+In this section, the energy performance of the investigated ESSs is
+analyzed. Fig. 5 exhibits the amount of power generation using the
+examined PV and WT systems. From this figure, it can be seen that a
+large amount of electricity is generated using the studied PV and WT
+systems, with an annual energy production of 26,238.44 and 8432.49
+kWh, respectively. These values correspond to a productivity of 1988
+Wh/Wp/year for PV system and an annual energy generation of 1124.33
+kWh per unit of rated power of WT. Actually, the maximum share of
+hourly power production is 12.11 kW for the PV system and 6.26 kW for
+the WT system. These values are obtained during the periods when the
+PV system receives the highest solar radiation and when the WT site
+records the highest wind speed. These findings are essential for
+comparing the energy performance of the two investigated RESs and
+therefore assessing their environmental and economic effectiveness.
+The energy requirements of the examined building detailed in Sec-
+tion 2.1 and the power outputs data of the studied PV and WT in-
+stallations presented in Fig. 5 are used to estimate the overall energy
+Table 5
+Main economic data considered for all ESSs.
+Cost
+Unit
+Considered lifetime,
+years
+Ref.
+CAPEX
+PV system
+800
+$/kW
+25
+Local
+market
+Battery
+150
+$/kWh
+10
+[45]
+WT
+1325
+$/kW
+25
+[24]
+Electrolyzer
+1200
+$/kW
+20
+[53]
+Hydrogen tank
+378
+$/kgH2
+25
+[54]
+Fuel cells
+1000
+$/kW
+10
+[55]
+Heat
+exchanger
+500
+$
+15
+Local
+market
+Discount rate
+3
+%
+–
+[56]
+Electricity price
+0.116
+$/kWh
+–
+[57]
+Annual OPEX
+2
+% of
+CAPEX
+–
+[58]
+Fig. 5. Power production using the considered PV and WT systems.
+Y. Elaouzy et al.
+Journal of Energy Storage 99 (2024) 113378 
+8 
+
+===PAGE 9===
+surplus and shortage in the three studied ESSs. The findings of this
+evaluation for the first ESS are outlined in Fig. 6. This figure highlights
+that the annual energy surplus (20,935.10 kWh) is 68.83 % higher than
+energy shortage (12,399.86 kWh). Furthermore, it can be seen that the
+energy shortage increases significantly during the summer period (i.e.,
+4425th–6324th hours), which can mainly be attributed to the elevated
+cooling demand in this period of the year (see Fig. 2).
+The above data are exploited to analyze the energy outcomes of the
+second and third ESSs. The primary energy findings of these scenarios
+are presented in Figs. 7 and 8, consecutively. Fig. 7 shows that delivering
+the excess electricity produced by the considered PV and WT systems to
+the batteries (i.e., in the second ESS) is an energy-efficient method, since
+it provides all the energy requirements of the building under study. In
+this scenario, the overall electricity charged to/discharged from batte-
+ries is about 18,842/16,957 kWh/year. On the other hand, Fig. 8 reveals
+that suppling the excess electricity of PV and WT generators, depicted in
+Fig. 7, to the selected electrolyzer (i.e., in the third ESS) produces around
+440 kg/year of hydrogen, corresponding to 14,655 kWh/year of energy.
+Furthermore, the findings point out that consuming the generated
+hydrogen via the considered fuel cells results in annual electricity and
+heat production of 5862 and 8793 kWh/year, respectively.
+To better compare the energy outputs of the three investigated ESSs,
+these outputs are summarized in Fig. 9. This figure emphasizes that the
+second and third ESSs provide the highest ECR with a value of 100 %,
+while the first ESS achieves lower ECR of 52.56 %. This highlights the
+importance of incorporating both RESs and energy storage systems,
+mainly batteries and hydrogen, into the energy supply chain to achieve
+energy independence, thereby reaching the goal of net zero energy
+buildings. In contrast, the total amount of energy fed into the grid is
+more significant in the first ESS, where no storage system is integrated,
+compared to the second and third ESSs, with values of 20,935, 4558 and
+2255 kWh/year, respectively. These results can be explained by the
+minimum losses of the first ESS, and the increased energy efficiency of
+batteries compared to the hydrogen systems where significant losses
+occurred. Therefore, it is vital to diminish the energy losses within
+hydrogen supply chain, with a specific focus on optimizing efficiency in
+electrolyzers and fuel cells. This approach is critical not only to enhance
+the overall energy efficiency of hydrogen use, but also to merge it
+seamlessly into the energy distribution network.
+4.2. Environmental analysis
+The energy findings reported above and the embodied carbon of the
+materials integrated in every system, listed in Table 4, are used to esti-
+mate the CPBP and CER of the explored ESSs. The results of this
+assessment are shown in Fig. 10. This figure illustrates that the first ESS,
+relying solely on the direct energy supply without using any energy
+storage method, yields the most favorable environmental outcomes with
+the shortest CPBP (one year) and the greatest CER (18.21 tCO2e/year).
+This result can be interpreted by the significant amount of green energy
+supplied to the building and fed into the grid, which is much higher in
+the first ESS than in the two others (see Fig. 9). Additionally, the first ESS
+includes fewer materials than the second and third ESSs, which
+encompass additional equipment for energy storage, thereby raising
+their carbon footprint. On the other hand, it is noticeable that the second
+ESS exhibits longer CPBP but slightly higher CER values compared to the
+third ESS, with values of 1.66 years and 15.13 tCO2e/year for the second
+ESS, and 1.14 years and 14.82 tCO2e/year for the third ESS, respectively.
+These outcomes can be ascribed to the elevated embodied carbon of
+batteries compared to the hydrogen storage method, resulting in an
+extended CPBP for the second ESS in comparison with the third one. This
+point has been confirmed in several previous works, such as in Refs.
+[68–70]. Furthermore, the increased quantity of annual energy supplied
+to the building in the second ESS, as shown in Fig. 9, elucidates the slight
+relative rise in its CER compared to the third ESS. In real-world settings,
+these environmental outcomes could guide decisions regarding the se-
+lection of environmentally friendly ESSs, thereby reducing the carbon
+footprint of the energy sector and improving building sustainability.
+From the above findings, it is clear that the incorporation of RESs for
+energy supply has a substantial role in diminishing the carbon emissions
+of buildings. However, the embodied carbon of some energy storage
+equipment, such as batteries and hydrogen storage systems, hinders the
+environmental feasibility of these technologies. Therefore, minimizing
+the carbon content of equipment used in the energy supply infrastruc-
+ture as well as providing affordable and efficient recycling techniques
+are essential to improving the environmental friendliness of energy
+supply routes using storage methods, like in the second and third ESSs
+examined in this research.
+4.3. Economic feasibility
+In this section, the economic viability of the studied ESSs is explored,
+Fig. 6. Power surplus and shortage in the first ESS.
+Fig. 7. Power charged to/discharged from batteries in the second ESS.
+Fig. 8. Main energy outcomes of the third ESS.
+Y. Elaouzy et al.
+Journal of Energy Storage 99 (2024) 113378 
+9 
+
+===PAGE 10===
+and the primary outcomes are shown in Fig. 11. As this figure empha-
+sizes, the first ESS reveals the best economic findings with the shortest
+SPP/DPP, the lowest LCOE and the highest SIR. These shares are around
+5.80/6.46 years, 0.05 $/kWh and 2.26, respectively. These significant
+economic outcomes of the first ESS can be attributed to the large
+quantity of energy generated by the PV and WT systems, which is
+designed to be directly supplied to the considered building or injected
+into the grid. This study assumes that the price of electricity sold to the
+grid is 80 % of that purchased from it [47]. In addition, the results
+highlight that the second ESS, which employs batteries to store elec-
+tricity, is more economically feasible than the third ESS that uses
+hydrogen for energy storage. This conclusion is supported by the
+respective values of SPP, DPP, LCOE and SIR, which amount to 7.89
+years, 9.13 years, 0.09 $/kWh and 1.44 for the second ESS, while the
+third one exhibits the values of 16.30 years, 22.71 years, 0.21 $/kWh
+and 0.66. The higher cost-effectiveness of the second ESS compared to
+the third one is mainly due to the smaller capital costs required to
+incorporate batteries in contrast to hydrogen systems, which are char-
+acterized by their substantial CAPEXs (Table 5). The minimal losses
+encountered when using batteries are also a critical factor that increases
+the profitability of this energy storage technology compared to the
+hydrogen storage one that still suffers from many energy losses. These
+findings are in line with those reported by Kohol´e et al. [71], high-
+lighting that storing surplus energy generated by PV and WT systems in
+batteries rather than as hydrogen proved to be a more cost-effective
+choice. From another point of view, Zhang et al. [72] indicated that
+the electrolyzer cost is the most critical factor to enhance the economic
+viability of hydrogen storage. Furthermore, Falama et al. [73] outlined
+that enhancing fuel cell energy efficiency is essential for lowering the
+cost of hydrogen-based energy storage systems. This would certainly
+increase the competitiveness of hydrogen as a means of energy storage.
+Fig. 9. Main energy outcomes for every ESS.
+Fig. 10. CPBP and annual CER for each investigated ESS.
+Fig. 11. Economic indicators of each studied ESS.
+Y. Elaouzy et al.
+Journal of Energy Storage 99 (2024) 113378 
+10 
+
+===PAGE 11===
+To summarize, the above results clearly underline that direct supply
+of renewable energy and the use of batteries for electricity storage
+provide significant economic benefits. On the contrary, the inclusion of
+hydrogen for energy storage is not economically viable. In this regard,
+improving the efficiency of hydrogen systems and launching support
+programs to reduce their costs, mainly electrolyzers, hydrogen storage
+tank and fuel cells, is essential for enhancing the cost-effectiveness of the
+third ESS. Besides, as demonstrated in Ref. [68], the introduction of
+carbon pricing policies could have a significant effect on augmenting the
+economic benefits of energy storage in the form of hydrogen, thereby
+encouraging households to adopt such ESSs.
+4.4. Limitations of this study
+First, it is important to note that this study was based on simulation
+data, which may introduce uncertainties in real-world settings regarding
+some parameters, such as actual weather conditions, maintenance costs,
+and embodied carbon. Second, while the economic analysis of ESSs
+offered insights into their cost-effectiveness, it did not account for po-
+tential future changes in energy prices or policy incentives that could
+impact the economic viability of these ESSs. In addition, this study
+focused on three of the most efficient and promising ESSs. However,
+other ESSs have also demonstrated high efficiency, underscoring the
+importance of comparing their effectiveness with those examined in this
+research. This comparison will only be conclusive if other ESSs are
+assessed under similar climatic, economic, and environmental circum-
+stances as those considered in this study.
+Indeed, addressing the above limitations in future works would
+enhance the robustness and applicability of the study's findings. None-
+theless, it is worth mentioning that we have minimized the uncertainty
+of the results as much as possible by incorporating realistic parameters,
+such as building and HVAC system features (Section 2.1), embodied
+carbon (Table 4), and the CAPEX and OPEX of all scenarios (Table 5).
+These parameters were carefully selected based on a thorough review of
+local thermal regulations, the local market, and consultations with local
+companies in the field.
+5. Conclusions
+In this research, the energy, environmental and economic (3E) per-
+formance of three energy supply scenarios was assessed. The explored
+scenarios were designed to provide electricity, heating and cooling to a
+typical residential building under the Mediterranean climate of Tangier,
+Morocco. The first scenario was intended to directly feed the energy,
+generated by the examined photovoltaic and wind turbine systems, into
+the building and inject the extra electricity into the grid, while the
+second and third scenarios involved storing this excess energy in bat-
+teries and as hydrogen, respectively. To achieve this aim, multiple
+software tools, mainly EnergyPlus and PVsyst, and numerical models
+were used. Furthermore, the 3E efficiency of the three scenarios was
+analyzed utilizing key metrics, including ECR, CPBP, CER, SPP, DPP and
+LCOE. The major conclusions from this study can be drawn as follows.
+i. The second and third scenarios achieved the highest ECR with a
+value of 100 %, whilst the first scenario showed lower ECR of
+53.56 %. In contrast, the first and second scenarios exhibited the
+greatest energy efficiencies, delivering more energy than the
+third scenario.
+ii. Environmentally, the first scenario revealed the excellent out-
+comes with a CPBP of one year and a CER of 18.21 tCO2e/year. In
+addition, the third scenario outperformed the second one in terms
+of environmental friendliness, as the former reached a lower
+CPBP of 1.14 years compared to 1.66 years for the latter.
+iii. From an economic perspective, the first scenario showed the best
+economic findings followed by the second one, while the third
+scenario exhibited unfavorable economic results. The obtained
+SPP/DPP values for the first, second and third scenarios were
+found to be 5.80/6.46, 7.89/9.13 and 16.30/22.71 years,
+whereas their LCOE were 0.05, 0.09 and 0.21 $/kWh, sequen-
+tially. Indeed, the findings of this research could be relevant in
+various regions worldwide, characterized by similar conditions in
+terms of weather data, environmental parameters (e.g., carbon
+emission factors), and economic variables including energy pri-
+ces, discount rates, and economic incentives.
+In summary, the outcomes of this work highlighted the substantial
+3E effectiveness of the first and second scenarios; however, the third
+scenario, wherein energy is stored in the form of hydrogen, still faces
+many challenges, especially with regard to energy and economic pros-
+pects. Therefore, more research and development is necessary to
+enhance the energy performance and cost-effectiveness of hydrogen
+production, storage and utilization systems, leading to increase their
+widespread adoption and improve building sustainability.
+CRediT authorship contribution statement
+Y. Elaouzy: Writing – original draft, Software, Methodology,
+Investigation, Formal analysis, Data curation, Conceptualization. A. El
+Fadar: Writing – review & editing, Validation, Supervision, Methodol-
+ogy, Investigation, Formal analysis, Conceptualization. O.B. Achkari:
+Writing – review & editing, Investigation, Formal analysis.
+Declaration of competing interest
+The authors declare that they have no known competing financial
+interests or personal relationships that could have appeared to influence
+the work reported in this paper.
+Data availability
+No data was used for the research described in the article.
+References
+[1] World Green Building Council, Bringing Embodied Carbon Upfront. https://
+worldgbc.org/advancing-net-zero/embodied-carbon/, 2023. (Accessed 22 October
+2023).
+[2] IEA, Buildings. https://www.iea.org/topics/buildings, 2023 (accessed December
+25, 2023).
+[3] L. Al-Ghussain, A.D. Ahmad, A.M. Abubaker, M. Abujubbeh, A. Almalaq, M.
+A. Mohamed, A demand-supply matching-based approach for mapping renewable
+resources towards 100% renewable grids in 2050, IEEE Access 9 (2021)
+58634–58651, https://doi.org/10.1109/ACCESS.2021.3072969.
+[4] N. Niveditha, M.M. Rajan Singaravel, Optimal sizing of hybrid PV–wind–battery
+storage system for net zero energy buildings to reduce grid burden, Appl. Energy
+324 (2022) 119713, https://doi.org/10.1016/j.apenergy.2022.119713.
+[5] Y. Elaouzy, A. El Fadar, Solar and photovoltaics energy utilization and
+sustainability, Ref. Modul. Earth Syst. Environ. Sci. (2023), https://doi.org/
+10.1016/B978-0-323-93940-9.00002-5.
+[6] M.A. Cusenza, F. Guarino, S. Longo, M. Mistretta, M. Cellura, Reuse of electric
+vehicle batteries in buildings: an integrated load match analysis and life cycle
+assessment approach, Energ. Build. 186 (2019) 339–354, https://doi.org/10.1016/
+j.enbuild.2019.01.032.
+[7] R. Hren, A. Vujanovi´c, Y. Van Fan, J.J. Klemeˇs, D. Krajnc, L. ˇCuˇcek, Hydrogen
+production, storage and transport for renewable energy and chemicals: an
+environmental footprint assessment, Renew. Sust. Energ. Rev. 173 (2023) 113113,
+https://doi.org/10.1016/j.rser.2022.113113.
+[8] Y. Elaouzy, A. El Fadar, Water-energy-carbon-cost nexus in hydrogen production,
+storage, transportation and utilization, Int. J. Hydrog. Energy 53 (2024)
+1190–1209, https://doi.org/10.1016/j.ijhydene.2023.12.114.
+[9] T.T. Le, P. Sharma, B.J. Bora, V.D. Tran, T.H. Truong, H.C. Le, et al., Fueling the
+future: a comprehensive review of hydrogen energy systems and their challenges,
+Int. J. Hydrog. Energy (2023), https://doi.org/10.1016/j.ijhydene.2023.08.044.
+[10] I.B. Mansir, E.H. Bani Hani, N. Farouk, A. AlArjani, H. Ayed, D.D. Nguyen,
+Comparative transient simulation of a renewable energy system with hydrogen and
+battery energy storage for residential applications, Int. J. Hydrog. Energy 47
+(2022) 26198–26208, https://doi.org/10.1016/j.ijhydene.2022.02.092.
+[11] G.D. Sharma, M. Verma, B. Taheri, R. Chopra, J.S. Parihar, Socio-economic aspects
+of hydrogen energy: an integrative review, Technol. Forecast. Soc. Change 192
+(2023) 122574, https://doi.org/10.1016/j.techfore.2023.122574.
+Y. Elaouzy et al.
+Journal of Energy Storage 99 (2024) 113378 
+11 
+
+===PAGE 12===
+[12] A. ˇSimelyt˙e, in: M. Tvaronaviˇcien˙e, B. ´Slusarczyk (Eds.), Chapter 13 - promotion of
+renewable energy in Morocco, Energy Transform. Towar. Sustain, Elsevier, 2020,
+pp. 249–287, https://doi.org/10.1016/B978-0-12-817688-7.00013-6.
+[13] O. Achkari, A. El Fadar, Latest developments on TES and CSP technologies – energy
+and environmental issues, applications and research trends, Appl. Therm. Eng. 167
+(2020) 114806, https://doi.org/10.1016/j.applthermaleng.2019.114806.
+[14] I. Ourya, N. Nabil, S. Abderafi, N. Boutammachte, S. Rachidi, Assessment of green
+hydrogen production in Morocco, using hybrid renewable sources (PV and wind),
+Int. J. Hydrog. Energy 48 (2023) 37428–37442, https://doi.org/10.1016/j.
+ijhydene.2022.12.362.
+[15] A. Khouya, Levelized costs of energy and hydrogen of wind farms and concentrated
+photovoltaic thermal systems. A case study in Morocco, Int. J. Hydrog. Energy 45
+(2020) 31632–31650, https://doi.org/10.1016/j.ijhydene.2020.08.240.
+[16] N. Ennemiri, A. Berrada, A. Emrani, J. Abdelmajid, R. El Mrabet, Optimization of
+an off-grid PV/biogas/battery hybrid energy system for electrification: a case study
+in a commercial platform in Morocco, Energy Convers. Manag. X 21 (2024)
+100508, https://doi.org/10.1016/j.ecmx.2023.100508.
+[17] Y. Jung, Y. Heo, H. Cho, Y.T. Kang, Y. Kim, H. Lee, A plan to build a net zero energy
+building in hydrogen and electricity-based energy scenario in South Korea,
+J. Clean. Prod. 397 (2023) 136537, https://doi.org/10.1016/j.
+jclepro.2023.136537.
+[18] L. Jin, M. Rossi, L. Ciabattoni, M. Di Somma, G. Graditi, G. Comodi, Environmental
+constrained medium-term energy planning: the case study of an Italian university
+campus as a multi-carrier local energy community, Energy Convers. Manag. 278
+(2023) 116701, https://doi.org/10.1016/j.enconman.2023.116701.
+[19] Y. Wang, C. Liu, Y. Qin, Y. Wang, H. Dong, Z. Ma, et al., Synergistic planning of an
+integrated energy system containing hydrogen storage with the coupled use of
+electric-thermal energy, Int. J. Hydrog. Energy 48 (2023) 15154–15178, https://
+doi.org/10.1016/j.ijhydene.2022.12.334.
+[20] E. Assareh, A. Dejdar, A. Ershadi, M. Jafarian, M. Mansouri, A.S. Roshani, et al.,
+Techno-economic analysis of combined cooling, heating, and power (CCHP) system
+integrated with multiple renewable energy sources and energy storage units,
+Energ. Build. 278 (2023) 112618, https://doi.org/10.1016/j.
+enbuild.2022.112618.
+[21] H. Dong, C. Xu, W. Chen, Modeling and configuration optimization of the rooftop
+photovoltaic with electric-hydrogen-thermal hybrid storage system for zero-energy
+buildings: consider a cumulative seasonal effect, Build. Simul. 16 (2023)
+1799–1819, https://doi.org/10.1007/s12273-023-1066-5.
+[22] U.S. Department of Energy, EnergyPlus Energy Simulation Software. http
+s://energyplus.net/, 2024 (accessed May 24, 2024).
+[23] Y. Elaouzy, A. El Fadar, A multi-level evaluation of bioclimatic design in
+Mediterranean climates, Sustain. Energy Technol. Assess. 52 (2022) 102124,
+https://doi.org/10.1016/j.seta.2022.102124.
+[24] IRENA, Renewable power generation costs in 2021, Int. Renew. Energy Agency
+(2022) 204. https://www.irena.org/publications/2022/Jul/Renewable-Power-Ge
+neration-Costs-in-2021 (accessed February 25, 2024).
+[25] M. Mortadi, A. El Fadar, Performance, economic and environmental assessment of
+solar cooling systems under various climates, Energy Convers. Manag. (2021)
+114993, https://doi.org/10.1016/j.enconman.2021.114993.
+[26] J. Linssen, P. Stenzel, J. Fleer, Techno-economic analysis of photovoltaic battery
+systems and the influence of different consumer load profiles, Appl. Energy 185
+(2017) 2019–2025, https://doi.org/10.1016/j.apenergy.2015.11.088.
+[27] J. Koskela, A. Rautiainen, P. J¨arventausta, Using electrical energy storage in
+residential buildings – sizing of battery and photovoltaic panels based on electricity
+cost optimization, Appl. Energy 239 (2019) 1175–1189, https://doi.org/10.1016/
+j.apenergy.2019.02.021.
+[28] M. Carmo, D.L. Fritz, J. Mergel, D. Stolten, A comprehensive review on PEM water
+electrolysis, Int. J. Hydrog. Energy 38 (2013) 4901–4934, https://doi.org/
+10.1016/j.ijhydene.2013.01.151.
+[29] O. Achkari, A. El Fadar, Renewable energy storage technologies-a review, Proc.
+Eng. Technol. 35 (2018) 69–79.
+[30] M.R. Usman, Hydrogen storage methods: review and current status, Renew. Sust.
+Energ. Rev. 167 (2022) 112743, https://doi.org/10.1016/j.rser.2022.112743.
+[31] Trimble, SketchUp. https://www.sketchup.com/, 2024 (accessed May 13, 2024).
+[32] U.S. Department of Energy. OpenStudio n.d. http://openstudio.net/ (accessed May
+16, 2024).
+[33] M. Mortadi, A. El Fadar, Begdouri O. Achkari, 4E analysis of photovoltaic thermal
+collector-based tri-generation system with adsorption cooling: annual simulation
+under Moroccan climate conditions, Renew. Energy 221 (2024) 119828, https://
+doi.org/10.1016/j.renene.2023.119828.
+[34] M. Witte, R. Henninger, D. Crawley, Experience Testing EnergyPlus with ASHRAE
+1052-RP Building Fabric Analytical Tests, 2004.
+[35] N.M. Mateus, A. Pinto, G.C. da Graça, Validation of EnergyPlus thermal simulation
+of a double skin naturally and mechanically ventilated test cell, Energ. Build. 75
+(2014) 511–522, https://doi.org/10.1016/j.enbuild.2014.02.043.
+[36] G. Bastos Porsani, Bandera C. Fern´andez, A case study of empirical validation of
+EnergyPlus infiltration models based on different wind data, Buildings (2023) 13,
+https://doi.org/10.3390/buildings13020511.
+[37] S.S. Shrestha, Empirical Validation of Building Energy Simulation Software:
+EnergyPlus, Iowa State University, 2006, https://doi.org/10.26868/
+25222708.2011.1938.
+[38] J. Xu, J. Zou, A.D. Ziegler, J. Wu, Z. Zeng, What drives the change of capacity
+factor of wind turbine in the United States? Environ. Res. Lett. 18 (2023) 64009,
+https://doi.org/10.1088/1748-9326/acce4f.
+[39] S.A. PVsyst, PVsyst – Photovoltaic Software. https://www.pvsyst.com/, 2024.
+(Accessed 10 February 2024).
+[40] Y. Elaouzy, A. El Fadar, Investigation of building-integrated photovoltaic,
+photovoltaic thermal, ground source heat pump and green roof systems, Energy
+Convers. Manag. 283 (2023) 116926, https://doi.org/10.1016/j.
+enconman.2023.116926.
+[41] F. Oueslati, Hybrid renewable system based on solar wind and fuel cell energies
+coupled with diesel engines for Tunisian climate: TRNSYS simulation and
+economic assessment, Int. J. Green Energy 18 (2021) 402–423, https://doi.org/
+10.1080/15435075.2020.1865366.
+[42] E. Bellos, P. Lykas, C. Tzivanidis, Performance analysis of a zero-energy building
+using photovoltaics and hydrogen storage, Appl. Syst. Innov. (2023) 6, https://doi.
+org/10.3390/asi6020043.
+[43] R. Zeng, X. Tang, Y. Deng, X. Zhang, H. Li, W. Yin, et al., Design and optimization
+of solar energy system with hydrogen energy storage and alkaline fuel cell, Energy
+Convers. Manag. 295 (2023) 117628, https://doi.org/10.1016/j.
+enconman.2023.117628.
+[44] O.M. Babatunde, J.L. Munda, Y. Hamam, Off-grid hybrid photovoltaic – micro
+wind turbine renewable energy system with hydrogen and battery storage: effects
+of sun tracking technologies, Energy Convers. Manag. 255 (2022) 115335, https://
+doi.org/10.1016/j.enconman.2022.115335.
+[45] J. Liu, X. Chen, H. Yang, Y. Li, Energy storage and management system design
+optimization for a photovoltaic integrated low-energy building, Energy 190 (2020)
+116424, https://doi.org/10.1016/j.energy.2019.116424.
+[46] European Investment Bank, EIB Project Carbon Footprint Methodologies-
+Methodologies for the Assessment of Project GHG Emissions and Emission
+Variations. https://www.eib.org/attachments/lucalli/eib_project_carbon_footpr
+int_methodologies_2023_en.pdf, 2023 (accessed December 13, 2023).
+[47] Y. Elaouzy, A. El Fadar, Role of carbon tax in the widespread integration of
+sustainable strategies in buildings, Build. Environ. 234 (2023) 110182, https://doi.
+org/10.1016/j.buildenv.2023.110182.
+[48] M. Mortadi, A. El Fadar, Novel design of concentrating photovoltaic thermal
+collector – a comparative analysis with existing configurations, Energy Convers.
+Manag. 268 (2022) 116016, https://doi.org/10.1016/j.enconman.2022.116016.
+[49] T.F. Kristjansdottir, C.S. Good, M.R. Inman, R.D. Schlanbusch, I. Andresen,
+Embodied greenhouse gas emissions from PV systems in Norwegian residential
+zero emission pilot buildings, Sol. Energy 133 (2016) 155–171, https://doi.org/
+10.1016/j.solener.2016.03.063.
+[50] Office of Energy Efficiency & Renewable Energy, How Wind Can Help Us Breathe
+Easier. https://www.energy.gov/eere/wind/articles/how-wind-can-help-us-breath
+e-easier, 2023 (accessed December 12, 2023).
+[51] T. Le Varlet, O. Schmidt, A. Gambhir, S. Few, I. Staffell, Comparative life cycle
+assessment of lithium-ion battery chemistries for residential storage, J. Energy
+Storage 28 (2020) 101230, https://doi.org/10.1016/j.est.2020.101230.
+[52] A. Bahrami, C.O. Okoye, U. Atikol, Technical and economic assessment of fixed,
+single and dual-axis tracking PV panels in low latitude countries, Renew. Energy
+113 (2017) 563–579, https://doi.org/10.1016/j.renene.2017.05.095.
+[53] IRENA, Green hydrogen cost reduction. https://www.irena.org/publications/
+2020/Dec/Green-hydrogen-cost-reduction, 2020 (accessed December 14, 2023).
+[54] C. Houchins, B.D. James, Y. Acevedo, Hydrogen storage cost analysis, US Dep.
+Energy 30 (2021), https://www.hydrogen.energy.gov/docs/hydrogenprograml
+ibraries/pdfs/review21/st100_james_2021_o-pdf.pdf. (Accessed 14 December
+2023).
+[55] H. Mehrjerdi, H. Saboori, S. Jadid, Power-to-gas utilization in optimal sizing of
+hybrid power, water, and hydrogen microgrids with energy and gas storage,
+J. Energy Storage 45 (2022) 103745, https://doi.org/10.1016/j.est.2021.103745.
+[56] Trading Economics, Indicators. https://tradingeconomics.com/morocco/indicato
+rs, 2024 (accessed May 28, 2024).
+[57] Global Petrol Prices, Electricity prices around the world. https://www.globalpetro
+lprices.com/electricity_prices/, 2023 (accessed June 3, 2024).
+[58] Andrey Solyanik, Analysis of cost efficiency of hydrogen production via
+electrolysis: the Russian case study, E3S Web Conf. 289 (2021) 4002, https://doi.
+org/10.1051/e3sconf/202128904002.
+[59] Y. Yoon, S. Jung, P. Im, M. Salonvaara, M. Bhandari, N. Kunwar, Empirical
+validation of building energy simulation model input parameter for multizone
+commercial building during the cooling season, Renew. Sust. Energ. Rev. 188
+(2023) 113889, https://doi.org/10.1016/j.rser.2023.113889.
+[60] P. Haves, B. Ravache, A. Fergadiotti, C. Kohler, M. Yazdanian, Accuracy of HVAC
+load predictions: validation of EnergyPlus and DOE-2: using an instrumented test
+facility, Proc. Build. Simul. (2019), https://doi.org/10.26868/
+25222708.2019.211268.
+[61] B. Shen, K. Nawaz, V. Baxter, A. Elatar, Development and validation of quasi-
+steady-state heat pump water heater model having stratified water tank and
+wrapped-tank condenser, Int. J. Refrig. 87 (2018) 78–90, https://doi.org/10.1016/
+j.ijrefrig.2017.10.023.
+[62] E. Muljadi, Y.C. Zhang, V. Gevorgian, D. Kosterev, Understanding dynamic model
+validation of a wind turbine generator and a wind power plant, in: 2016 IEEE
+Energy Convers. Congr. Expo, IEEE, 2016, pp. 1–5.
+[63] D.D. Milosavljevi´c, T.S. Kevki´c, S.J. Jovanovi´c, Review and validation of
+photovoltaic solar simulation tools/software based on case study, Open Phys. 20
+(2022) 431–451, https://doi.org/10.1515/phys-2022-0042.
+[64] F.F. Ahmad, M. Abdelsalam, A.K. Hamid, C. Ghenai, W. Obaid, M. Bettayeb,
+Experimental validation of PVSYST simulation for fix oriented and azimuth
+tracking solar PV system BT - modelling, simulation and intelligent computing, in:
+N. Goel, S. Hasan, V. Kalaichelvi (Eds.), Singapore: Springer Singapore, 2020,
+pp. 227–235.
+[65] N. Riedel-Lyngskær, D. Berrian, D. Alvarez Mira, A. Aguilar Protti, P.B. Poulsen,
+J. Libal, et al., Validation of bifacial photovoltaic simulation software against
+Y. Elaouzy et al.
+Journal of Energy Storage 99 (2024) 113378 
+12 
+
+===PAGE 13===
+monitoring data from large-scale single-axis trackers and fixed tilt systems in
+Denmark, Appl. Sci. 10 (2020), https://doi.org/10.3390/app10238487.
+[66] A. Ameur, A. Sekkat, K. Loudiyi, M. Aggour, Performance evaluation of different
+photovoltaic technologies in the region of Ifrane, Morocco, Energy Sustain. Dev. 52
+(2019) 96–103, https://doi.org/10.1016/j.esd.2019.07.007.
+[67] A. Berrada, M.A. Laasmi, Technical-economic and socio-political assessment of
+hydrogen production from solar energy, J. Energy Storage 44 (2021) 103448,
+https://doi.org/10.1016/j.est.2021.103448.
+[68] Y. Elaouzy, A. El Fadar, Potential of thermal, electricity and hydrogen storage
+systems for achieving sustainable buildings, Energy Convers. Manag. 294 (2023)
+117601, https://doi.org/10.1016/j.enconman.2023.117601.
+[69] M.A. Pellow, C.J.M. Emmott, C.J. Barnhart, S.M. Benson, Hydrogen or batteries for
+grid storage? A net energy analysis, Energy Environ. Sci. 8 (2015) 1938–1952,
+https://doi.org/10.1039/C4EE04041D.
+[70] L. Li, B. Wang, K. Jiao, M. Ni, Q. Du, Y. Liu, et al., Comparative techno-economic
+analysis of large-scale renewable energy storage technologies, Energy AI 14 (2023)
+100282, https://doi.org/10.1016/j.egyai.2023.100282.
+[71] Y.W. Kohol´e, C.A. Wankouo Ngouleu, F.C.V. Fohagui, G. Tchuen, Quantitative
+techno-economic comparison of a photovoltaic/wind hybrid power system with
+different energy storage technologies for electrification of three remote areas in
+Cameroon using Cuckoo search algorithm, J. Energy Storage 68 (2023) 107783,
+https://doi.org/10.1016/j.est.2023.107783.
+[72] Y. Zhang, A. Lundblad, P.E. Campana, J. Yan, Comparative study of battery storage
+and hydrogen storage to increase photovoltaic self-sufficiency in a residential
+building of Sweden, Energy Procedia 103 (2016) 268–273, https://doi.org/
+10.1016/j.egypro.2016.11.284.
+[73] R.Z. Falama, A.S. Saidi, M.H. Soulouknga, Salah C. Ben, A techno-economic
+comparative study of renewable energy systems based different storage devices,
+Energy 266 (2023) 126411, https://doi.org/10.1016/j.energy.2022.126411.
+Y. Elaouzy et al.
+Journal of Energy Storage 99 (2024) 113378 
+13 
+

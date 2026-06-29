@@ -1,0 +1,99 @@
+{
+  "Paper Information": {
+    "Paper Name": "Techno-economic feasibility and performance analysis of an islanded hybrid renewable energy system with hydrogen storage in Morocco"
+  },
+  "Performance Metrics": {
+    "TOTAL ANNUAL LOAD DEMAND": null,
+    "LCOE": "$0.0701/kWh",
+    "LPSP": null,
+    "COE": null
+  },
+  "Generator Configurations": {
+    "rated_PV": null,
+    "v_cut_in": null,
+    "v_rated": "13.50 m/s",
+    "rated_power": "605 kW",
+    "Cap_H2": "750.5 kg",
+    "Cap_FC": "300 kW",
+    "Cap_EL": "500 kW",
+    "Cap_DG": "1500 kW",
+    "H_min_percentage": "10%",
+    "H_max_percentage": "90%"
+  },
+  "Diesel Constants": {
+    "f_0": null,
+    "f_1": null
+  },
+  "Efficiency Parameters": {
+    "eta_PV": null,
+    "eta_FC": "56.6%",
+    "eta_EL": null,
+    "eta_INVT": "96.53%",
+    "H2_LHV": null
+  },
+  "Capital Costs": {
+    "c_PV": null,
+    "c_WT": "$1300/kW",
+    "c_H2": "$100/m3",
+    "c_FC_cap": "$600/kW",
+    "c_EL_cap": "$151/kW",
+    "c_DG_cap": "$230/kW",
+    "c_INVT": "$550/kW"
+  },
+  "Operating Costs": {
+    "c_FC": "$0.01/h/kW",
+    "c_DG": "$0.007/kWh",
+    "c_EL": "$8/year/kW",
+    "c_DG_FUEL": "$0.1/m3"
+  },
+  "O&M Costs": {
+    "om_PV": null,
+    "om_WT": "$26.7/kW",
+    "om_H2": "$0.5/m3",
+    "om_FC": null,
+    "om_EL": null,
+    "om_DG": null,
+    "om_INVT": "$5/kW/year"
+  },
+  "Replacement Costs": {
+    "rc_PV": null,
+    "rc_WT": "$1300/kW",
+    "rc_H2": "$100/m3",
+    "rc_FC": "$600/kW",
+    "rc_EL": "$151/kW",
+    "rc_DG": "$210/kW",
+    "rc_INVT": "$450/kW"
+  },
+  "Emission Factors": {
+    "e_FC": null,
+    "e_DG": null,
+    "e_EL": null
+  },
+  "Economic Parameters": {
+    "T_life": "20 years",
+    "r": "9.3%",
+    "p_grid": null
+  },
+  "Technical Parameters": {
+    "A_PV": null,
+    "P_DG_min": "0 kW"
+  },
+  "Component Lifetimes": {
+    "life_PV": null,
+    "life_WT": "20 years",
+    "life_H2": "20 years",
+    "life_FC": "10 years",
+    "life_EL": "20 years",
+    "life_DG": "15000 h",
+    "life_INVT": "15 years"
+  },
+  "System Configuration": {
+    "N_PV": null,
+    "N_WT": 1,
+    "N_H2": 1,
+    "N_FC": 1,
+    "N_EL": 1,
+    "N_DG": 5
+  },
+  "NOTES": "No PV in this system (wind/hydrogen/diesel only). TOTAL ANNUAL LOAD DEMAND not explicitly reported; daily consumption is 7680 kWh/day, 320 kW average, 639 kW peak. LPSP not reported. COE not reported (LCOE reported instead at $0.0701/kWh). v_cut_in not reported in extracted text. rated_power: Table 1 says 605 kW, but text and Table 4 capacity column say 600 kW. eta_FC: fuel cell efficiency of 56.6% reported. eta_INVT: DC/AC converter efficiency 96.53% (AC/DC converter at 95.91%). H2_LHV not reported (HHV mentioned instead). c_FC, c_DG, c_EL recorded as O&M costs from Table 4 (paper combines operating and maintenance into single O&M values). e_FC, e_DG, e_EL not explicitly reported per component; paper states Morocco grid emission factor EF=0.748 tCO2/MWh for CO2 reduction calculation. om_WT: $26.7/kW from Table 4 wind turbine O&M. c_FC recorded as $0.01/h/kW from Table 4 fuel cell O&M row. c_EL recorded as $8/year/kW from Table 4 electrolyzer O&M. c_DG recorded as $0.007/kWh from Table 4 diesel O&M. om_INVT: $5/kW/year from converter O&M (both AC/DC and DC/AC). c_DG_FUEL: $0.1/m3 for diesel fuel. Hydrogen storage: 400 bar, 50 m3 capacity. P_DG_min: lower limit set to 0 kW, upper limit 360 kW per unit. Renewable fraction: 44.57%. No battery storage (hydrogen only). NPVCost: $2,650,843. NPVProduction: 37,819,172 kWh. Annual energy production: 4,714,559 MWh/year. T_life: 20 years (project lifespan). r: 9.3% discount rate."
+}

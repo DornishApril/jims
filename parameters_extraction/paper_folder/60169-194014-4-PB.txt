@@ -1,0 +1,1481 @@
+                     Int. J. Renew. Energy Dev. 2024, 13 (3), 491-507
+                                                                                                                                       | 491
+
+Contents list available at CBIORE journal website
+
+International Journal of Renewable Energy Development
+
+Journal homepage: https://ijred.cbiore.id
+
+                                                                                                                                                                                                     Research Article
+
+Multi-criteria optimal sizing and analysis of PV/wind/fuel
+cell/battery/diesel generator for rural electrification: A case study in
+Chad
+
+Mahamat Adoum Abdoulayea,b  , Sebastian Waitaa , Cyrus Wabuge Wekesac ,
+Julius Mwakondo Mwaboraa
+
+aDepartment of Physics, University of Nairobi, PO Box 30197-00100, Nairobi, Kenya
+bDistributed Energy Team, Jeju Global Research Center, Korea Institute of Energy Research, (63357) 200, Haemajihaean-ro, Gujwa-eup, Jeju-si, Jeju, South
+Korea
+cSchool of Engineering, University of Eldoret, PO Box 1125-30100, Eldoret, Kenya
+
+Abstract. Access to sustainable, clean, affordable, and reliable electricity is crucial for social and economic development, yet Sub-Saharan Africa
+(SSA) struggles significantly in this context. In CHAD, only 11.3% of the population is able to access electricity, making it one of the least electrified
+countries in SSA with the lowest clean energy access. In rural areas, electricity access falls to just 1.3%. This research applies and executes a Multi-
+Objective Particle Swarm Optimization (MOPSO) algorithm using MATLAB R2023b to assess the techno-economic, environmental, and social impacts
+of a hybrid system based on optimal PV/Wind/Battery/Fuel Cell (FC)/Diesel generator (DG) sizing for rural electrification in CHAD. The proposed
+system's self-sufficiency index (SSSI) and the Annualized System Cost (ASC) were chosen as objective functions to guarantee the economic feasibility
+of the system, higher self-sufficiency, and lower dependence on external energy sources (DG). The simulation results show that the optimal size of
+the proposed system supplies the load demand by 100% of the renewable energy sources (RES) fraction, and the optimal capacities of the main
+components to supply the load demand are: Solar Power (493 KW), Wind Turbine (166 KW), Battery Energy Charge/Discharge (229180 kWh /221300
+kWh), Hydrogen tank storage energy (83 874 kWh), Electrolyzer size (202 KW), Fuel cell size (144 KW). The evelized cost of electricity (LCOE) of
+0.2982 $/kWh, which is 51.12% lower than the national unit production costs of electricity in rural areas of CHAD (0.61 $/kWh). This LCOE is also
+the lowest compared to previous works done using HOMER Pro for the country of CHAD. The results also give a levelized cost of hydrogen (LCOH)
+of 3.8563 US $/kg, lower than for all studies found in the literature for the country of Chad. The proposed system's yearly avoided greenhouse gas
+(GHG) emission is 374 640 kg. The proposed system will create five (5) new jobs (JCO) and improve the Human Development Index (HDI) of the
+study area by 17.66% (the obtained HDI is 0.4683, and the CHAD HDI is 0.398) with an SSSI of 51.14%. This study provides a better practical energy
+design tool in decision-making for designers, companies, investors, policymakers, and the Chadian government when implementing this type of
+system in particular rural locations.
+
+Keywords: Avoided greenhouse gas (GHG), social assessment, Hybrid energy system, Optimal sizing, rural electrification, Particle Swarm
+Optimization algorithm, zero-carbon electricity.
+
+                 @ The author(s). Published by CBIORE. This is an open access article under the CC BY-SA license
+                                                                             (http://creativecommons.org/licenses/by-sa/4.0/).
+
+Received: 27th February 2024; Revised: 6th April 2024; Accepted: 15th April 2024; Available online: 18th April 2024
+
+1. Introduction                                                    list (Casati et al., 2023). This lack of access clean energy
+                                                                   negatively influences education, communication, and access to
+Access to contemporary energy is critical for economic and         quality care. Traditional energy sources can only satisfy the
+social development, but Africa confronts significant difficulties  demand for electricity by addressing the difficulties harmful
+in this regard. Due to the usage of environmentally harmful        emissions of gases as well as elevated fuel life cycle costs
+energy sources like wood and charcoal coupled with restricted      (Bahramara et al., 2016). Renewable energy sources (RES) are
+access to clean energy resources, SSA is for instance,             accessible, inexhaustible, and eco-friendly. As the world's
+characterized by economic retardation and poverty                  population continues to grow and the imperative to decrease
+(Agoundedemba et al., 2023). CHAD ranks among the countries        carbon dioxide (CO2) emissions intensifies, the search for
+with the lowest levels of electrification in SSA, with only 11.3%  sustainable and renewable energy is expanding rapidly globally
+of its population has electricity access. This proportion of the   (Shafiullah et al., 2021); (Hassane et al., 2022).
+population with electricity access is considerably lower in
+remote areas of CHAD (1.3%) (The World Bank Group, 2021).                 Accelerating rural electrification is an efficient strategy for
+Based on a comparison of the 35 SSA nations' social index of       lowering carbon dioxide emissions. One of the most prominent
+access to clean energy (Social CEA), Chad is ranked last on the    RES under consideration is photovoltaic (PV) electricity
+                                                                   generation (Fu, 2022). Zhang et al. concluded from their
+
+ Corresponding author
+Email: mahamatadoumabdoulaye1@gmail.com (M. A. Abdoulaye)
+
+                                                                                           https://doi.org/10.61435/ijred.2024.60169
+                                                                   ISSN: 2252-4940/© 2024.The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                                                                   Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+experiment that wind energy integration can affect the                                                                                    | 492
+reduction of CO2 emissions via the use of hydrogen-energy
+storage (Y. Zhang & Yu, 2022). Due to the variability of RES,          technical criteria, five (5) sub-criteria have been considered: The
+combining an energy storage system (ESS) with RES is an option         System Self-Consumption Index (SSCI), the System Self-
+for increasing system reliability (Wang et al., 2021). Currently,      Sufficiency Index (SSSI), the Loss of Load Probability (LOLP),
+electrochemical energy storage systems (ESS), such as lithium          the unmet load, and the energy excess. For the economic
+and lead-acid batteries, dominate the market (Xu et al., 2022).        criteria, we considered the Net Present cost (NPC), the
+For instance, these electrochemical ESS are unsuitable for the         Levelized Cost of Energy (LCOE), the Levelized Cost of
+long-term storage necessary for RES because they are only cost-        Hydrogen (LCOH), and the fuel cost. The environmental criteria
+effective for short-term storage. Also, their technological            evaluate the avoided carbon dioxide (CO2) and the renewable
+progress may be limited because they need more lithium and             energy fraction. The new job creation opportunity, the Human
+cobalt, which are essential parts of their technology (Albertus et     Development Index (HDI) improvement, and the social
+al., 2020); (Olivetti et al., 2017). As a result, there has been a     acceptance have been considered as social criteria.
+search for various ESS alternatives that can work in hybrid or
+independently (Bocklisch, 2015). The green hydrogen storage                   The objective of this research is to perform a techno-
+system is one of the most often used alternatives nowadays due         economic, environmental, and social analysis of a multi-criteria
+to its environmentally friendly nature and minimal                     hybrid system based on optimal sizing of solar photovoltaic
+environmental footprint, and hydrogen may be transported to            (PV), wind, battery, fuel cell, and diesel generator (DG) for rural
+the desired area if storage is low (Al-Buraiki & Al-Sharafi, 2022;     electrification in CHAD using a multi-objective particle swarm
+J. Li et al., 2022). According to (Delano et al., 2020; (Aziz et al.,  optimization (MOPSO) algorithm that is implemented and runs
+2019); León Gómez et al., 2023), a hybrid off-grid system proves       in the MATLAB R2023b environment.
+to be a more reliable and economical option for rural
+electrification compared to a single energy source system.             2. Materials and method
+
+       Many previous works in the subregion have been carried          2.1 Problem statement and significance of the study
+out in modeling and optimizing hybrid RES, considering
+hydrogen and/or battery storage options with various                          Chad ranks among the countries with the lowest
+configurations and methods. To the best of our knowledge, only         electrification rates globally, with just 11.3% of its populace
+few have been carried out for some sites in Chad (Diop et al.,         having electricity access. In Chad's rural regions, this figure
+2019); Wu et al., 2019; Jahangiri et al., 2019; Hassane et al., 2022;  drops significantly to merely 1.3% (The World Bank Group,
+Hassane, Didane et al., 2022; Kelly et al., 2023).                     2021). Furthermore, in Chad, 75% of the population continues
+                                                                       to reside in remote regions (Hassane et al., 2018; Hassane et al.,
+       In (Hassane et al., 2022; Hassane, Didane et al., 2022), the    2022), so access to electricity enables the population to have
+authors compared and analyzed six different hybrid system              lighting after sunset, significantly extending the duration of
+scenarios across five remote locations in Chad to evaluate the         productive tasks. It also provides households with the
+technical, economic and environmental viability. In (Kelly et al.,     opportunity to adopt clean cooking techniques, as opposed to
+2023), using HOMER software, the authors modeled and                   the hazardous and polluting fuels like wood and charcoal, which
+simulated a hybrid system comprising off-grid                          are commonly used by the large portion of the rural population
+PV/DG/Wind/Batteries, which was evaluated across 16                    in Chad (Hassane et al., 2019). The absence of electricity in rural
+unelectrified regions in Chad, taking into account three distinct      areas of Chad adversely affects education, communication,
+community load profiles for each region. (Diop et al., 2019)           access to quality care, and the Human Development Index
+Designed and evaluated the technological, economic, and                (HDI). Chad's HDI stands at 0.398, categorizing it under "low
+ecological dimensions of a hybrid system that includes PV              human development" globally, ranking 187th among 189
+panels, winds, diesel generators, and batteries for three climatic     countries and territories (PNUD, 2020). Rural electrification in
+regions of Chad using HOMER. In (Wu et al., 2019), The authors         Chad encounters several challenges (technical, economic,
+explored the viability of using solar/wind/DG/batteries to meet        environmental, and social) that need to be overcome. A major
+the energy requirements of Amjarass (a Chadian town), And in           hurdle is financing, given the country's insufficient resources to
+(Jahangiri et al., 2019), the authors evaluated the Grid-              support costly electrification initiatives. Additionally, the
+connected PV/Wind/Hydrogen storage system feasibility to               inadequacy of electricity infrastructure in rural regions presents
+supply electricity in 25 locations across Chad.                        further difficulties, especially since the population is spread out
+                                                                       across Chad's countryside (Djounga, 2023). Sustainability is a
+       However, there are some limitations to these previous           crucial concern, as climate change may impact the stability and
+works: in (Jahangiri et al., 2019), even though 25 Chadian             longevity of the electricity grid. The absence of sustainable and
+locations were taken into account, only a single load profile was      decentralized electrification systems in Chad's rural areas is a
+utilized for each location. Although the four potential load           significant and urgent problem (Mbainaissem et al.; PNUD,
+profiles in each of the three climatic zones of Chad were              2014). The cost of electricity is a major issue, as the electricity
+examined by (Diop et al., 2019), the authors assumed that the          supplied by Chad's National Electricity Company (SNE) is
+Faya, Pala, and Abeche sites were indicative of the entire             among the highest-priced in Central Africa. The average resale
+country. (Wu et al., 2019) focused their study on a single site,       price per kilowatt-hour (kWh) stands at 157 F CFA (0.25 USD),
+Amjarass, and examined one hypothetical load profile.                  yet it is sold at a loss due to the SNE's unit production costs
+                                                                       ranging from 252 F CFA to 375 F CFA (0.41 to 0.61 USD) per
+       None of the works done in Chad has explored off-grid            kWh in urban and rural areas, respectively. This pricing
+PV/Wind/Battery/FC/DG systems for rural electrification.               structure hinders the population's access to electricity
+Also, all these previous works focused on techno-economic and          (Abdelhamid, 2023). The National Electricity Company (SNE) of
+environmental factors, and none of them considered social              Chad is limited to producing and distributing electricity in just 7
+criteria, especially the job creation opportunities and the            out of the 23 regions in Chad, leaving 16 regions without
+improvement of the Human Development Index by their                    electricity. Many remote areas in Chad still struggle with
+proposed systems.                                                      accessing electricity. The constant availability of power is a
+                                                                       challenge because of the elevated costs of fuel and insufficient
+       To fill these gaps identified in the prior studies, we propose  electricity infrastructure. In certain rural parts of Chad,
+a multi-criteria hybrid system to electrify rural areas within the     electricity is available to the population for approximately four
+scope of Chad by considering fourteen (14) sub-criteria. For the
+
+ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                                            Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+                                                                                                                                 | 493
+
+Table 1
+Load profile for the studied area by types of households by category of consumption
+
+Type 1 households
+
+Devices used by the households   Lamps  Phone charge                                 Television  Ventilator  Fridge
+                                                                                                     40       200
+Power (W)                        40                                 20               200              0         0
+                                                                                                      0         0
+Number of devices                3                                  1                0                0         0
+                                                                                                      0         0
+Duration of use (hour/day)       6                                  2                0
+                                                                                                 Ventilator  Fridge
+Total power (W)                  120                                20               0               40       200
+                                                                                                      0         0
+Daily Energy (Wh) by device      720                                40               0                0         0
+                                                                                                      0         0
+Type 2 households                                                                                     0         0
+
+Devices used by the households   Lamps  Phone charge                                 Television  Ventilator  Fridge
+                                                                                                     40       200
+Power (W)                        40                                 20               200              2         1
+                                                                                                      8         8
+Number of devices                5                                  1                1               80       200
+                                                                                                     640      1600
+Duration of use (hour/day)       6                                  2                4
+
+Total power (W)                  200                                20               200
+
+Daily Energy (Wh) by device      1200                               40               800
+
+Type 3 households
+
+Devices used by the households   Lamps  Phone charge                                 Television
+
+Power (W)                        40                                 20               200
+
+Number of devices                3                                  1                1
+
+Duration of use (hour/day)       6                                  2                4
+
+Total power (W)                  120                                20               200
+
+Daily Energy (Wh) by device      720                                40               800
+
+Source : (Hassane et al., 2022)
+
+hours daily, between 6 p.m. and 10 p.m (Kelly et al., 2023). The                Fig. 1 Load profile for 24 hours of the studied area
+lack of affordable and reliable electricity severely restricts
+development, perpetuating poverty, slowing education, and                  Figure 1 shows the load profile for 24 hours of the studied
+limiting economic opportunities for the Chadian rural               area. From Figure 1, we notice that the peak load demand for
+community.                                                          the studied area is between 6 p.m. and 10 p.m. with a value of
+                                                                    144 KW. The average load is reached at 4 p.m. with a value of
+       Considering all the above Chadian rural electrification      91 KW. The minimum low load profile is reached at 5 p.m. with
+challenges, this study addresses a techno-economic,                 a value of 24 KW. The particularity of these three types of
+environmental, and social analysis based on                         households is that the load consumption is zero from 1 a.m. to
+PV/Wind/Battery/Fuel Cell/DG using a MOPSO algorithm.               7 a.m. 30.
+The proposed optimization model aims to balance the energy
+between the demand for power and its supply and the charging                 Figures 2 represents the 24 hours meteorological data,
+process of battery and hydrogen storage by defining the             respectively, the solar irradiance, wind speed, and the ambient
+installed capacities of the main components, and Diesel             temperature of the studied area. From this Figure 2, we can also
+generator while minimizing the ASC and maximizing the SSSI          note that the maximum and minimum solar irradiance, wind
+and obtaining the values of the other sub-criteria which serve as   speed, and ambient temperature are 1017 W/m2 and 0, 4.14
+decision-making variables for this feasibility analysis. primary    m/s and 2.62 m/s, 29.37 0C and 16.19 0C.
+objective of this research is to maximize the use of PV, Wind,
+Battery, and hydrogen while minimizing the use of Diesel                   Table 1 shows the three types of household load profiles
+generator.                                                          used in this study that represent low, medium, and high
+                                                                    community consumers obtained through a survey (Hassane,
+2.2 Study area, load profile, and meteorological data               Didane et al., 2022). In the context of Chad, these three types of
+                                                                    households can be identified in the country's rural and non-
+       The present study was carried out in KOUNDOUL, Chari         electrified areas.
+Baguirmi, with geographical coordinates 11° 58 35 North and
+15° 09 00 East, where live (5,000 - 9,000) people in the rural
+area of the sahelian zone of Chad.
+
+       In this study, to perform the optimization outcomes for the
+PV/Wind/Battery/Fuel cell/Diesel generator, the PSO
+algorithm needs extra input data, such as the hourly load profile
+(Figure 1) and the meteorological data of the study area
+collected from the Photovoltaic Geographical Information
+System (PVGIS) website (Figures 2), and the characteristics
+techno-economic of components collected from the literature
+(Table 2).
+
+                                 ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                                               Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+                                                                                                                                    | 494
+
+          Fig. 2 Studied area's meteorological data for 24 hours      2.3.2 Control strategy
+
+2.3 System configuration, Control strategy, and energy management         The proposed model controls the energy flow management
+system                                                                of different technologies (BES, PV, Wind, and FC), to fulfill the
+2.3.1 Presentation of the proposed system configuration               load requirement with maximum efficiency. In this standalone
+The proposed system's schematic configuration considered in           model, if the electricity from PV/Wind/FC/BES unable to
+the present study is illustrated in Figure 3. In this system, the     supply the load, the missing load will be supplied by the DG. i.e.,
+load requirement is met by RES, Battery (BES), Fuel Cell (FC),        (PPV(t) + PWT(t) + PFC(t) + PBES(t) < Pload(t)).
+and Diesel Generator (DG) as a backup. Direct current (DC) bus
+is used as the connector of PV panels, Wind, FC, BES, Hydrogen            A novel MOPSO algorithm is used as the control dispatch.
+Tank (HT), and Electrolyzer. Electrolyzer utilizes input power        The model determines the optimal dimensions for each
+from PV panels/Wind to generate green hydrogen, this                  component and the optimal control of the power distribution
+hydrogen is then converted into electrical energy through a fuel      among the components.
+cell, which is used to meet energy demands. The proposed
+system have electrical demand, i.e., or alternative current AC.           The proposed control dispatch aims to balance the energy
+Therefore, converters are utilized for converting energy from         between power consumption and provision, and the charging
+DC to AC, and satisfy the power demand.                               process of battery and hydrogen storage while minimize NPC.
+                                                                      The working principles of the novel control dispatch were based
+       With this proposed system configuration, we obtained a         on the design objective. As previously mentioned, the proposed
+completely autonomous electrical grid integrating zero-carbon         model is aimed at designing an off-grid system
+electricity generation (PV and Wind). We are thus talking about       (PV/Wind/FC/BES/DG) that maximizes the utilization of fuel
+an "island" mini-local grid (off grid) with low short-circuit power.  cell power output and minimizes the cost.
+This proposed system with a continuous common bus                     The working principles of the proposed operating strategies are
+configuration is more suitable for small power island generation,     as bellow:
+which matches the need of the Chadian rural area power
+requirement.                                                          Case 1. If the combined produced power from PV + Wind
+                                                                      surpasses the required load, the demand is supplied by the
+       The main advantages of the proposed system are the             output power from RES, and the extra electricity charges the
+complementarity of resources, particularly wind and solar,            BES; otherwise, the excess electricity will be utilized for
+whether on an annual or daily scale, more reliable energy             hydrogen production to store in the HT. The FC is still not
+availability, and environmental efficiency.                           turned on.
+One of the goals of this research is to maximize the use of solar,
+wind, battery, and hydrogen, respectively, and minimize the use       Case 2. If the produced electricity by PV + Wind surpasses the
+of diesel generators as much as possible.                             required load, the required load is fulfilled by the RES output,
+                                                                      and BES is fully charged and HT is also filled. Then surplus
+  Fig. 3 Configuration of the proposed system: PV - Wind -Battery     energy is dumped.
+  - Fuel cell ­ DG
+                                                                      Case 3. If the required load surpasses the PV + Wind power
+                                                                      output, BES is discharged to fulfill load demand. The algorithm
+                                                                      favors the RES and BES to satisfy the energy demand.
+
+                                                                      Case 4. In case of RES and BES cannot fulfill the power
+                                                                      requirement, FC runs. i.e., (PPV(t) + PWT(t) + PBES(t) <
+                                                                      Pload(t)), The FC generates the excess power necessary to fulfill
+                                                                      the specified load demand; i.e., (PFC(t) = Pload(t) - PPV(t) -
+                                                                      PWT(t) - PBES(t)).
+
+                                                                      Case 5. If the electricity from PV/Wind/FC/BES unable to
+                                                                      match the energy demand, i.e., (PPV(t) + PWT(t) + PFC(t) +
+                                                                      PBES(t) < Pload(t)), then the missing load energy is purchased
+                                                                      from DG.
+
+                                                                      2.3.3 Energy and power management system
+
+                                                                      Figure 4 shows the proposed system's energy management
+
+                                                                      system flowchart. As mentioned above, the proposed control
+
+                                                                      dispatch aims to balance the energy between power
+
+                                                                      consumption and provision and the charging process of battery
+
+                                                                      and hydrogen storage while minimizing NPC. The proposed
+
+                                                                      algorithm aims to optimally design the system
+
+                                                                      (PV/Wind/FC/BES/DG) that maximizes fuel cell power output
+
+                                                                      utilization and minimizes the cost. The abbreviations used in the
+
+                                                                      flowcharts are listed below:
+
+                                                                      PWT(t)          : Wind turbine power
+                                                                      PPV(t) / Ps(t)  : Power of solar
+                                                                                      : Power demand at time t
+                                                                      PL(t)           : Inverter efficiency
+                                                                                      : Available power for charging the battery
+                                                                      Inv             : Charged energy into the battery
+                                                                      Pch(t)          : Power intended for discharge from the
+                                                                      Ech(t)
+                                                                      Pdistch(t)
+
+                       ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                                              Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+                                                                                                                                   | 495
+
+                                                                  Start
+
+                                                                 Read
+                                                                 nput
+                                                                 Data
+
+                                            For loop 8760 times
+
+                           No                       ()   +  ()
+
+                                                     ()                                  Yes
+
+                         () = ( ()/ ) -  () -
+                                               ()
+
+                                () =   (). 1
+
+                        ( - 1) -                    () = (()+()  ) - ()
+                        ()                                        () =  (). 1
+
+                                            Yes
+
+                       No                    () =  ( - 1) -   ()
+
+                         
+                            the
+                            deficient load
+
+                                
+
+                                                                               () 
+                                                                              ( +  ( - 1))
+
+                                                                         Yes                   No
+
+                                                                  () =  ( - 1) +                                         ()=
+                                                                                           
+                            
+
+                                                                                Return
+
+                       Fig. 4 Flowchart for the control strategy of the proposed system
+
+Edistch(t)              battery                                               in the study: Air mass (AM=1.5), Tam=20°C, and the solar
+Ebmax                  : Battery discharged energy                            radiation (G = 1000W/m2), Tam is the ambient temperature (°C)
+Eb(t)                  : Battery's maximum energy capacity                    (Wankouo Ngouleu et al., 2023a).
+Egridp_s(t)
+                       : Battery's energy level at time t                     2.4.2 Modeling of wind turbines
+Input Data             : Supplied energy to the grid at time t
+                                                                              Equation (3) is utilized to determine the power output from the
+                       :Load demand, meteorological data,                     wind turbine (Alshammari & Asumadu, 2020; Kharrich et al.,
+                       components characteristics, and techno-                2021):
+                       economic parameters.
+
+2.4 Proposed system's mathematical modeling                                              0,                                   V(t)  Vci, V(t)  Vco
+
+2.4.1 PV generator modeling                                                   PWT(t) = { Pr,                                  Vr  V(t) < Vco (3)
+
+The the equation (1) the PV generator output power (Talla                                a × V(t)3 - b × Pr,                  Vci  V(t) < Vr
+Konchou et al., 2021; Islam et al., 2022; Wankouo Ngouleu et
+al., 2023) :                                                                  a and b represent two variables as outlined in equation (4):
+
+                                                                                =   ( 3  
+ () =  ×  ×  × () × [1 + ( - )] (1)                                                      - 3)
+                                                                                                                                                    (4)
+Here PPV is the PV output power in (kW), Pr represents the                                3
+estimated unit output in (kW), Npv is the quantity of PV panels,                 =  (3 - 3)
+PV is the efficiency of the PV panel, G represents the entire                 {
+irradiation in (kW/m2), Gref represents the standard solar
+irradiance in (1 kW/m2) under normal conditions (25°C), Tref is               Where PWT(t): wind turbine's generated power (kW), Pr is the
+the temperature at the standard condition (25°C),  is the                     calculated wind power (kW), Vci in (m/s) indicates the wind
+temperature coefficient of the PV cell at peak power, T is the PV             speed cutoff, Vco represents wind speed at which the wind
+cell`s temperature (°C) as shown in equation (2) (Zhang et al.,               turbine achieves its speed termination, measured in meters per
+2020; Koholé et al., 2023; Wankouo Ngouleu et al., 2023):                     second, Vr represents the estimated wind speed in meter per
+                                                                              second, V(t) in (m/s) represents speed of wind at hub height and
+                - 20                               (2)                        can be computed by utilizing equation (5) (Alshammari &
+ =  + ( 1000 ) ×                                                              Asumadu, 2020):
+
+Where NOCT refers to the standard cell's operating                            () =  ()                                                              (5)
+temperature (°C) taken as 45°C under the following conditions
+
+                           ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                                             Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+                                                                                                                                  | 496
+
+Where : represents the parameter of friction, assuming a value      battery  is equal to its nominal capacity 
+of (1/7) for exposed locations and surfaces with little roughness,  according to equation (14):
+HWT: represents wind turbine's hub height, Hr: altitude.
+                                                                     =                                                        (14)
+    The wind turbine's rated power (Pr) can be determined
+using equation (6) using wind turbine's swept area A, the           2.4.5 Electrolyzer modeling
+maximum power coefficient (Cp), which ranges between 0.25
+and 0.45% and the air density () (Kharrich et al., 2019;            The electrolyzer is used to convert electrical energy into
+Guangqian et al., 2018 ):                                           hydrogen via electrodialysis processes. Hydrogen is produced
+                                                                    by applying an electric current to water as shown in equation
+  =  1  ×  ()  ×         ×    ×  3()                (6)             (15) (C. H. Li et al., 2009):
+     2
+
+2.4.3 Inverter modeling                                                                                1  (15)
+                                                                    2 +   2 + 2 2
+According to (Mumtaz et al., 2021) the inverter power can be
+expressed in equation (7) :                                         The produced hydrogen is subsequently stored in specialized
+                                                                    tanks for future utilization, while the oxygen is released into the
+ ()     =   ()                                      (7)             atmosphere. In this research, excess generated energy will be
+                                                                    utilized from the proposed system to supply the electrolyzer the
+                                                                    required electrical power to operate. The rate of mass flow of
+Where PL(t) is the hourly load demand and inv is the                the produced hydrogen can be determined using equation(16)
+efficiency of the inverter. The size of inverter is given by the    (Baghaee et al., 2016):
+
+equation (8) (Singh et al., 2020; Emad et al., 2021):
+
+,          =  ,                                     (8)              2  =                                                     (16)
+                                                                           2
+
+Where Pinv,rated is the rated inverter `s power and PL,peak is the  Where Ez represents electrolyzer efficiency, HHVH2is
+peak load.                                                          hydrogen's higher heating hydrogen value, PEZ is the electrical
+                                                                    power input utilized by the electrolyzer.
+2.4.4 Battery energy storage (BES) system modeling
+                                                                    According to (Falama et al., 2023) the power consumed by the
+The proposed system has a total hourly power output of              electrolyzer  is given by equation (17):
+equation (9):
+
+() = () + ()                                        (9)
+
+Where PPV(t) and PWT(t) are the hourly outputs of PV and wind       ()  =   ()                                                (17)
+turbines, respectively.                                                       
+
+    The battery battery charges when PT(t) > Pload(t), the          The electrolyzer nominal power is given by equation (18)
+battery SOC is given by equation (10) (Anoune et al., 2018; Diaf    (Falama et al., 2023):
+
+et al., 2007):
+
+() = ( - 1)(1 - ) + (() - ())                             (10)      ,   =  { ()}                                              (18)
+                                                                                  
+
+Where  is the battery's manufacturer-provided self-discharge        With Pexcess(t) = PPV(t) + PWT(t) - PL(t) representing
+rate, and BC is the battery charging efficiency.                    proposed system's produced excess energy, inv is the inverter
+                                                                    efficiency.
+However, When PT(t) < Pload(t), at that hour the battery is
+discharging, the battery SOC is given by equation (11) (Anoune      2.4.6 Hydrogen tank modeling
+
+et al., 2018; Diaf et al., 2007):                                   With the proposed system, when the produced power from RES
+                                                                    is higher than the required load, the load is fulfilled by the
+() = ( - 1)(1 - ) - (() - ())                             (11)      combined output of PV and wind, and any excess electricity is
+                                                                    directed towards charging the battery. Otherwise, the excess
+Where  represents battery's discharging efficiency and the          electricity is utilized to generate hydrogen for the purpose of
+charge/discharge process is always between the battery's            storage in the hydrogen storage tank (HT). The hydrogen tank
+                                                                    capacity is given by the equation (19) (Mehrjerdi, 2019):
+maximum and minimum limitations, equation (12):
+
+  ()                                                (12)            () = ( - 1) +  2() -  2()                                 (19)
+
+The  is given by equation (13):                                   Where  2() hydrogen's load. The hydrogen tanks, when in
+  =  ×                                                            operation, are subject to the following constraints, equation
+
+                                                                  (20) (Mehrjerdi, 2019):
+                                                    (13)
+
+Where  is the nominal capacity, DOD represents the                  _  ()  _                                                  (20)
+
+depth of battery's discharge. The maximum permitted state of a
+
+                                      ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                                                         Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+                                                                                                                                              | 497
+
+Where CHT_min is the minimum capacity of the hydrogen tank            =  ×                                                      (26)
+and CHT_max is the maximum allowable limit.
+                                                                     Here overall : represents the overall efficiency and
+The hydrogen tank's state of charge ( SOCH2) at any time t is        Brakethermal: signifies the brake thermal efficiency of the DG.
+determined by the equation (21) (Falama et al., 2023):
+
+2 ()  =  2 ()(         -  1)  +  ()             +  ()    (21)        Equation (27) gives the yearly fuel cost (Wankouo Ngouleu et
+                                        2,           2,              al., 2023b):
+
+                                                                                                        8760
+
+                                                                      =  ×  ()                                                  (27)
+
+According to (Amara et al., 2021; H2data, n.d.), 1 kilogram of                                          =1
+hydrogen is equivalent to 33.33 kilowatt-hours (kWh), the
+hydrogen tank nominal capacity in kWh is given by the equation       The use of DG in HRES produced several greenhouse gas
+(22):                                                                emissions (GHG) such as carbon dioxide (CO2), Nitrogen oxides
+                                                                     (NOX), carbon monoxide (CO), and Sulphur dioxide (SO2)
+2, = 2_ × 2_ × 33.33                                     (22)        (Jamshidi et al., 2021).
+
+CH2_unit represents HT unit capacity, equal to 1 kg and CoefH2_tank         In this study, we calculated the yearly avoided CO2 by the
+is the HT multiplication factor.                                     proposed system instead GHG emissions given that CO2 makes
+                                                                     up the largest share of GHG emissions originating from the
+2.4.8 Fuel Cell modeling                                             electricity sector and diesel uses (Cardenas et al., 2022). To find
+                                                                     the yearly avoided CO2 by the proposed system, we deducted
+With the proposed in case of the combined energy output from         the total CO2 emission of DG. The annual total emission of CO2
+PV, wind, and the battery energy storage (BES) cannot fulfill the    by the DG is evaluate using equation (28) (Wankouo Ngouleu et
+required load demand i.e. (PPV(t) + PWT(t) + PBES(t) <               al., 2023b):
+Pload(t)), the fuel cell (FC) produces the additional power
+necessary to fulfill the energy requirement, i.e., (PFC(t) =                                                         8760  (/)  (28)
+Pload(t) - PPV(t) - PWT(t) - PBES(t)).
+                                                                     2 = 2 ×   ()
+       According to (Falama et al., 2023) the fuel cell's
+instantaneous power output is determined by the equation (23):                                                        =1
+
+                                                                     Where CO2 (assumed to 2.7 kg/L ) is the CO2 emission rate
+                                                                     measured in kg/L (Jamshidi et al., 2021).
+
+ ()  =   ()                                              (23)        2.5 Annualized cost analysis
+          
+                                                                     The annual cost of a component can be computed using the
+And the nominal power of the FC is given by the equation (24):       Capital Recovery Factor (CRF). The CRF is employed to assess
+                                                                     the current value, enhancing the economic precision
+,  =   { ()}                                             (24)        calculations. The CRF is given by the equation (29) (Baghaee et
+                                                                     al., 2016; Wankouo Ngouleu et al., 2023a):
+
+Where (Pdeficit(t) = Pload(t) - PPV(t) - PWT(t) - PBES(t))is           =       (1 + )                                           (29)
+the power produced by the FC when the RES, and BES                        (1  + ) - 1
+
+production cannot supply the required load demand,  is the
+FC efficiency.
+
+2.4.6 Diesel Generator modeling                                      Where ir is represents the interest rate (we consider 10% in this
+                                                                     study), N represents the lifespan of the systems component.
+In this proposed model, when the out power from RES, BES, and
+FC unable to supply the load requirement, i.e., (PPV(t) +                The annualized cost of the key components of the proposed
+PWT(t) + PFC(t) + PBES(t) < Pload(t)), the missing load will be      system is by the equations (37) ­ (37) (Gangopadhyay et al.,
+satisfied by the Diesel Generator (DG). When designing the           2024; Yimen et al., 2020; Yimen et al., 2020):
+proposed PV/Wind/FC/BES/DG system, the fuel consumption
+per hour and efficiency of the DG should be considered                =   [(  ) + ]                                             (30)
+(Mouachi et al., 2020). The expression of the DG fuel usage at a
+specific time (t) is computed using equation (25) (Wankouo            =   [(  ) + ]                                             (31)
+Ngouleu et al., 2023b; Ouedraogo et al., 2015):
+                                                                      =   [(  ) + ]                                             (32)
+
+() =  × _() +  × _                                       (25)         =   [( + )   + ] (33)
+
+Where FG(t) is the consumed fuel by the DG at the time t (L/h),       =   [( + )   + ]                                          (34)
+PG_rated represents DG nominal power (Kw), PG_out(t) the DG's
+output power at time t (Kw), while AG and BG denote the user-         =   [(  ) + ]                                             (35)
+defined coefficients for the curve representing fuel consumption
+                                                                      =   [( + )   + ]                                          (36)
+(Liter/kWh). In this study we considered AG=0.246L/kwh and
+
+BG =0.0845L/kwh (Hamanah et al., 2020), and the efficiency of
+
+the DG is calculated utilizing equation (26) (Mouachi et al., 2020;
+
+Azoumah et al., 2011):
+
+                                            ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                                  Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+                                                                                                                       | 498
+
+Table 2
+
+Input parameters values utilized in optimization processes
+
+Components             Rate capacity  Efficiency                      Initial cost  Maintenance cost  Life time
+
+PV                     0.330 KW       17.01%                          270 $         20$/year          20 years
+
+Wind turbine           0.5 kW         96%                             2000 $        60$/year          20 years
+
+Battery                1.35 kWh       85%                             130 $         10$/year          10 years
+
+Electrolyzer           3 kW           74%                             20000 $       1400$/kW          5 years
+
+Fuel cell              3 kW           50%                             20000 $       1400$/kW          5 years
+
+H2 tank                1 kWh          95%                             2000 $        0                 20 years
+
+Inverter               3 kW           95%                             1500 $        0                 10 years
+
+Diesel Generator       3 kW           80%                             500 $         0.10 $/hour       43800 h
+
+Fuel                   -                                    -         1$/L          -                 -
+
+Inflation rate         10%
+
+Project                -                                    -         -             -                 20 years
+
+Sources : (Wankouo Ngouleu et al., 2023a; Baruah et al., 2021; Ramesh & Saini, 2020; Alonso et al., 2023; Wankouo Ngouleu et al., 2023b)
+
+ = [(  ) +  + ]                       (37)
+
+Where CPV is the capital cost of solar modules, PVOM is the solar     Fig. 5 Criteria considered for the evaluation of the proposed
+modules' operation and maintenance, NPV represents the solar                                            system
+modules' number, CWT is the wind turbines' capital cost, WTOM
+represents the wind turbines' maintenance and operation cost,         above and their mathematical models are presented in the
+                                                                      following sections.
+NWT is the wind turbines number, CInv is the inverter capital
+cost, InvOM represents the inverter's operation and                   2.6.2 Technical criteria
+maintenance cost, Invsize is the rated inverter power, CBat is the
+battery capital cost, BatOM is the battery unit cost of operation     2.6.2.1 System Self-Consumption Index (SSCI)
+and maintenance, NBat is the number of the battery units, CFC
+is the fuel cell capital cost, FCOM represents the fuel cell cost of  The SSCI measures how much energy generated by RES is
+maintenance and operation, NFC is the fuel cell's number, CEZ is      consumed directly by the load demand rather than exported to
+the electrolyzer's capital cost , EZOM is represents electrolyser's   the grid (Ciocia et al., 2021). A higher SSCI indicates more self-
+maintenance and operation cost, NEZ is the electrolyzer number,       consumption and less grid dependence. The SSCI calculates the
+CHT is the HT's capital cost, HTOM represents HT's operation          proportion between the instantaneous load demand that
+and maintenance cost, NHT is the hydrogen storage tank                directly matches with the produced power by RES and the total
+number, DGcost is the DG capital cost per KW, DGOMcostis the          generated energy by RES at interval T (Lombardi et al., 2018;
+DG's operation and maintenance cost, and DGsize represents the        Sokolnikova et al., 2020) equation (39):
+DG's rated capacity.
+
+    The equation (38) provides the total yearly cost of the
+
+proposed system :
+
+ =  +  +  +                           (38)
+                        +  +  + 
+                        + 
+
+Table 2 presents a summary of the input parameters utilized in
+this study throughout the optimization rocedure.
+
+2.6 Evaluation of the criteria considered by the study                   =     0    {(), ()}                                              (39)
+                                                                                         0 ()
+2.6.1 Criteria of evaluation
+                                                                      2.6.2.2 System Self-Sufficiency Index (SSSI)
+    In this study, we consider four (4) main criteria (technical,
+economic, environmental, and social) and fourteen (14) sub-           The SSSI measures how much of a system's energy demand is
+criteria (Figure 5) to optimally size the proposed system that        met by its own generation rather than imported from the grid or
+maximizes the utilization of (PV/Wind/Fuel cell/battery)              other sources. A higher SSSI means higher system self-
+power output while minimizes the cost, and minimize as much           sufficiency and lower dependence on external energy sources
+as possible the use of DG. For the technical criteria, five (5) sub-  (Dufo-López et al., 2016). The SSSI calculates the proportion
+criteria have been considered: The System Self-Consumption            between the amount of load requirement which directly
+Index (SSCI), the System Self-Sufficiency Index (SSSI), the Loss      corresponds to the power produced by RES, and covers the
+of Load Probability (LOLP), the unmet load, and the energy            total load demand over the period T (Lombardi et al., 2018;
+excess. For the economic criteria, we considered the Net              Sokolnikova et al., 2020) equation (40). SSSI can be employed to
+Present cost (NPC), the Levelized Cost of Energy (LCOE), the          assess the performance and benefits of net-zero energy systems
+Levelized Cost of Hydrogen (LCOH), and the fuel cost.                 or multi-energy systems, which generate electricity entirely
+                                                                      from RES and convert it into alternative energy forms to meet
+    The environmental criteria evaluate the avoided carbon            multi-energy load (Dufo-López et al., 2016; Lombardi et al.,
+dioxide (CO2) and the renewable energy fraction. The new job
+creation opportunity, the Human Development Index (HDI)
+improvement, and the social acceptance have been considered
+as social criteria. The details of all the sub-criteria mentioned
+
+                       ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                                                     Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+                                                                                                                                          | 499
+
+2018). SSSI can also forecast energy security and greenhouse           Table 4
+gas emission reductions (Lombardi et al., 2018).
+                                                                       Job creation factor of the various components
+
+                                                                       Components                              Job Creation Factor
+
+         0  {(), ()}                                                   Battery                                 0.01 job/MWh
+                0 ()
+     =                                                           (40)  Electrolyzer/Hydrogen tank/Fuel         0.5 job/MWe
+
+                                                                       cell
+
+                                                                       PV generator                            2.70 jobs/MW
+
+2.6.2.3 Loss of Load Probability (LOLP)                                Wind                                    1.10 jobs/MW
+
+The LOLP calculates the duration during which RES fail to fulfill      Sources: (BHAGWAT & OLCZAK, 2020; Hassan et al., 2022; Ram et al.,
+the load requirement at the targeted reliability level (Lombardi
+et al., 2018; Sokolnikova et al., 2020) equation (41). LOLP is one     2020; Hondo & Moriizumi, 2017)
+of the generation system reliability indices that can be utilised
+to evaluate the economic and ecological advantages of RES,                   =                                                      (45)
+energy storage system (ESS), and grid export or import (Ascend                  8=7610 ()
+Analytics, n.d.).
+                                                                       2.6.4 Environmental criteria
+     =   1   ()                100%                              (41)
+             8760                                                      2.6.4.1 Avoided carbon dioxide (CO2)
+
+2.6.2.4 Unmet load (UL)                                                Avoided CO2 refers to the quantity of CO2 emissions prevented
+                                                                       from accessing the atmosphere due to using renewable energy
+The UL is defined as the ratio of the annual non-serviced load         sources rather than fossil fuels (Alshammari & Asumadu, 2020;
+to the total annual load, as indicated in the equation (42)            EIA, n.d. ; Kabeyi & Olanrewaju, 2022), the yearly avoided CO2
+(Mandal et al., 2018; Khan et al., 2021):                              is expressed by the equation (46):
+
+                                                                       2 = ( +  + 2)  (0.001)
+                                                                                     8760
+                                                                                                                                    (46)
+  =                                                              (42)                  () 
+
+                                                                                     =1
+
+2.6.3 Economic criteria                                                Total yearly avoided CO2 in Kg (0.001 factor to convert g to Kg)
+                                                                       Where SOx, NOX, and CO2 are emission factor for the
+2.6.3.1 Net Present cost (NPC)                                         greenhouse gas respectively sulfur oxides, nitrogen oxides, and
+                                                                       carbon dioxide.
+The NPC represents the initial Total Annualized Cost (TAC)             Table 3 gives the different values of the emission factor of
+ratio by the Total CRF at the project's onset (Uwineza et al.,         greenhouse gas.
+2022; Masrur et al., 2020) equation (43):
+
+     =                                                           (43)  2.6.4.2 Renewable energy penetration (REP)
+         (, )
+                                                                       REP measures the percentage of RES in the total energy supply
+Where i_r is the yearly real rate of interest in percentage (%),       of the system as presented in equation (47). A higher REP means
+and N is the project lifespan.CRF is expressed in equation (29)        a higher share of RES and a lower dependence on fossil fuels
+(Ghenai & Bettayeb, 2019; Uwineza et al., 2022).                       (Ramli et al., 2018; Khan et al., 2021; Bukar et al., 2019). Thus, an
+                                                                       REP value close to 100% is more desirable.
+2.6.3.2 Levelized Cost of Energy (LCOE)
+                                                                        = 100  [1 - (8=78=6170610(()))]                             (47)
+The LCOE ($/kWh) is calculated by dividing the TAC by the
+total annual electrical load served (Uwineza et al., 2022; Mandal
+et al., 2018; Ajlan et al., 2017) equation (44):
+
+     =                                                           (44)  2.6.5 Social criteria
+         8=7610 ()                                                     2.6.5.1 Job creation opportunity (JCO)
+
+2.6.3.3 Levelized Cost of Hydrogen (LCOH)                              The proposed system's job creation opportunity is calculated
+                                                                       considering the job creation of each component of the
+The LCOH ($/kWh) is calculated by dividing the TAC sum by              technology that constitutes the proposed system. It is expressed
+the total yearly hydrogen load provided (Bhandari & Shah, 2021;        by the equation (48) (Dufo-López et al., 2016; Cameron & Van
+Nasser et al., 2022) equation (45):                                    Der Zwaan, 2015; Sawle et al., 2018):
+
+Table 3                                                                 =    +    +    + (                                          (48)
+
+Factor for emissions of greenhouse gases                                             +  +  + 2)  2
+
+Greenhouse             Emission factor value          Unit
+
+Gas                                                                    Where JCPV, JCWT, JCBat, and JCEZH2FC are respectively the job
+                                                                       creation factors of PV, Wind, Battery and electrolyzer/
+SOX                    0.5                            gSOx/ kWh        hydrogen/fuel cell. PPV is the maximum power of the PV, PWT is
+                                                                       the maximum power of wind turbine, EBat is the nominal
+NOX                    0.22                           gNOx/ kWh        capacity of the battery, NFC is the fuel cell number, NEZ is the
+
+CO2                    690                            gCO2/ kWh
+
+Sources: (Peng et al., 2013; Ackermann et al., 2001)
+
+                                              ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                                              Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+electrolyzer number, HTPC is the hydrogen tank power capacity,                                                                     | 500
+and the NH2 is the hydrogen tank number.
+Table 4 shows the job creation factor of the various proposed
+system's components.
+
+2.6.5.2 Human Development Index (HDI)
+
+A mentioned in the section 2.1 CHAD is one of the countries
+that has an HDI that is too low (0.398), ranking it 187th out of
+189 in the world. In this study the developed model considers
+the HDI.
+
+    We consider that the annual energy excess from RES (Table
+5), which was not taken into account when defining the load and
+that cannot be stored in the battery or utilized to produce
+hydrogen, can be utilized to launch new services, businesses or
+small workshops that can enhance the quality of life therefore
+the HDI. The HDI can be formulated as follows (Sawle et al.,
+2018; Dufo-López et al., 2016) equation (49).
+
+                                 8760        (49)
+
+ = 0.0978 [  ()                                                                                 Fig. 6 Pseudo-code for PSO
+
+                                  =1                                 The OF and the constraints of the variables under consideration
+                                                                     in this study are respectively expressed in equations (50) and
++  (                                                                 (52) (Uwineza et al., 2022; Rosenstiel et al., 2021; Ming et al.,
+                                                                     2017):
+8760                                   8760
+
+  ,   ())
+
+=1                                     =1
+
+/] - 0.0319
+
+Where Edump is the annual energy excess transferred to the           Fig. 7 Application of the PSO in the proposed system's optimal
+grid, FmaxSE is a factor utilized to calculate the maximum           design
+Edump that could be utilized by additional unexpected AC load
+demand, Fmaxload presents the factor multiplied by the yearly
+AC load demand to ensure that the surplus energy consumed
+by unexpected AC does not exceed the required load, per is
+number of persons residing is studied location. In this study we
+consider that all energy excess will be transferred to the grid for
+loads FmaxSE = 100% that do not exceed 75% of current load
+demand, Fmaxload = 0.75.
+
+2.7 Formulation of the optimization problem
+
+2.7.1 Optimization method
+
+We used the MATLAB R2023b environment to implement a
+MOPSO algorithm to design the proposed system. Originally,
+Kenedy and Eberhart developed the PSO algorithm, which was
+utilized to solve multi-objective and non-linear complex
+problems (Alshammari & Asumadu, 2020). The PSO algorithm
+is a powerful optimization technique modeled on social
+behaviors observed in animals, like the flocking of birds and
+schooling of fish, and operates on a population-based approach
+(Ma & Yuan, 2023). PSO is a popular optimization method due
+to its simple concept and ability to find quickly an optimal
+solution. It is commonly utilized in hybrid renewable energy
+system sizing (El Boujdaini et al., 2022). Figure 6 represents he
+pseudo-code of the PSO (Ma & Yuan, 2023) and Figure 7 shows
+the optimal sizing of the proposed system utilizing the PSO
+algorithm.
+
+2.7.2 Objective functions and constraints
+
+To evaluate the economic viability, the higher self-sufficiency
+and the lower dependence on external energy sources of the
+proposed system, the ASC and the SSSI, respectively, were
+chosen as objective functions (OF).
+
+                                       ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                              Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+                                                                                                                    | 501
+
+  =  {(())             = (, , , , , , )                            (50)  Table 5
+                       = (, , , , , , )                                  Optimal sizing of the proposed system
+
+Subject to:                                                                                             Optimal solutions  166
+                                                                                                                           166340
+  20%    100%                                                              Wind Turbine (KW)                               493
+                                                                           Total Wind Energy (kWh)                         820020
+{5%    100%                                                        (51)    Solar Power (KW)                                229180
+       = {, , , , , , }                                                    Total Solar Energy (kWh)                        221300
+                                                                           Battery Energy Charge (KWh)                     202
+Where SOCHT, SOCBat, Nxmin, Nx, Nxmax are respectively                     Battery Energy Discharge (KWh)                  997
+hydrogen tank and battery's state of charge, and Nx represent              Electrolyzer size (KW)                          83874
+proposed system's number of components.                                    Number of Hydrogen Tanks                        144
+                                                                           Hydrogen Energy (KWh)                           41937
+3. Results and discussion                                                  Fuel Cell size (KW)                             0
+                                                                           Fuel Cell output Energy (kWh)                   0
+This present section discusses the results of the proposed                 Total DG Energy (kWh)                           0
+system's optimal sizing (PV/Wind/Battery/FuelCell/DG)                      DG size                                         542390
+considering technical, economic, environmental, and social                 DG emissions (Kg)
+criteria.                                                                  Total Load demand (kWh)
+
+3.1 Optimal sizing results and energy management analysis                reliability of 51.14 % (average of the best system reliability and
+                                                                         reliability at the best system economic value) and an economic
+Energy management describes the control strategy developed               value of 156034$ (average of the best economic value and the
+in 2.3.2 and the optimized system's energy and power flows.              economic value at the best system reliability).
+This subsection presents and analyzes the results of the optimal
+sizing and energy management of the proposed system                             Table 5 shows the proposed system's optimal regarding
+(PV/Wind/BES/FC/DG).                                                     each component's power and energy and the total load demand.
+                                                                         From Table 5, to meet the total load demand of 542,390 KWh,
+       Figure 8 below shows the pareto front optimal solutions           we note that in terms of energy source, the load is primarily
+for the variation of system self-sufficiency Index (SSSI) against        satisfied by solar with a power of 493 KW, followed by the wind
+annualized cost of the system (ACS). SSSI is a measure of                turbine with a power of 166 KW. Regarding the contribution of
+system reliability while ACS is an economic assessment index             storage to meeting load demand, the battery is at the head with
+of the system. As outlined in the methodology details in Figures         an energy supply of 221,300 KWh, followed by hydrogen with a
+6 and 7 above, when the reproduction is done for maximum                 contribution of 83,874 kWh. As stated in point 2.3.1, one of the
+iterations and the fitness solution does not improve further, the        objectives of this research is to maximize the use of solar, wind,
+MOPSO generates the optimal pareto front solutions for the               battery, and hydrogen, respectively, and minimize the use of
+proposed sizing technique as shown in Figure 8. The trend is             diesel generators (DG) as much as possible. Thus, Table 5
+attributed to the tricky balance between the system reliability          clearly shows that the contribution of DG is zero with zero CO2
+(SSSI) and the system economics (ACS). Our study established             emissions.
+the best system reliability (SSSI) of about 56.87 % (~57%) with
+a system economic value of (ACS) of 153891$ while the best                      Figure 9 (a) and (b) represents the daily production of the
+system economic value 158177$ at a system reliability of                 solar and wind turbines, with a maximum output of 323 KW at
+45.41% (~45%). Thus, the proposed system should have a                   noon for the PV and a maximum production of 104 KW for the
+                                                                         wind turbine at 10 am. The minimum output is 32 KW at 7 am
+                                                                         for the wind turbine and zero between 1-6 am, 6 pm, and
+                                                                         midnight for the PV.
+
+Fig. 8 Plot of SSSI against ASC showing the pareto front solution        Fig. 9 Plot of daily solar power output (a) and wind power output
+                                        set                              (b) versus hours for the study area
+
+                       ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                              Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+                                                                                                                   | 502
+
+                                                                     Fig. 12 Annual hydrogen tank energy status
+
+Fig. 10 Difference between the total renewable energy generated
+power, DG and the load
+
+       The effect of solar irradiation and wind speed variations                Fig. 13 Annual electrolyzer load and Fuel cell output
+can explain the maximum and minimum outputs of solar and
+wind turbines. As shown in Figure 2, the maximum solar               figures show the annual contribution of each storage option to
+irradiance is 1017 W/m2 at noon, corresponding to the                the satisfaction of load demand.
+maximum output of PV (323 KW) in Figure 9. In the same way,
+the maximum wind speed of 4.14 m/s observed at 10 a.m. in                   The energy excess from renewable energy sources (solar
+Figure 2 corresponds to the maximum output of a wind turbine         and wind) observed in Figure 10 (between 6 a.m. and 6 p.m. for
+(104 KW) in Figure 9. We can also explain the minimum                solar) and (between 11 p.m. and 6 a.m. for wind) will be stored
+production of the solar and wind turbines in the same way: the       in the storage devices (as shown in Figures 11 and 12). As per
+minimum solar irradiance of 0 (between 1-6 a.m., 6 p.m., and         our control strategy described in 2.3.2, Case 1, this energy
+midnight) and wind speed (2.62 m/s at 7 a.m.) observed in            excess was used to charge the battery (Figure 11); otherwise,
+Figure 2 correspond to the minimum of solar PV and wind              the excess will be utilized for hydrogen production to store in
+turbines, respectively in Figure 9.                                  the hydrogen tank (Figure 12). In Case 2, if the battery is fully
+                                                                     charged, the hydrogen tank is also filled, and the output of
+       Figure 10 illustrates the disparity between the total output  renewable energy sources fulfills the load demand, then surplus
+of PV, wind, and DG and the considered load requirement for          energy is dumped. This excess energy can be used for other
+three (3) consecutive days. From Figure 10, we notice that           businesses and applications such as heating, cooling, and
+during the three (3) days, the production of PV and wind is          ventilation. In this study, the algorithm will use the amount of
+significantly higher than the load demand between 6 a.m. and 6       dumped energy to calculate the Human Development Index
+p.m. At the same time, the load demand is greater than the PV        using equation 49 (as described in 2.6.5.2).
+and wind generation every day between 6 p.m. and 10 p.m.,
+corresponding to the peak of the load demand. We also note                  The complementarity of resources of the proposed system
+that the production of the wind turbine is greater than the load     (PV/Wind/battery/FC) makes the system more reliable for
+demand during day 1 (between 11 p.m. and 6 a.m.) and day 2           energy availability on an annual or daily scale, eco-friendly, and
+(between 11 p.m. and 7 a.m.). and on day 3, the PV production        environmentally efficient. Figures 14 and 15 illustrate the
+alone is higher than the load demand between 6 a.m. and 6 p.m.       comparison over three (3) days of different combinations of
+DG production is zero during the three (3) days.                     sources. Figures 14 and 15 show that no solar power is
+                                                                     produced (between 1-6 a.m., 6 p.m., and midnight) due to the
+       Both the photovoltaic solar production (which is only         unavailability of solar irradiance, as explained in Figures 9 (a)
+available during the day) and the wind power production are          and 2. At this moment, the wind turbine is the only renewable
+irregular and do not always correspond to the peak load              energy source working to meet the load demand. When the
+demand, as observed in Figure 10. Thus, both lead to a               wind turbine's power output is insufficient, as observed in
+mismatch between production and load demand. Therefore,              Figures 14 during the peak demand hours (between 6 p.m. and
+energy storage devices are essential to supply electricity to the    10 p.m.), the energy previously stored in the battery (Figure 11)
+village at any time, whether annually or daily, for more reliable    and hydrogen tank (Figure 12) will be used to meet the deficit
+energy availability. At a given time, t, of the day, the difference  between renewable power sources and the load demand. As per
+between the total power generated from renewable energy              the developed control strategy (2.3.2), the battery is discharged
+sources and the load demand is derived from (t) =                    (Figure 11) to fulfill the load demand. At this moment, the
+(PPV(t) + PWT(t)) - Pload(t) and the storage must fulfill this       algorithm prioritizes the wind and the battery to satisfy the
+difference. In this study, we used batteries and hydrogen as         energy demand (Figure 14). In the case of the wind, the battery
+storage options. Figures 11-13 show the annual battery charge        cannot fulfill the load demand, so the fuel cell uses the stored
+/discharge, hydrogen tank energy status, and the annual              hydrogen from hydrogen tanks to fill the gap between the load
+produced hydrogen and converted into electricity. These              and the produced power (Figure 13). If the power from solar,
+                                                                     wind, fuel cells, and batteries cannot match the energy demand,
+                   Fig. 11 Annual battery input and output           the diesel generator is purchased to provide the missing load
+                                                                     demand. Due to the high fuel cost and environmental impact of
+                                                                     using a diesel generator (DG), in this study, we minimize the use
+                                                                     of DG (DG = 0) throughout the year. According to Figures 14­
+
+                       ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                              Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+                                                                                                                   | 503
+
+Fig. 14 Renewable Energy Vs Fuel cell and battery output             Fig. 16 Proposed system's yearly energy status
+
+Fig. 15 Comparison of electrolyzer and battery load Vs               Fig. 17 Annual power status of the proposed system
+Renewable Energy
+
+17 and the results of Table 5, the output power of DG is zero,       Chad who already have access to electricity and to provide
+with zero CO2 emissions. Figure 15 shows clearly that the load       access to electricity to the 98.7% of the rural population who
+requirement is fulfilled at any time by the complementarity and      have not yet access to electricity using hybrid renewable energy
+combination of battery output, fuel cell output, solar, and wind.    sources can be a hopeful alternative. Thus, the government,
+                                                                     private institutions, and stakeholders can use this study as a
+       Additionally, Figures 14 and 15 show that when solar          decision tool.
+irradiation is available between 6 a.m. and 6 p.m., the combined
+power from solar and wind turbines far exceeds the load              3.2 Technical criteria results analysis
+demand. The excess energy is used to charge the battery
+(Figure 11); otherwise, it goes through the electrolyzer to          We will analyze and evaluate the technical criteria results
+produce hydrogen (Figure 13), which is stored in hydrogen            considered during the optimal modelling of the proposed
+tanks until it reaches full charge (Figure 11). When the battery     system in this subsection. The developed strategy impacts the
+is fully charged, the hydrogen tanks are full, and the load          technical criteria because one objective function is maximizing
+demand is satisfied, the excess from renewable energy is             the System Self-Sufficiency Index (SSSI). Table 6 displays the
+dumped and recorded as "excess energy." The algorithm will           optimal results of the technical criteria. There is no load loss, as
+consider this dumped energy in this study in the calculation of      mentioned in the operational strategy, which is implemented to
+the Human Development Index.                                         ensure that the load will always be supplied (LOLP = 0 and
+                                                                     Unmet load = 0). By using the proposed operational strategy
+       The proposed system's annual energy and power output          28.39% of the produced electricity by RES can be directly
+status for each system element and their contribution to fulfilling  integrated to supply the load requirement (SSCI = 28.39%) and
+the load demand by month, the surplus energy, and DG are             51.63% of the power produced by RES is utilized to charge the
+shown in Figures 16 (energy vs months) and 17 (power vs              battery and produce green hydrogen then to convert it into
+months). Figures 16 and 17 show that solar production is             electricity to satisfy the load requirement when the RE cannot
+dominant throughout the year due to the high solar irradiation,      meet it (SSSI = 51.63%). As mentioned in section 2.6.2.2 a
+as seen in Figure 2. Wind production is low between July and         higher SSSI means higher proposed system self-sufficiency and
+November due to the low wind speed in the study area during          lower dependence on external energy sources.
+this interval (rainy season). We also note the contribution of the
+battery throughout the year, while the contribution of hydrogen      Table 6                                           28.39
+is only noted between May and November. This phenomenon              Optimal results of the technical criteria         51.14
+is explained by the management strategy that we implemented.                                                           0
+The algorithm first prioritizes solar and wind to satisfy the load                                  Technical results  0
+demand. Then, if solar and wind production cannot meet the             SSCI (%)                                        290090
+load demand, the algorithm prioritizes the battery to fill the gap.    SSSI (%)
+Finally, if solar, wind, and battery output power cannot meet the      LOLP (%)
+load demand, the algorithm calls on hydrogen to satisfy the            Unmet load
+demand. Figures 16 and 17 also show the contribution of diesel         Excess Energy (kWh)
+generation is zero throughout the year for the same reasons
+explained previously.                                                Table 7                                           2298500
+                                                                     Optimal results of the economic criteria          0.2982
+       In practice, 1.3% of Chad's rural population with access to                                                     3.8563
+electricity uses diesel generators (DG) to meet their electricity                                   Economic results   0
+demand. These DG are often inefficient and challenging to              NPC ($)
+maintain, leading to regular power outages in rural areas.             LCOE ($/kWh)
+Furthermore, there is a need to transport fuel to these locations.     LCOH ($/kg)
+Together, these problems contribute to an expensive electricity        Fuel cost ($/L)
+production system. Consequently, taking into account the
+difficulties encountered by the 1.3% of the rural population of
+
+                       ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                                                                 Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+3.3 Economic criteria results analysis                                                                                                  | 504
+
+Table 7 shows the optimal findings of the proposed system's          transitioning to renewable energy systems.
+economic criteria for the considered load demand. The
+proposed system's NPC is 2298500$, the results reveal that the       4. Conclusions
+optimal sizing gives the lowest LCOE (0.2982$/kWh) compared
+to the previous works done in Chad by HOMER Pro (0.30                In this study, we performed a techno-economic, environmental,
+/kWh=0.32$/kWh) (Hassane, Didane et al., 2022), and (0.507           and social multi-criteria hybrid system based on optimal sizing
+$/kWh) (Jahangiri et al., 2019) with different systems               of solar photovoltaics, wind turbines, batteries, fuel cells, and
+configurations. The found LCOE is 51.12% lower than the              diesel generators for rural electrification in Chad. To fulfill this
+national unit production costs of the electricity in rural areas of  purpose, we used three types of load profiles that can be
+CHAD, which is 0.61 $/kWh (Abdelhamid, 2023). These optimal          identified as a typical example of a non-electrified rural area of
+results give also low LCOH (3.8563 $/kg) compared to                 Chad, choosing the village of KOUNDOUL (11° 58 35 North,
+(Jahangiri et al., 2019).                                            15° 09 00 East) as a case study. Hourly meteorological data
+                                                                     (ambient temperature, solar irradiation, and wind speed) of the
+3.4 Environmental criteria results analysis                          study area collected from the Photovoltaic Geographical
+                                                                     Information System (PVGIS) website, as well as the techno-
+Table 8 shows the environmental criteria results, which are the      economic characteristics of components of the proposed
+avoided CO2 (Kg) and the renewable energy fraction (%). The          system, have been used for this purpose.
+annual CO2 avoided by the proposed system is 374640kg (374.
+640 tonnes), which will help Chad meet its commitments made                 The MATLAB R2023b environment has been used to
+during the 2015 Paris Agreement, which included an overall           implement and run a multi-objective Particle Swarm
+mitigation target of 19.3% compared to the reference scenario,       Optimization (MOPSO) algorithm to solve the main
+i.e., 16,372 kt CO2 eq to be avoided by 2030. The energy sector      optimization problem of the proposed system. The objective is
+is the most targeted by less polluting actions in producing and      to find the optimal sizing of the proposed system by defining the
+consuming electrical energy based on renewable energies,             installed capacities of the PV, Wind, Battery, electrolyzer,
+natural gas, and energy efficiency (Abdelhamid, 2023).               hydrogen tank, and fuel cell while minimizing the Annualized
+Currently, the national energy consumption is dominated by           System Cost (ASC) and maximizing the system self-sufficiency
+96.5% by the consumption of wood fuels (wood and charcoal),          index (SSSI), and obtaining the values of the other sub-criteria
+with disastrous consequences for the forest cover and the            representing the technical, economic, environmental, and social
+environment. The RES fraction in the proposed system is 100%,        criteria, which are decision variables for this feasibility study.
+with 17% Wind turbine fraction and 83% Solar fraction.
+Therefore, with this high percentage in RE, the proposed system             The simulation results demonstrate that the optimal sizing
+provides and improve access to cost-effective, reliable, and         of the proposed fulfills the load demand at annual and daily
+sustainable energy to the rural areas of Chad and also a solution    scales by complementarity and combination of the different
+to the consequences of climate change to which Chad is               resources. In this study, we also analyzed the simulation results
+exposed.                                                             of the technical, economic, environmental, and social criteria,
+                                                                     respectively, and the results showed significant improvement in
+3.5 Social criteria results analysis                                 social, environmental, economic, and system reliability. This
+                                                                     study could help designers, companies, investors, policymakers,
+The social criteria obtained values while optimizing the             and the government of Chad in making decisions when
+proposed system by the implemented PSO algorithm are                 implementing such a system in particular rural areas. It could
+displayed in Table 9. This study considered three social criteria:   also provide a better practical energy design tool.
+the job creation opportunity (JCO), the HDI, and social
+acceptance. This study is one of the fist studies evaluating these   Acknowledgments
+social criteria in the Chadian context. According to the results of
+the social criteria obtained from the simulation, the proposed       The authors acknowledge the Regional Scholarship for
+system will create five (5) direct jobs and improve the HDI by       Innovation Fund (RSIF) - Partnership for Skills in Applied
+17.66% (Table 9). The obtained HDI is 0.4683, and the Chad           Sciences, Engineering, and Technology (PASET) for the
+HDI is 0.398 (PNUD, 2020). Concerning the 3rd evaluation             financial support.
+criterion, which is the social acceptance, we referred to the field
+survey carried out by (Hassane, Didane et al., 2022) on              Author Contributions: Mahamat Adoum Abdoulaye:
+accessibility to renewable energies in Chad; 95% of the surveyed     Conceptualization, Methodology, Software, Validation, Formal analysis,
+individuals expressed a positive inclination towards adopting or     Investigation, Resources, Writing ­ original draft, Writing ­ review &
+                                                                     editing, Visualization. Sebastian Waita: Conceptualization,
+Table 8                                            374640            Methodology, Writing - review, Supervision. Cyrus Wekesa Wabuge:
+Optimal results of the environmental criteria      100               Conceptualization, Methodology, Writing - review, Supervision. Julius
+                                                   17                Mwakondo Mwabora: Conceptualization, Methodology, Writing -
+                            Environmental results  83                review, Supervision.
+  Avoided CO2 (Kg)
+  Renewable Energy fraction (%)                                      Funding: Funding for this research was provided by RSIF ­ PASET
+  Solar PV fraction (%)
+  Wind turbine fraction (%)                                          Conflicts of Interest: The authors declare that they have no known
+                                                                     conflict of interest interests or personal relationships that could have
+Table 9                                                              appeared to influence the work reported in this paper.
+
+Optimal results of the social criteria                               References
+
+                       Social results                                Abdelhamid, I. H. (2023). These de doctorat/Ph.D, Promotion des
+                                                                              énergies renouvelables pour réduire l'impact environnemental
+Job Creation Opportunity (JCO)          5                                     du Tchad à travers sa balance énergétique: cas du solaire et de
+                                                                              l'éolien. UNIVERSITE DE DOUALA (Laboratory of Energy,
+Human Development Index (HDI)           0.4683 (CHAD HDI =0.398)
+
+                                           ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                                                      Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+                                                                                                                                           | 505
+
+Materials, Modeling and Methods).                                            energy access and social development in sub-Saharan Africa.
+
+Ajlan, A., Tan, C. W., & Abdilahi, A. M. (2017). Assessment of               Data               in         Brief,               47,             108948.
+
+environmental and economic perspectives for renewable-based                  https://doi.org/10.1016/j.dib.2023.108948
+
+hybrid power system in Yemen. Renewable and Sustainable Energy               Ciocia, A., Amato, A., Leo, P. Di, Fichera, S., Malgaroli, G., Spertino, F.,
+
+Reviews,               75(November            2016),        559­570.         & Tzanova, S. (2021). Systems: Effect of Grid Limitation and Storage
+
+https://doi.org/10.1016/j.rser.2016.11.024                                   Installation.
+
+Al-Buraiki, A. S., & Al-Sharafi, A. (2022). Hydrogen production via using    Delano, O., Odou, T., Bhandari, R., & Adamou, R. (2020). Hybrid off-
+
+excess electric energy of an off-grid hybrid solar/wind system               grid renewable power system for sustainable rural electri fi cation
+
+based on a novel performance indicator. Energy Conversion and                in Benin. Renewable Energy, 145, 1266­1279.
+
+Management,                       254(January),             115270.          https://doi.org/10.1016/j.renene.2019.06.032
+
+https://doi.org/10.1016/j.enconman.2022.115270                               Diaf, S., Diaf, D., Belhamel, M., Haddadi, M., & Louche, A. (2007). A
+
+Albertus, P., Manser, J. S., & Litzelman, S. (2020). Long-Duration           methodology for optimal sizing of autonomous hybrid PV / wind
+
+Electricity Storage Applications, Economics, and Technologies.               system.                       35(11),                          5708­5718.
+
+Joule, 4(1), 21­32. https://doi.org/10.1016/j.joule.2019.11.009              https://doi.org/10.1016/j.enpol.2007.06.020
+
+Alshammari, N., & Asumadu, J. (2020). Optimum unit sizing of hybrid          Diop, M., Sow, S., Pabame, Z., Ndiaye, A., & Kébé, C. M. F. (2019).
+
+renewable energy system utilizing harmony search, Jaya and                   Technical, Economic and Environmental Analysis of Hybrid
+
+particle swarm optimization algorithms. Sustainable Cities and               Energy Solutions for Rural Electrification in the Republic of Chad.
+
+Society,                          60(March),                102255.          Lecture Notes of the Institute for Computer Sciences, Social-
+
+https://doi.org/10.1016/j.scs.2020.102255                                    Informatics and Telecommunications Engineering, LNICST, 296, 26­
+
+Amara, S., Toumi, S., Salah, C. Ben, & Saidi, A. S. (2021). Improvement      37. https://doi.org/10.1007/978-3-030-34863-2_3
+
+of techno-economic optimal sizing of a hybrid off-grid micro-grid            Djounga, B. A. (2023). Planning and implementation of a sustainable,
+
+system.                Energy,                233,          121166.          decentralized village electricity access program: Case study of Ourda
+
+https://doi.org/10.1016/j.energy.2021.121166                                 Community ­ Chad.
+
+Anoune, K., Bouya, M., Astito, A., & Abdellah, A. Ben. (2018). Sizing        Dufo-López, R., Cristóbal-Monreal, I. R., & Yusta, J. M. (2016).
+
+methods and optimization techniques for PV-wind based hybrid                 Optimisation of PV-wind-diesel-battery stand-alone systems to
+
+renewable energy system: A review. Renewable and Sustainable                 minimise cost and maximise human development index and job
+
+Energy                 Reviews,     93(April),              652­673.         creation.          Renewable          Energy,      94,             280­293.
+
+https://doi.org/10.1016/j.rser.2018.05.032                                   https://doi.org/10.1016/j.renene.2016.03.065
+
+Ascend Analytics. (n.d.). Loss of Load Probability: Application to Montana.  EIA, U. S. E. I. A. (n.d.). How much carbon dioxide is produced per
+
+1­7.                                                                         kilowatthour of U.S. electricity generation?
+
+Ayop, R., & Tan, C. W. (2017). A comprehensive review on photovoltaic        El Boujdaini, L., Mezrhab, A., Moussaoui, M. A., Jurado, F., & Vera, D.
+
+emulator. Renewable and Sustainable Energy Reviews, 80(January),             (2022). Sizing of a stand-alone PV­wind­battery­diesel hybrid
+
+430­452. https://doi.org/10.1016/j.rser.2017.05.217                          energy system and optimal combination using a particle swarm
+
+Aziz, A. S., Tajuddin, M. F. N., Adzman, M. R., Azmi, A., & Ramli, M. A.     optimization algorithm. Electrical Engineering, 104(5), 3339­3359.
+
+M. (2019). Optimization and sensitivity analysis of standalone               https://doi.org/10.1007/s00202-022-01529-0
+
+hybrid energy systems for rural electrification: A case study of             Emad, D., El-Hameed, M. A., & El-Fergany, A. A. (2021). Optimal
+
+Iraq.                  Renewable  Energy,             138,  775­792.         techno-economic design of hybrid PV/wind system comprising
+
+https://doi.org/10.1016/j.renene.2019.02.004                                 battery energy storage: Case study for a remote area. Energy
+
+Azoumah, Y., Yamegueu, D., Ginies, P., Coulibaly, Y., & Girard, P.           Conversion         and        Management,                249,      114847.
+
+(2011). Sustainable electricity generation for rural and peri-urban          https://doi.org/10.1016/j.enconman.2021.114847
+
+populations of sub-Saharan Africa: The "flexy-energy" concept.               Falama, R. Z., Saidi, A. S., Soulouknga, M. H., & Salah, C. Ben. (2023). A
+
+Energy                 Policy,                39(1),        131­141.         techno-economic comparative study of renewable energy
+
+https://doi.org/10.1016/j.enpol.2010.09.021                                  systems based different storage devices. Energy, 266(June 2022),
+
+Baghaee, H. R., Mirsalim, M., Gharehpetian, G. B., & Talebi, H. A. (2016).   126411. https://doi.org/10.1016/j.energy.2022.126411
+
+Reliability/cost-based multi-objective Pareto optimal design of              Fu, X. (2022). Statistical machine learning model for capacitor planning
+
+stand-alone wind/PV/FC generation microgrid system. Energy,                  considering uncertainties in photovoltaic power. Protection and
+
+115, 1022­1041. https://doi.org/10.1016/j.energy.2016.09.007                 Control        of            Modern         Power        Systems,  7(1).
+
+Bahramara, S., Moghaddam, M. P., & Haghifam, M. R. (2016). Optimal           https://doi.org/10.1186/s41601-022-00228-z
+
+planning of hybrid renewable energy systems using HOMER: A                   Gangopadhyay, A., Seshadri, A. K., & Patil, B. (2024). Wind-solar-
+
+review. Renewable and Sustainable Energy Reviews, 62, 609­620.               storage trade-offs in a decarbonizing electricity system. Applied
+
+https://doi.org/10.1016/j.rser.2016.05.039                                   Energy,                       353(PA),                             121994.
+
+BHAGWAT, S., & OLCZAK, M. (2020). Green hydrogen: bridging the               https://doi.org/10.1016/j.apenergy.2023.121994
+
+energy transition in Africa and Europe. In FSR Global (Issue                 Ghenai, C., & Bettayeb, M. (2019). Modelling and performance analysis
+
+October). https://cadmus.eui.eu/handle/1814/68677                            of a stand-alone hybrid solar PV/Fuel Cell/Diesel Generator
+
+Bhandari, R., & Shah, R. R. (2021). Hydrogen as energy carrier: Techno-      power system for university building. Energy, 171, 180­189.
+
+economic assessment of decentralized hydrogen production in                  https://doi.org/10.1016/j.energy.2019.01.019
+
+Germany.               Renewable    Energy,           177,  915­931.         Guangqian, D., Bekhrad, K., Azarikhah, P., & Maleki, A. (2018). A hybrid
+
+https://doi.org/10.1016/j.renene.2021.05.149                                 algorithm based optimization on modeling of grid independent
+
+Bocklisch, T. (2015). Hybrid energy storage systems for renewable            biodiesel-based hybrid solar/wind systems. Renewable Energy,
+
+energy applications. Energy Procedia, 73, 103­111.                           122, 551­560. https://doi.org/10.1016/j.renene.2018.02.021
+
+https://doi.org/10.1016/j.egypro.2015.07.582                                 H2data. (n.d.). http://www.h2data.de/ [Accessed on October 19, 2023]
+
+Bukar, A. L., Tan, C. W., & Lau, K. Y. (2019). Optimal sizing of an          Hamanah, W. M., Abido, M. A., & Alhems, L. M. (2020). Optimum Sizing
+
+autonomous photovoltaic/wind/battery/diesel generator                        of Hybrid PV, Wind, Battery and Diesel System Using Lightning
+
+microgrid using grasshopper optimization algorithm. Solar                    Search Algorithm. Arabian Journal for Science and Engineering,
+
+Energy,                           188(June),                685­696.         45(3), 1871­1883. https://doi.org/10.1007/s13369-019-04292-
+
+https://doi.org/10.1016/j.solener.2019.06.050                                w
+
+Cameron, L., & Van Der Zwaan, B. (2015). Employment factors for wind         Hassan, R., Das, B. K., & Hasan, M. (2022). Integrated off-grid hybrid
+
+and solar energy technologies: A literature review. Renewable and            renewable energy system optimization based on economic,
+
+Sustainable            Energy     Reviews,            45,   160­172.         environmental, and social indicators for sustainable
+
+https://doi.org/10.1016/j.rser.2015.01.001                                   development.                 Energy,               250,            123823.
+
+Cardenas, G. A. R., Khezri, R., Mahmoudi, A., & Kahourzadeh, S. (2022).      https://doi.org/10.1016/j.energy.2022.123823
+
+Optimal Planning of Remote Microgrids with Multi-Size Split-                 Hassane, A. I., Ali, A. H. M., Tahir, A. M., & Hauglustaine, J. M. (2019).
+
+Diesel Generators. Sustainability (Switzerland), 14(5).                      Simulation of a photovoltaic panels market for promoting solar
+
+https://doi.org/10.3390/su14052892                                           energy in Chad. International Journal of Renewable Energy
+
+Casati, P., Moner-Girona, M., Shehu, I. K., Szabó, S., & Nhamo, G. (2023).   Research,                            9(3),                     1472­1469.
+
+Datasets for a multidimensional analysis connecting clean                    https://doi.org/10.20508/ijrer.v9i3.9377.g7741
+
+                                              ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                                                  Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+                                                                                                                                       | 506
+
+Hassane, A. I., Didane, D. H., Tahir, A. M., & Hauglustaine, J. M. (2018).  Renewable                  Energy,           34(3),       815­826.
+
+Wind and solar assessment in the Sahelian zone of Chad.                     https://doi.org/10.1016/j.renene.2008.04.018
+
+International Journal of Integrated Engineering, 10(8), 164­174.            Li, J., Liu, P., & Li, Z. (2022). Optimal design and techno-economic
+
+https://doi.org/10.30880/ijie.2018.10.08.026                                analysis of a hybrid renewable energy system for off-grid power
+
+Hassane, A. I., Didane, D. H., Tahir, A. M., Hauglustaine, J. M.,           supply and hydrogen production: A case study of West China.
+
+Manshoor, B., Batcha, M. F. M., Tamba, J. G., & Mouangue, R.                Chemical Engineering Research and Design, 177, 604­614.
+
+M. (2022). Techno-economic feasibility of a remote PV mini-grid             https://doi.org/10.1016/j.cherd.2021.11.014
+
+electrification system for five localities in Chad. International           Lombardi, P., Arendarski, B., Suslov, K., Shamarova, N., Sokolnikova,
+
+Journal of Sustainable Engineering, 15(1), 179­193.                         P., Pantaleo, A. M., & Komarnicki, P. (2018). A Net-Zero Energy
+
+https://doi.org/10.1080/19397038.2022.2101707                               System Solution for Russian Rural Communities. E3S Web of
+
+Hassane, A. I., Didane, D. H., Tahir, A. M., Mouangue, R. M., Tamba, J.     Conferences, 69. https://doi.org/10.1051/e3sconf/20186901013
+
+G., & Hauglustaine, J. M. (2022). Comparative analysis of hybrid            Ma, J., & Yuan, X. (2023). Techno-economic optimization of hybrid solar
+
+renewable energy systems for off-grid applications in chad.                 system with energy storage for increasing the energy
+
+International Journal of Renewable Energy Development, 11(1), 49­           independence in green buildings. Journal of Energy Storage,
+
+62. https://doi.org/10.14710/ijred.2022.39012                               61(December                         2022),                106642.
+
+Hondo, H., & Moriizumi, Y. (2017). Employment creation potential of         https://doi.org/10.1016/j.est.2023.106642
+
+renewable power generation technologies: A life cycle approach.             Maklewa Agoundedemba. (2023). Energy Status in Africa: Challenges,
+
+Renewable and Sustainable Energy Reviews, 79(August 2016), 128­             Progress and Sustainable Pathways. Energies,16, 7708.
+
+136. https://doi.org/10.1016/j.rser.2017.05.039                             Mandal, S., Das, B. K., & Hoque, N. (2018). Optimum sizing of a stand-
+
+Islam, M. R., Akter, H., Howlader, H. O. R., & Senjyu, T. (2022). Optimal   alone hybrid energy system for rural electrification in
+
+Sizing and Techno-Economic Analysis of Grid-Independent                     Bangladesh. Journal of Cleaner Production, 200, 12­27.
+
+Hybrid Energy System for Sustained Rural Electrification in                 https://doi.org/10.1016/j.jclepro.2018.07.257
+
+Developing Countries: A Case Study in Bangladesh. Energies,                 Masrur, H., Howlader, H. O. R., Lotfy, M. E., Khan, K. R., Guerrero, J.
+
+15(17). https://doi.org/10.3390/en15176381                                  M., & Senjyu, T. (2020). Analysis of techno-economic-
+
+Jahangiri, M., Soulouknga, M. H., Bardei, F. K., Shamsabadi, A. A.,         environmental suitability of an isolated microgrid system located
+
+Akinlabi, E. T., Sichilalu, S. M., & Mostafaeipour, A. (2019).              in a remote island of Bangladesh. Sustainability (Switzerland),
+
+Techno-econo-environmental optimal operation of grid-wind-                  12(7). https://doi.org/10.3390/su12072880
+
+solar electricity generation with hydrogen storage system for               Mbainaissem Peurdoum Richard (Consultant National au PNUD, A. E.
+
+domestic scale, case study in Chad. International Journal of                (2014). Rapport national du tchad.
+
+Hydrogen               Energy,             44(54),        28613­28628.      Mehrjerdi, H. (2019). Off-grid solar powered charging station for electric
+
+https://doi.org/10.1016/j.ijhydene.2019.09.130                              and hydrogen vehicles including fuel cell and hydrogen storage.
+
+Jamshidi, S., Pourhossein, K., & Asadi, M. (2021). Size estimation of       International Journal of Hydrogen Energy, 44(23), 11574­11583.
+
+wind/solar hybrid renewable energy systems without detailed                 https://doi.org/10.1016/j.ijhydene.2019.03.158
+
+wind and irradiation data: A feasibility study. Energy Conversion           Mouachi, R., Jallal, M. A., Gharnati, F., & Raoufi, M. (2020). Multiobjective
+
+and                    Management,         234(January),  113905.           Sizing of an Autonomous Hybrid Microgrid Using a Multimodal
+
+https://doi.org/10.1016/j.enconman.2021.113905                              Delayed PSO Algorithm: A Case Study of a Fishing Village. 2020.
+
+Kaabeche, A., & Ibtiouen, R. (2014). Techno-economic optimization of        Mumtaz, F., Zaihar Yahaya, N., Tanzim Meraj, S., Singh, B., Kannan, R.,
+
+hybrid photovoltaic/wind/diesel/battery generation in a stand-              & Ibrahim, O. (2021). Review on non-isolated DC-DC converters
+
+alone power system. Solar Energy, 103, 171­182.                             and their control techniques for renewable energy applications.
+
+https://doi.org/10.1016/j.solener.2014.02.017                               Ain Shams Engineering Journal, 12(4), 3747­3763.
+
+Kabeyi, M. J. B., & Olanrewaju, O. A. (2022). Sustainable Energy            https://doi.org/10.1016/j.asej.2021.03.022
+
+Transition for Renewable and Low Carbon Grid Electricity                    Nasser, M., Megahed, T. F., Ookawara, S., & Hassan, H. (2022). Techno-
+
+Generation and Supply. In Frontiers in Energy Research (Vol. 9).            economic assessment of clean hydrogen production and storage
+
+Frontiers                           Media                  S.A.             using hybrid renewable energy system of PV/Wind under
+
+https://doi.org/10.3389/fenrg.2021.743114                                   different climatic conditions. Sustainable Energy Technologies and
+
+Kelly, E., Medjo Nouadje, B. A., Tonsie Djiela, R. H., Kapen, P. T.,        Assessments,                        52(PB),               102195.
+
+Tchuen, G., & Tchinda, R. (2023). Off grid                                  https://doi.org/10.1016/j.seta.2022.102195
+
+PV/Diesel/Wind/Batteries energy system options for the                      Olivetti, E. A., Ceder, G., Gaustad, G. G., & Fu, X. (2017). Lithium-Ion
+
+electrification of isolated regions of Chad. Heliyon, 9(3).                 Battery Supply Chain Considerations: Analysis of Potential
+
+https://doi.org/10.1016/j.heliyon.2023.e13906                               Bottlenecks in Critical Metals. Joule, 1(2), 229­243.
+
+Khan, F. A., Pal, N., & Saeed, S. H. (2021). Optimization and sizing of     https://doi.org/10.1016/j.joule.2017.08.019
+
+SPV/Wind hybrid renewable energy system: A techno-economic                  Ouedraogo, B. I., Kouame, S., Azoumah, Y., & Yamegueu, D. (2015).
+
+and social perspective. Energy, 233, 121114.                                Incentives for rural off grid electrification in Burkina Faso using
+
+https://doi.org/10.1016/j.energy.2021.121114                                LCOE.         Renewable             Energy,          78,  573­582.
+
+Kharrich, M., Mohammed, O. H., & Akherraz, M. (2019). Assessment of         https://doi.org/10.1016/j.renene.2015.01.044
+
+renewable energy sources in Morocco using economical                        PNUD. (2020). Élargir l'horizon des populations et de la planète: le
+
+feasibility technique. International Journal of Renewable Energy            développement humain et l'Anthropocène / Rapport sur le
+
+Research,                           9(4),                 1856­1864.        développement humain 2020. http://hdr.undp.org/en/data.
+
+https://doi.org/10.20508/ijrer.v9i4.10181.g7791                             Ram, M., Aghahosseini, A., & Breyer, C. (2020). Job creation during the
+
+Kharrich, M., Mohammed, O. H., Alshammari, N., & Akherraz, M.               global energy transition towards 100% renewable power system
+
+(2021). Multi-objective optimization and the effect of the                  by 2050. Technological Forecasting and Social Change,
+
+economic factors on the design of the microgrid hybrid system.              151(September                       2018),                119682.
+
+Sustainable Cities and Society, 65(October 2020), 102646.                   https://doi.org/10.1016/j.techfore.2019.06.008
+
+https://doi.org/10.1016/j.scs.2020.102646                                   Ramli, M. A. M., Bouchekara, H. R. E. H., & Alghamdi, A. S. (2018).
+
+Koholé, Y. W., Djiela, R. H. T., Fohagui, F. C. V., & Ghislain, T. (2023).  Optimal sizing of PV/wind/diesel hybrid microgrid system using
+
+Comparative study of thirteen numerical methods for evaluating              multi-objective self-adaptive differential evolution algorithm.
+
+Weibull parameters for solar energy generation at ten selected              Renewable                  Energy,           121,         400­411.
+
+locations in Cameroon. Cleaner Energy Systems, 4(November                   https://doi.org/10.1016/j.renene.2018.01.058
+
+2022), 100047. https://doi.org/10.1016/j.cles.2022.100047                   Sawle, Y., Gupta, S. C., & Bohre, A. K. (2018). Socio-techno-economic
+
+León Gómez, J. C., De León Aldaco, S. E., & Aguayo Alquicira, J. (2023).    design of hybrid renewable energy system using optimization
+
+A Review of Hybrid Renewable Energy Systems: Architectures,                 techniques. Renewable Energy, 119, 459­472.
+
+Battery Systems, and Optimization Techniques. Eng, 4(2), 1446­              https://doi.org/10.1016/j.renene.2017.11.058
+
+1467. https://doi.org/10.3390/eng4020084                                    Shafiullah, G. M., Masola, T., Samu, R., Elavarasan, R. M., Begum, S.,
+
+Li, C. H., Zhu, X. J., Cao, G. Y., Sui, S., & Hu, M. R. (2009). Dynamic     Subramaniam, U., Romlie, M. F., Chowdhury, M., & Arif, M. T.
+
+modeling and sizing optimization of stand-alone photovoltaic                (2021). Prospects of Hybrid Renewable Energy-Based Power
+
+power systems using hybrid energy storage technology.                       System: A Case Study, Post Analysis of Chipendeke Micro-
+
+                                           ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+M. A. Abdoulaye et al                                                                         Int. J. Renew. Energy Dev 2024, 13(3), 491-507
+
+                                                                                                                              | 507
+
+Hydro, Zimbabwe. IEEE Access, 9, 73433­73452.                            battery and fuel cell storage devices under different climatic
+
+https://doi.org/10.1109/ACCESS.2021.3078713                              conditions in Cameroon. Journal of Cleaner Production,
+
+Singh, S., Chauhan, P., Aftab, M. A., Ali, I., Suhail Hussain, S. M., &  423(September). https://doi.org/10.1016/j.jclepro.2023.138753
+
+Ustun, T. S. (2020). Cost Optimization of a Stand-Alone Hybrid           Wankouo Ngouleu, C. A., Koholé, Y. W., Fohagui, F. C. V., & Tchuen,
+
+Energy System with Fuel Cell and PV. Energies 2020, Vol. 13, Page        G. (2023b). Optimal sizing and techno-enviro-economic
+
+1295, 13(5), 1295. https://doi.org/10.3390/EN13051295                    evaluation of a hybrid photovoltaic/wind/diesel system with
+
+Sokolnikova, P., Lombardi, P., Arendarski, B., Suslov, K., Pantaleo, A.  battery and fuel cell storage devices under different climatic
+
+M., Kranhold, M., & Komarnicki, P. (2020). Net-zero multi-energy         conditions in Cameroon. Journal of Cleaner Production, 423(May).
+
+systems for Siberian rural communities: A methodology to size            https://doi.org/10.1016/j.jclepro.2023.138753
+
+thermal and electric storage units. Renewable Energy, 155, 979­          Wu, Q., Fan, Z., Zhang, J., Sun, Q., & Yang, J. (2019). Optimization
+
+989. https://doi.org/10.1016/j.renene.2020.03.011                        Design and Simulation of Microgrid in Amdjarass Town, Chad.
+
+Talla Konchou, F. A., Djeudjo Temene, H., Tchinda, R., & Njomo, D.       E3S       Web        of            Conferences,  118.
+
+(2021). Techno-economic and environmental design of an                   https://doi.org/10.1051/e3sconf/201911802015
+
+optimal hybrid energy system for a community multimedia                  Xu, Y., Pei, J., Cui, L., Liu, P., & Ma, T. (2022). The Levelized Cost of
+
+centre in Cameroon. SN Applied Sciences, 3(1), 1­12.                     Storage of Electrochemical Energy Storage Technologies in
+
+https://doi.org/10.1007/s42452-021-04151-0                               China. Frontiers in Energy Research, 10(June), 1­16.
+
+The World Bank Group. (2021). World Development Indicators |             https://doi.org/10.3389/fenrg.2022.873800
+
+DataBank. In DataBank - World Development Indicators.                    Yimen, N., Tchotang, T., Kanmogne, A., Idriss, I. A., Musa, B., Aliyu, A.,
+
+https://databank.worldbank.org/indicator/NY.GDP.MKTP.KD                  Okonkwo, E. C., Abba, S. I., Tata, D., Meva'a, L., Hamandjoda,
+
+.ZG/1ff4a498/Popular-                                                    O., & Dagbasi, M. (2020). Optimal sizing and techno-economic
+
+Indicators%0Ahttp://databank.worldbank.org/data/reports.as               analysis of hybrid renewable energy systems--a case study of a
+
+px?source=world-development-indicators                                   photovoltaic/wind/battery/diesel system in Fanisau, Northern
+
+Uwineza, L., Kim, H. G., Kleissl, J., & Kim, C. K. (2022). Technical     Nigeria.       Processes,          8(11),        1­25.
+
+Control and Optimal Dispatch Strategy for a Hybrid Energy                https://doi.org/10.3390/pr8111381
+
+System.                Energies,    15(8),             1­19.             Zhang, G., Shi, Y., Maleki, A., & A. Rosen, M. (2020). Optimal location
+
+https://doi.org/10.3390/en15082744                                       and size of a grid-independent solar/hydrogen system for rural
+
+Wang, Z., Wang, Q., Zhang, Z., & Razmjooy, N. (2021). A new              areas using an efficient heuristic approach. Renewable Energy,
+
+configuration of autonomous CHP system based on improved                 156, 1203­1214. https://doi.org/10.1016/j.renene.2020.04.010
+
+version of marine predators algorithm: A case study. International       Zhang, Y., & Yu, Y. (2022). Carbon Value Assessment of Hydrogen
+
+Transactions on Electrical Energy Systems, 31(4), 1­22.                  Energy Connected to the Power Grid. IEEE Transactions on
+
+https://doi.org/10.1002/2050-7038.12806                                  Industry  Applications,            58(2),        2803­2811.
+
+Wankouo Ngouleu, C. A., Koholé, Y. W., Fohagui, F. C. V., & Tchuen,      https://doi.org/10.1109/TIA.2021.3126691
+
+G. (2023a). Optimal sizing and techno-enviro-economic
+
+evaluation of a hybrid photovoltaic/wind/diesel system with
+
+© 2024. The Author(s). This article is an open access article distributed under the terms and conditions of the Creative Commons
+Attr)ibution-ShareAlike 4.0 (CC BY-SA) International License (http://creativecommons.org/licenses/by-sa/4.0/)
+
+                                  ISSN: 2252-4940/© 2024. The Author(s). Published by CBIORE
+Int. J. Renew. Energy Dev. 2024, 13 (3), 491-507
+                                                                                                               | 508
+
+                                                                                                   https://doi.org/10.61435/ijred.2024.60169
+                                                                          ISSN: 2252-4940/© 2024.The Author(s). Published by CBIORE
+
