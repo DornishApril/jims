@@ -66,6 +66,7 @@ C:\Users\Admin\OneDrive\Desktop\jims\parameters_extraction\prompt.txt
 ```
 
 This is the **single prompt** injected into the body of every kanban task. It contains:
+
 - Role definition
 - Extraction rules (10 strict rules)
 - Column structure (exact order)
@@ -86,50 +87,55 @@ Each agent writes its extracted data here. The orchestrator merges all results i
 ## Agent Lifecycle
 
 ### Step 1: Orient
+
 Each agent reads its kanban task, identifies which paper it was assigned (from the task title), and locates the PDF in `paper_folder`.
 
 ### Step 2: Read Prompt
+
 The agent reads `prompt.txt` to understand the exact extraction rules, column structure, and output requirements.
 
 ### Step 3: Extract
+
 The agent reads its assigned PDF and extracts all parameters according to the 10 strict rules.
 
 ### Step 4: Write Output
+
 The agent writes extracted data to `results/results.xlsx` in append mode (or creates a per-paper temp file that gets merged).
 
 ### Step 5: Complete
+
 The agent calls `kanban_complete` with a summary of what it extracted.
 
 ---
 
 ## The 24 Papers (Current Inventory)
 
-| # | Filename | Assigned Task |
-|---|----------|---------------|
-| 1 | 1-s2.0-S2352484723001609-main.pdf | T1 |
-| 2 | Techno-Economic_Analysis_of_Hybrid_Hydrogen... | T2 |
-| 3 | Article 3607.pdf | T3 |
-| 4 | Article 36.pdf | T4 |
-| 5 | Article 37.pdf | T5 |
-| 6 | Article 38.pdf | T6 |
-| 7 | Article 39.pdf | T7 |
-| 8 | 1-s2.0-S0959652622033388-main.pdf | T8 |
-| 9 | Article Text-19435-1-10-20260522.pdf | T9 |
-| 10 | mathematics-10-03708-v2.pdf | T10 |
-| 11 | 60169-194014-4-PB.pdf | T11 |
-| 12 | ok58218-189848-2-PB.pdf | T12 |
-| 13 | ayop2018.pdf | T13 |
-| 14 | han2017.pdf | T14 |
-| 15 | s41598-024-55631-3.pdf | T15 |
-| 16 | 1-s2.0-S1110016820305457-main.pdf | T16 |
-| 17 | file.pdf | T17 |
-| 18 | (1) Design simulation of hydrogen based hybrid... | T18 |
-| 19 | (10) Techno-economic and multicriteria analysis... | T19 |
-| 20 | (6) Optimizing an integrated hybrid energy system... | T20 |
-| 21 | (13) Solar, Wind, Hydrogen, and Bioenergy-Based... | T21 |
-| 22 | (15) The Best Techno-economic Aspects... | T22 |
-| 23 | (8) Hydrogen Energy Storage Based Green Power... | T23 |
-| 24 | (11) [fourth paper if present] | T24 |
+| #  | Filename                                             | Assigned Task |
+| -- | ---------------------------------------------------- | ------------- |
+| 1  | 1-s2.0-S2352484723001609-main.pdf                    | T1            |
+| 2  | Techno-Economic_Analysis_of_Hybrid_Hydrogen...       | T2            |
+| 3  | Article 3607.pdf                                     | T3            |
+| 4  | Article 36.pdf                                       | T4            |
+| 5  | Article 37.pdf                                       | T5            |
+| 6  | Article 38.pdf                                       | T6            |
+| 7  | Article 39.pdf                                       | T7            |
+| 8  | 1-s2.0-S0959652622033388-main.pdf                    | T8            |
+| 9  | Article Text-19435-1-10-20260522.pdf                 | T9            |
+| 10 | mathematics-10-03708-v2.pdf                          | T10           |
+| 11 | 60169-194014-4-PB.pdf                                | T11           |
+| 12 | ok58218-189848-2-PB.pdf                              | T12           |
+| 13 | ayop2018.pdf                                         | T13           |
+| 14 | han2017.pdf                                          | T14           |
+| 15 | s41598-024-55631-3.pdf                               | T15           |
+| 16 | 1-s2.0-S1110016820305457-main.pdf                    | T16           |
+| 17 | file.pdf                                             | T17           |
+| 18 | (1) Design simulation of hydrogen based hybrid...    | T18           |
+| 19 | (10) Techno-economic and multicriteria analysis...   | T19           |
+| 20 | (6) Optimizing an integrated hybrid energy system... | T20           |
+| 21 | (13) Solar, Wind, Hydrogen, and Bioenergy-Based...   | T21           |
+| 22 | (15) The Best Techno-economic Aspects...             | T22           |
+| 23 | (8) Hydrogen Energy Storage Based Green Power...     | T23           |
+| 24 | (11) [fourth paper if present]                       | T24           |
 
 ---
 
@@ -169,12 +175,14 @@ The `.bat` file is Windows batch syntax — it must run in `cmd.exe`, NOT in git
 Navigate to `C:\Users\Admin\OneDrive\Desktop\jims\` in File Explorer and double-click `create_kanban_swarm.bat`.
 
 **Method 2 — From cmd.exe:**
+
 ```
 cd C:\Users\Admin\OneDrive\Desktop\jims
 create_kanban_swarm.bat
 ```
 
 **Method 3 — From git-bash (calling cmd explicitly):**
+
 ```bash
 cd /c/Users/Admin/OneDrive/Desktop/jims
 cmd //c create_kanban_swarm.bat
@@ -193,41 +201,50 @@ If you're in git-bash, run the `hermes kanban create` commands directly. See the
 ## Monitoring Task Progress
 
 ### View all tasks
+
 ```bash
 hermes kanban list
 ```
 
 ### View only running tasks
+
 ```bash
 hermes kanban list --status running
 ```
 
 ### View only done tasks
+
 ```bash
 hermes kanban list --status done
 ```
 
 ### View a specific task's details (including summary)
+
 ```bash
 hermes kanban show <task_id>
 hermes kanban show <task_id> --json
 ```
 
 ### Check gateway status
+
 ```bash
 hermes gateway status
 ```
 
 ### Watch live updates (poll every 10 seconds)
+
 ```bash
 watch -n 10 "hermes kanban list"
 ```
+
 Or in a loop:
+
 ```bash
 while true; do clear; hermes kanban list; sleep 10; done
 ```
 
 ### Count tasks by status
+
 ```bash
 hermes kanban list | grep -c "running"   # how many still working
 hermes kanban list | grep -c "done"      # how many finished
@@ -242,20 +259,25 @@ hermes kanban list | grep -c "blocked"   # how many need attention
 Kanban workers use the **default profile's model**. There is no per-task `--model` flag on `hermes kanban create`.
 
 ### Check current model
+
 ```bash
 hermes config show
 ```
+
 Look for the `Model:` line — currently: `deepseek-v4-flash` via DeepSeek provider.
 
 ### Change the default model (affects all future kanban dispatches)
 
 **Interactive picker:**
+
 ```bash
 hermes model
 ```
+
 Select provider, then model. This updates `config.yaml`.
 
 **Non-interactive (set directly):**
+
 ```bash
 # Switch to a specific provider + model
 hermes config set model.provider openrouter
@@ -267,6 +289,7 @@ hermes config set model.model "V3"
 ```
 
 **Verify the change:**
+
 ```bash
 hermes config show
 ```
@@ -287,6 +310,7 @@ hermes kanban create "Param Extraction: paper.pdf" --assignee <profile-name> --b
 ```
 
 Each profile can have its own model configured. To create a profile:
+
 ```bash
 hermes profile create <name>
 hermes -p <name> model   # set model for that profile
@@ -319,13 +343,13 @@ This combines all per-paper outputs into a single `results.xlsx`.
 
 ## Troubleshooting
 
-| Problem | Solution |
-|---------|----------|
-| Task stuck in `running` | `hermes kanban reclaim <id>` to reset |
-| Task needs human input | `hermes kanban block <id> "reason"` then `hermes kanban unblock <id>` |
-| Agent wrote wrong output | Check `hermes kanban show <id>` for summary |
-| Gateway not running | `hermes gateway start` |
-| Too many concurrent agents | Reduce batch size (run .bat twice, half the tasks each) |
+| Problem                    | Solution                                                                  |
+| -------------------------- | ------------------------------------------------------------------------- |
+| Task stuck in`running`   | `hermes kanban reclaim <id>` to reset                                   |
+| Task needs human input     | `hermes kanban block <id> "reason"` then `hermes kanban unblock <id>` |
+| Agent wrote wrong output   | Check`hermes kanban show <id>` for summary                              |
+| Gateway not running        | `hermes gateway start`                                                  |
+| Too many concurrent agents | Reduce batch size (run .bat twice, half the tasks each)                   |
 
 ---
 
@@ -335,3 +359,4 @@ This combines all per-paper outputs into a single `results.xlsx`.
 - Each agent only touches its own paper — no cross-file interference
 - The `results/` directory is the only shared write target
 - If an agent fails, only that one paper is affected — re-run just that task
+
