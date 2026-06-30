@@ -1,0 +1,82 @@
+# =================================================================
+# GENERATOR CONFIGS
+# =================================================================
+parameters:
+  # --- PV & Inverter from Paper 1 (Sundarbans, India) ---
+  rated_PV: 0.327          # kW - rated power per PV panel (Paper 1: 327 W) [UNCHANGED]
+  eta_PV: 0.214            # fraction - PV panel efficiency (Paper 1: 21.4%) [WAS 0.15]
+  eta_INVT: 0.96           # fraction - inverter efficiency (Paper 1: 96%) [WAS 0.90]
+  c_PV: 1300               # $/kW - PV capital cost (Paper 1: 1300 $/kW) [WAS 1500]
+  c_INVT: 300              # $/kW - inverter capital cost (Paper 1: 300 $/kW) [UNCHANGED]
+  om_PV: 20                # $/kW/year - PV O&M (Paper 1: 20 $/kW/yr) [UNCHANGED]
+  om_INVT: 0               # $ - inverter O&M (Paper 1: 0) [UNCHANGED]
+  rc_PV: 0                 # $/kW - PV replacement cost (Paper 1: 0) [UNCHANGED]
+  rc_INVT: 300             # $/kW - inverter replacement cost (Paper 1: 300 $/kW) [UNCHANGED]
+  life_PV: 25              # years - PV panel lifetime (Paper 1: 25 yrs) [UNCHANGED]
+  life_INVT: 15            # years - inverter lifetime (Paper 1: 15 years) [UNCHANGED]
+
+  # --- Wind Turbine from Paper 10 (Jaman et al., Bangladesh) ---
+  v_cut_in: 1.8            # m/s - cut-in wind speed (Paper 10: 1.8 m/s) [WAS 2.75]
+  v_rated: 12.0            # m/s - rated wind speed (Paper 10: 12 m/s) [WAS 9.0]
+  rated_power: 5.0         # kW - wind turbine rated power (Paper 10: 5 kW) [WAS 25.0]
+  c_WT: 420                # $/kW - wind turbine capital cost (Paper 10: 420 $/kW) [WAS 3000]
+  om_WT: 50                # $/kW/year - wind turbine O&M [NOTE: Paper 10 reports 0.011 $/kWh (variable O&M), not directly comparable to fixed $/kW/year. Kept original 50.]
+  rc_WT: 0                 # $/kW - wind turbine replacement cost (Paper 10: 0) [WAS 1750]
+  life_WT: 20              # years - wind turbine lifetime (Paper 10: 20 years) [UNCHANGED]
+
+  # --- Diesel Generator from Paper 9 (Chad case study) ---
+  Cap_DG: 3                # kW - rated power per diesel generator unit (Paper 9: 3 kW) [WAS 50]
+  f_0: 0.246               # litre/kW/h - diesel curve intercept coefficient (Paper 9: 0.246) [WAS 0.246, UNCHANGED]
+  f_1: 0.0845              # litre/kWh - diesel curve slope coefficient (Paper 9: 0.0845) [WAS 0.08145]
+  c_DG_cap: 500            # $/kW - diesel generator capital cost (Paper 9: 500 $) [WAS 400]
+  c_DG_FUEL: 1.0           # $/litre - diesel fuel cost (Paper 9: 1 $/L) [WAS 0.82]
+  om_DG: 0.10              # $/h - diesel generator O&M per operating hour (Paper 9: 0.10 $/hour) [WAS 0.03]
+  rc_DG: 500               # $/kW - diesel generator replacement cost [NOT in Paper 9; kept original 500]
+  e_DG: 2.6391             # kg CO2/litre - diesel generator emissions [Paper 9 NOTES mention 2.68 kg CO2/L but e_DG column not populated; kept original 2.6391]
+  life_DG: 5               # years - diesel generator lifetime (Paper 9: 43800 h = 5 years) [WAS 15]
+  P_DG_min: 0.3            # fraction - minimum diesel generator load ratio [NOT in Paper 9; UNCHANGED]
+
+  # --- Electrolyzer, H2 Storage, Fuel Cell from Paper 13 (Dandelion Optimizer, Morocco) ---
+  Cap_H2: 1                # kg - capacity of 1 H2 storage unit (Paper 13: 74.93 Kg) [WAS 6]
+  Cap_FC: 1                # kW - rated power per fuel cell unit (Paper 13: 20.22 kW) [WAS 2]
+  Cap_EL: 1                # kW - rated power per electrolyzer unit (Paper 13: 18.85 kW) [WAS 2]
+  eta_FC: 0.60             # fraction - fuel cell efficiency (Paper 13: 60%) [WAS 0.50]
+  eta_EL: 0.75             # fraction - electrolyzer efficiency (Paper 13: 75%) [WAS 0.70]
+  c_H2: 1300               # $/kg - hydrogen storage capital cost (Paper 13: 1300 $/Kg) [WAS 500]
+  c_FC_cap: 3000           # $/kW - fuel cell capital cost (Paper 13: 3000 $/kW) [WAS 2000]
+  c_EL_cap: 2000           # $/kW - electrolyzer capital cost (Paper 13: 2000 $/kW) [UNCHANGED]
+  om_H2: 15                # $/kg/year - hydrogen storage O&M (Paper 13: 15 $/Kg) [WAS 10]
+  om_FC: 40                # $/kW/year - fuel cell O&M (Paper 13: 40 $/kW) [WAS 30]
+  om_EL: 20                # $/kW/year - electrolyzer O&M (Paper 13: 20 $/kW) [WAS 25]
+  rc_H2: 1200              # $/kg - hydrogen storage replacement cost (Paper 13: 1200 $/Kg) [WAS 10]
+  rc_FC: 2500              # $/kW - fuel cell replacement cost (Paper 13: 2500 $/kW) [WAS 30]
+  rc_EL: 1500              # $/kW - electrolyzer replacement cost (Paper 13: 1500 $/kW) [WAS 25]
+  life_H2: 20              # years - hydrogen storage lifetime (Paper 13: 20 years) [UNCHANGED]
+  life_FC: 5               # years - fuel cell lifetime (Paper 13: 5 years) [WAS 10]
+  life_EL: 20              # years - electrolyzer lifetime (Paper 13: 20 years) [WAS 15]
+
+  # =================================================================
+  # PARAMETERS NOT FOUND IN THE 4 PAPERS (kept original values)
+  # =================================================================
+  H_min_percentage: 0      # fraction - minimum H2 storage level [NOT reported]
+  H_max_percentage: 0      # fraction - maximum H2 storage level override [NOT reported]
+  c_FC: 0                  # $/kWh - fuel cell operating cost per kWh produced [NOT reported]
+  c_DG: 0                  # $/kWh - diesel operating cost per kWh produced [NOT reported]
+  c_EL: 0                  # $/kWh - electrolyzer operating cost per kWh consumed [NOT reported]
+  e_FC: 0.0                # kg CO2/kWh - fuel cell emissions (green H2 = 0) [UNCHANGED]
+  e_EL: 0.0                # kg CO2/kWh - electrolyzer direct emissions [UNCHANGED]
+  T_life: 20               # years - project lifetime [UNCHANGED]
+  r: 0.05                  # fraction - annual discount rate (5%) [UNCHANGED]
+  p_grid: 0.08             # $/kWh - grid energy selling price [UNCHANGED]
+  A_PV: 6.67               # m²/kW - PV area per kW capacity [UNCHANGED]
+  H2_LHV: 39.72            # kWh/kg - hydrogen lower heating value [Paper 13 reports HHV=39.72, not LHV]
+
+  output_simulation: True
+
+config:
+  N_PV: 2769                # number of PV panels
+  N_WT: 576                 # number of wind turbines
+  N_H2: 2                  # number of H2 storage units
+  N_FC: 5                  # number of fuel cell units
+  N_EL: 7                  # number of electrolyzer units
+  N_DG: 19                  # number of diesel generator units
