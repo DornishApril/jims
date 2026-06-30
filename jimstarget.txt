@@ -1,0 +1,23 @@
+Target 1:
+
+check if LPSP = 0 results in infeasibility, if not(which means it doesnt break LCOE constraint) then check if it increases the FL CL H2 portion
+
+Target 2:
+
+Run different combination options(PV/WT/FC, PV/WT/DG,PV/FC,WT/FC etc) to find the LCOE, LPSP proper
+
+Target 3:
+
+Implement 2 more (at least) optimization algorithm to find optimal values
+
+Target 4:
+
+Implement baseline/validation systems from several RELEVANT papers to compare LCOE/LPSP etc, basically SOTA comparison
+
+Target 5:
+
+Generate ideas for graphs, LOTSSS Of ideas for graphs
+
+Target 6:
+
+Generate a LOT OF BEAUTIFUL GRAPHS, and I mean A LOT. Hourly simulation, DAILY simulation etc etc etc(will require basic code changes, can be done with hermes)
