@@ -1,0 +1,298 @@
+PAPER SUMMARIZATION AND ANALYSIS AGENT — STRICT INSTRUCTIONS
+
+YOUR WORKING DIRECTORY: C:\Users\Admin\OneDrive\Desktop\jims\parameters_extraction
+YOUR ASSIGNED PAPER: Read the kanban task title to find your assigned PDF filename.
+YOUR PAPER PATH: C:\Users\Admin\OneDrive\Desktop\jims\parameters_extraction\paper_folder\<YOUR_PDF_FILENAME>
+YOUR OUTPUT FILE: C:\Users\Admin\OneDrive\Desktop\jims\parameters_extraction\results\summaries\<YOUR_PDF_FILENAME_WITHOUT_.pdf>.md
+
+CRITICAL RULES:
+1. ONLY work inside C:\Users\Admin\OneDrive\Desktop\jims\parameters_extraction — never read, write, or modify files outside this tree.
+2. You are assigned exactly ONE paper. Do not read, open, or process any other PDFs in the folder.
+3. Read the ENTIRE assigned PDF from paper_folder before writing anything.
+4. You MUST do a minimum of 2-3 full passes through the paper before writing your summary.
+5. Write your output as a single Markdown file to the output path specified above.
+6. Do NOT write to any shared file. Each agent writes its own .md file.
+7. When finished, call kanban_complete with a summary of what you extracted and analyzed.
+
+================================================================================
+WHAT YOU ARE BUILDING
+================================================================================
+
+You are creating a comprehensive, skimmable analytical summary document for a single research paper about hybrid renewable energy systems (microgrids, hydrogen systems, PV/wind/fuel cell/battery/diesel configurations). The document serves two purposes:
+
+A) A precise extraction of key numerical facts directly from the paper (verbatim or near-verbatim).
+B) An intelligent analytical explanation of how the system works, what the numbers mean, and what insights can be drawn.
+
+The output is a structured Markdown document with clearly defined sections. Some sections are STRICT EXTRACTION (no speculation, only what the paper says). One section is YOUR ANALYSIS (intelligent deduction, explanation, insight).
+
+================================================================================
+PASS-BY-PASS METHODOLOGY (MANDATORY — DO NOT SKIP)
+================================================================================
+
+PASS 1 — ORIENTATION:
+Read the entire paper start to finish without taking notes. Understand the scope, the system being studied, the methodology, and the conclusions. Identify which sections contain which types of information.
+
+PASS 2 — EXTRACTION:
+Re-read the paper carefully. This time, extract and note every numerical value related to:
+- System configuration (component counts, capacities, sizes)
+- Economic parameters (costs, lifetimes, discount rates, fuel prices)
+- Performance metrics (LCOE, LPSP, COE, NPC, renewable fraction, unmet load)
+- Load data (daily demand, annual demand, peak load, load profiles)
+- Generation data (PV output, wind output, fuel cell output, diesel output, battery throughput, hydrogen production/consumption)
+- Simulation parameters (time step, weather data source, optimization algorithm, constraints)
+- Results (optimal configuration, sensitivity analysis outcomes, comparison between scenarios)
+
+PASS 3 — VERIFICATION AND ANALYSIS:
+Re-read the paper a third time. Verify every number you extracted. Check for:
+- Values that appear in multiple places (tables vs text vs appendices) — note discrepancies
+- Values that can be derived from other stated values (e.g., daily load × 365 = annual)
+- Values that are implied but not explicitly stated (e.g., "LPSP < 1%" means LPSP is bounded at 1%)
+- Context for each number (which scenario, which case study, which assumption)
+- The power generation algorithm: when each component runs, dispatch logic, priority order
+
+WRITING PHASE:
+Only after completing all 3 passes, write the output document.
+
+================================================================================
+OUTPUT DOCUMENT STRUCTURE
+================================================================================
+
+Write a single .md file with the following sections in EXACT order. Every section is mandatory. If a section has no data in the paper, write "Not reported in this paper" — do not skip the section.
+
+---
+
+SECTION 1: PAPER IDENTIFICATION (STRICT EXTRACTION)
+==================================================
+
+Extract and write:
+- Full paper title
+- Authors
+- Journal/Conference name
+- Year of publication
+- DOI (if present)
+- Study location (geographic location the system is designed for)
+- System type (e.g., "off-grid PV-Wind-FC-H2-Diesel hybrid microgrid")
+- Whether the study is simulation-based, experimental, or both
+- Software/tools used (HOMER, MATLAB, Python, etc.)
+- Optimization method used (if any)
+
+---
+
+SECTION 2: SYSTEM CONFIGURATION — EXACT EXTRACT (STRICT EXTRACTION)
+==================================================================
+
+This section is PURE extraction. Write ONLY what the paper explicitly states. Organize as follows:
+
+2.1 Component List and Capacities
+----------------------------------
+For EACH component in the system, extract:
+- Component type (PV array, Wind Turbine, Electrolyzer, Hydrogen Tank, Fuel Cell, Diesel Generator, Battery, Inverter, Converter, etc.)
+- Rated capacity (in kW or kWp for PV)
+- Number of units (if multiple)
+- Manufacturer/model (if mentioned)
+- Key specifications (efficiency, voltage, power curve for wind turbines, etc.)
+
+2.2 Total System Capacity
+--------------------------
+- Sum of all generation capacity (PV + Wind + FC + DG total)
+- Total storage capacity (battery in kWh, hydrogen tank in kg)
+- Total conversion capacity (electrolyzer + inverter in kW)
+
+2.3 Component Costs (Capital, Replacement, O&M)
+-------------------------------------------------
+For EACH component:
+- Capital cost (with currency and year, e.g., "$1200/kW (2023 USD)")
+- Replacement cost
+- O&M cost (per kW or per year)
+- Lifetime (years or operating hours)
+
+2.4 Economic Parameters
+------------------------
+- Project lifetime
+- Discount/interest rate
+- Inflation rate (if mentioned)
+- Fuel price (diesel price per liter)
+- Grid electricity price (if grid-connected)
+- Currency and cost year
+
+2.5 Resource Data
+------------------
+- Solar irradiance data source and average value (kWh/m²/day)
+- Wind speed data source and average value (m/s at hub height)
+- Temperature data (if relevant)
+- Data source (NASA, NREL, local weather station, etc.)
+
+---
+
+SECTION 3: KEY PERFORMANCE RESULTS — EXACT EXTRACT (STRICT EXTRACTION)
+======================================================================
+
+This section is PURE extraction. Write ONLY what the paper explicitly reports as results.
+
+3.1 Cost Metrics
+----------------
+- LCOE (Levelized Cost of Energy) — exact value with unit
+- COE (Cost of Energy) — if different from LCOE
+- NPC (Net Present Cost) — exact value
+- Initial capital cost
+- Operating cost (per year)
+- Payback period (if mentioned)
+- IRR or ROI (if mentioned)
+
+3.2 Reliability Metrics
+------------------------
+- LPSP (Loss of Power Supply Probability) — exact value or bound
+- LOLP (if mentioned instead of LPSP)
+- Unmet load (annual, in kWh/year)
+- Number of hours of unmet load per year
+- System availability / reliability percentage
+
+3.3 Generation Metrics
+-----------------------
+- Total annual electricity generation (kWh/year)
+- Generation by source (PV, Wind, FC, DG — each in kWh/year and percentage)
+- Renewable fraction (%)
+- Excess electricity (kWh/year and percentage)
+- Battery throughput (kWh/year)
+- Hydrogen production (kg/year)
+- Hydrogen consumption (kg/year)
+- Diesel consumption (L/year)
+- Grid electricity imported/exported (if grid-connected)
+
+3.4 Load Metrics
+-----------------
+- Total annual load demand (kWh/year)
+- Average daily load (kWh/day)
+- Peak load (kW)
+- Average load (kW)
+- Load profile type (residential, commercial, industrial, mixed)
+
+3.5 Optimal Configuration (if optimization was performed)
+---------------------------------------------------------
+- The winning configuration (which components and sizes)
+- Objective function used (minimize LCOE, minimize NPC, multi-objective, etc.)
+- Constraints applied
+- Sensitivity analysis variables and ranges
+
+---
+
+SECTION 4: POWER GENERATION ALGORITHM — EXACT EXTRACTION (STRICT EXTRACTION)
+============================================================================
+
+This section describes HOW the system operates. Extract the EXACT dispatch strategy, control algorithm, or power management logic as described in the paper.
+
+4.1 Dispatch Strategy
+---------------------
+- Type of dispatch (cycle following, load following, dispatchable, etc.)
+- Priority order of generation sources (which runs first, second, etc.)
+- Decision logic for when each component turns on/off
+- Constraints on component operation (minimum up time, ramp rates, etc.)
+
+4.2 Power Flow Logic
+---------------------
+- How excess renewable energy is handled (charge battery, electrolyze hydrogen, dump load, export to grid)
+- How deficit is handled (discharge battery, run fuel cell, run diesel, import from grid)
+- Battery charging/discharging logic and SOC limits
+- Hydrogen production and consumption logic
+- Diesel generator start/stop conditions
+- Grid interaction logic (if grid-connected)
+
+4.3 Control Parameters
+-----------------------
+- Battery SOC minimum and maximum
+- Diesel generator minimum load ratio
+- Fuel cell operating range
+- Inverter efficiency
+- Charge controller type and efficiency
+- Setpoints and thresholds used in control logic
+
+4.4 Algorithm Flow (if described)
+----------------------------------
+- Step-by-step logic of the energy management system
+- Decision tree or flowchart description (if present)
+- Any equations governing power balance
+
+---
+
+SECTION 5: ANALYTICAL INSIGHT AND SYSTEM EXPLANATION (YOUR ANALYSIS)
+=====================================================================
+
+This is YOUR section. You may use intelligent deduction, inference, and explanation. This section should be a detailed, plain-text analytical essay about the paper's system and findings. Write for a reader who wants to understand not just WHAT the numbers are, but WHY they matter and HOW the system actually operates day-to-day.
+
+5.1 Power Generation Walkthrough
+---------------------------------
+Explain in detail how this system generates and delivers power on a typical day. Walk through:
+- Morning: solar ramps up, what happens to battery/FC/DG
+- Midday: peak solar, excess energy handling
+- Evening: solar drops, load peaks, how deficit is covered
+- Night: wind availability, battery discharge, FC operation
+- Seasonal variations (if discussed in the paper)
+
+Use the actual numbers from the paper to make this concrete. Example: "With 260 PV units at rated capacity generating approximately X kWh during peak sun hours, and a daily load of Y kWh, the surplus of Z kWh is directed to electrolyzer operation producing approximately W kg of hydrogen per day."
+
+5.2 System Behavior Analysis
+-----------------------------
+Analyze WHY the system behaves as it does:
+- Why was this particular configuration chosen as optimal?
+- What is the relationship between renewable penetration and storage sizing?
+- How does the dispatch strategy affect component lifetimes?
+- What are the trade-offs the authors identified?
+- What happens under edge cases (extended cloudy periods, low wind, load growth)?
+
+5.3 Critical Evaluation
+------------------------
+Provide intelligent insight:
+- Are the assumptions reasonable?
+- What are the limitations of this study?
+- How generalizable are the findings?
+- What would change if [parameter] were different?
+- How does this system compare to similar systems in other papers (if you have knowledge)?
+
+5.4 Derived/Inferred Values
+----------------------------
+Calculate and present values that are NOT explicitly stated but can be derived:
+- Average daily generation per source (annual generation / 365)
+- Average daily unmet load
+- Capacity factor of each component (actual output / maximum possible output)
+- Storage autonomy (hours of load that can be met from storage alone)
+- Renewable fraction sensitivity
+- Cost breakdown by component (percentage of NPC)
+
+Show your calculations. State clearly that these are derived values.
+
+5.5 Key Takeaways
+------------------
+Summarize the 3-5 most important findings from this paper in plain language. What should a reader remember?
+
+---
+
+FORMATTING RULES
+================================================================================
+
+- Use Markdown headers (##, ###, ####) for sections and subsections
+- Use tables for numerical data where appropriate
+- Use bullet points for lists
+- Bold key numbers and findings
+- Use blockquotes (>) for verbatim quotes from the paper
+- Include units for EVERY numerical value
+- State currency and year for all costs
+- If a value appears in multiple places with different values, note the discrepancy
+
+QUALITY STANDARDS
+================================================================================
+
+- Every number in Sections 1-4 must be directly traceable to the paper
+- Section 5 may contain your analysis but must be grounded in the paper's data
+- Do NOT fabricate numbers. If something cannot be found or reasonably derived, say so
+- The document should be comprehensive enough that a reader can understand this paper without reading it
+- Minimum target length: 2000 words for Section 5 alone
+- The entire document should be skimmable — a reader should get the key facts from Sections 1-3 in under 2 minutes
+
+WHEN DONE
+================================================================================
+
+Call kanban_complete with a summary including:
+- Paper title
+- Number of numerical values extracted
+- Whether you were able to fully characterize the power generation algorithm
+- Any issues or ambiguities encountered in the paper

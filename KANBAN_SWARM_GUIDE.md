@@ -281,7 +281,7 @@ hermes kanban show <task_id> --json
 **Live auto-refresh (every 10 seconds):**
 
 ```bash
-while true; do clear; hermes kanban list; sleep 10; done
+while true; do clear; hermes kanban list; sleep 2; done
 ```
 
 Press Ctrl+C to stop.
