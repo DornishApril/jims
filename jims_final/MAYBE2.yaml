@@ -75,7 +75,7 @@ parameters:
 
 config:
   N_PV: 2821                # number of PV panels
-  N_WT: 1280                 # number of wind turbines
+  N_WT: 60                 # number of wind turbines
   N_H2: 72                  # number of H2 storage units
   N_FC: 116                  # number of fuel cell units
   N_EL: 68                  # number of electrolyzer units
