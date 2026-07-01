@@ -21,3 +21,4 @@ Generate ideas for graphs, LOTSSS Of ideas for graphs
 Target 6:
 
 Generate a LOT OF BEAUTIFUL GRAPHS, and I mean A LOT. Hourly simulation, DAILY simulation etc etc etc(will require basic code changes, can be done with hermes)
+
