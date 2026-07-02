@@ -22,3 +22,14 @@ Target 6:
 
 Generate a LOT OF BEAUTIFUL GRAPHS, and I mean A LOT. Hourly simulation, DAILY simulation etc etc etc(will require basic code changes, can be done with hermes)
 
+Target 7:
+
+Run sensitivity analysis on load vs LPSP
+
+Target 8:
+
+Make Jim work till he fucking kills himself, start with modelling EVERY SINGLE PARAMETER by collecting data from HUNDREDS 
+AND THOUSANDS Of PAPERS SO FOR EVERY KILOWATT CAPACITY OR EVERY FORM OF KILOWATT-UNIT WE WILL *INTERPOLATE* EVERY SINGLE 
+VALUE, PRACTICALLY MODELLING THE ENTIRE RENEWABLE LANDSCAPE
+
+
